@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RedNimbus.API.DTO;
 using RedNimbus.API.Model;
-using System.Security.Cryptography; 
-using System.Text;
+using RedNimbus.API.Services;
 
 namespace RedNimbus.API.Controllers
 {
@@ -18,24 +13,11 @@ namespace RedNimbus.API.Controllers
    
     public class AccountController : ControllerBase
     {
-        public static Dictionary<string, User> registratedUsers = new Dictionary<string, User>();
+        private IUserService _userService;
 
-        static string ComputeSha256Hash(string rawData)  
-        {  
-            // Create a SHA256   
-            using (SHA256 sha256Hash = SHA256.Create())  
-            {  
-                // ComputeHash - returns byte array  
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));  
-  
-                // Convert byte array to a string   
-                StringBuilder builder = new StringBuilder();  
-                for (int i = 0; i < bytes.Length; i++)  
-                {  
-                    builder.Append(bytes[i].ToString("x2"));  
-                }  
-                return builder.ToString();  
-            }  
+        public AccountController()
+        {
+            _userService = new UserService();
         }
 
         [HttpPost("[action]")]      
@@ -43,50 +25,29 @@ namespace RedNimbus.API.Controllers
         {
             HttpResponseMessage response = new HttpResponseMessage();
 
-            if (!ModelState.IsValid)
+            if(_userService.Create(user) == null)
             {
                 response.StatusCode = HttpStatusCode.UnprocessableEntity;
-                return response;
             }
-
-            if(registratedUsers.ContainsKey(user.Email))
+            else
             {
-                response.StatusCode = HttpStatusCode.Conflict;
-                return response;
+                response.StatusCode = HttpStatusCode.Created;
             }
-
-            user.Password = ComputeSha256Hash(user.Password);
-            registratedUsers.Add(user.Email, user);
-            response.StatusCode = HttpStatusCode.Created;
 
             return response;
         }
 
-        [HttpPost("login")]
+        [HttpPost("[action]")]
         public HttpResponseMessage Login(UserLoginDTO userDTO)
         {
             HttpResponseMessage response = new HttpResponseMessage();
-            if (!ModelState.IsValid)
+            if(_userService.Login(userDTO) == null)
             {
                 response.StatusCode = HttpStatusCode.UnprocessableEntity;
-                return response;
-            }
-
-            if (registratedUsers.ContainsKey(userDTO.Email))
-            {
-                var tempUser = registratedUsers[userDTO.Email];
-                if(tempUser.Password == ComputeSha256Hash(userDTO.Password))
-                {
-                    response.StatusCode = HttpStatusCode.OK;
-                }
-                else
-                {
-                    response.StatusCode = HttpStatusCode.UnprocessableEntity;
-                }
             }
             else
             {
-                response.StatusCode = HttpStatusCode.UnprocessableEntity;
+                response.StatusCode = HttpStatusCode.OK;
             }
 
             return response;
