@@ -3,7 +3,7 @@ using System.Text;
 
 namespace RedNimbus.API.Services
 {
-    public class HashServices
+    public class HashService
     {
         public static string ComputeSha256Hash(string rawData)
         {
