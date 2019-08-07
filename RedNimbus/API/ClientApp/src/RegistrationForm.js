@@ -7,7 +7,7 @@ function RegisterForm(){
                 <table>
                     <tr><td>First Name:</td>        <td><input type="text"       name="firstName"        placeholder="First Name"       required/><br></br></td></tr>
                     <tr><td>Last Name:</td>         <td><input type="text"       name="lastName"         placeholder="Last Name"        required/><br></br></td></tr>
-                    <tr><td>E-mail:</td>            <td><input type="text"       name="email"            placeholder="e-mail adress"    required/><br></br></td></tr>
+                    <tr><td>E-mail:</td>            <td><input type="email"       name="email"            placeholder="e-mail adress"    required/><br></br></td></tr>
                     <tr><td>Password:</td>          <td><input type="password"   name="password"         placeholder="Password"         required/><br></br></td></tr>
                     <tr><td>Repeat Password:</td>   <td><input type="password"   name="repeatedPassword" placeholder="Reapeat Password" required/><br></br></td></tr>
                     <tr><td>Phone Number:</td>      <td><input type="text"       name="phoneNumber"      placeholder="Phone Number"     required/><br></br></td></tr>
@@ -17,6 +17,7 @@ function RegisterForm(){
         </div>
     );
 }
+
 
 function WelcomePage(props){
     return(
