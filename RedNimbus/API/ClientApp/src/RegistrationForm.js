@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 function RegisterForm(){
     return(
@@ -22,7 +23,7 @@ function WelcomePage(props){
     return(
         <div class="welcome user">
             <h3>Hello and welcome: {props.userName} {props.userSurname} </h3>
-            <button>Sign out</button>
+            <button onClick={sendPostMethod}>Sign out</button>
         </div>
        
     );
@@ -37,6 +38,17 @@ function Messages(props){
             </div>
         );
     }       
+}
+
+function sayHelloServer(props){
+    axios.get('localhost:59746/api/test/plain').then((response) => {
+        var odgovor = response.value;
+        props.res = odgovor;
+    })
+}
+
+function sendPostMethod(){
+    axios.post('http://localhost:59746/api/test/testiraj',{one:"hello",two:"noone"}).then(function(response){console.log("response")});
 }
 
 export default RegisterForm;
