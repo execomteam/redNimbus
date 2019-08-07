@@ -10,56 +10,44 @@ namespace RedNimbus.API.Model
     public class User
     {
         private string firstName;
-        private string secondName;
-        private string username;
+        private string lastName;
         private string email;
         private string password;
 
-        public User(string fn, string sn, string un, string e, string p)
+        public User(string _firstName, string _lastName, string _email, string _password)
         {
-            firstName = fn;
-            secondName = sn;
-            username = un;
-            email = e;
-            password = p;
+            firstName = _firstName;
+            lastName = _lastName;
+            email = _email;
+            password = _password;
         }
 
         #region properties
-        [Required]
+
         public string FirstName
         {
             get { return firstName; }
             set { firstName = value; }
         }
 
-        [Required]
-        public string SecondName
+        public string LastName
         {
-            get { return secondName; }
-            set { secondName = value; }
+            get { return lastName; }
+            set { lastName = value; }
         }
 
-        [Required]
-        public string Username
-        {
-            get { return username; }
-            set { username = value; }
-        }
-
-        [Required]
         public string Email
         {
             get { return email; }
             set { email = value; }
         }
 
-        [Required]
         public string Password
         {
             get { return password; }
             set { password = value; }
         }
-        #endregion
 
+        #endregion
     }
 }
