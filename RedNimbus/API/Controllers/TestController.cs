@@ -11,11 +11,12 @@ namespace API.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        [HttpGet("[action]")]
-
+        [HttpPost("[action]")]
         public string Testiraj(string one, string two)
         {
-            return one + two;
+            string str = one + " " + two;
+            Console.WriteLine(str);
+            return str;
         }
 
         [HttpGet("[action]")]
