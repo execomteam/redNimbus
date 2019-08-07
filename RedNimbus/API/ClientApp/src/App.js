@@ -1,14 +1,18 @@
-﻿import React from 'react';
-import { Route } from 'react-router';
-import Layout from './components/Layout';
-import Home from './components/Home';
-import Counter from './components/Counter';
-import FetchData from './components/FetchData';
+import React, {useState} from 'react';
+import RegisterForm, {Messages ,WelcomePage} from './RegistrationForm';
+import LoginForm from './LoginForm';
 
-export default () => (
-  <Layout>
-    <Route exact path='/' component={Home} />
-    <Route path='/counter' component={Counter} />
-    <Route path='/fetchdata/:startDateIndex?' component={FetchData} />
-  </Layout>
-);
+
+function App(){
+  
+  return(
+    <div id="1">
+          <WelcomePage userName="Emil" userSurname="Nisner Bajin"/>
+          <Messages messages="Password empty" />
+          <LoginForm />
+          <RegisterForm/>
+    </div>
+  );
+}
+
+export default App;
