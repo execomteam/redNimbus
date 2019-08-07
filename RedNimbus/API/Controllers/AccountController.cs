@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RedNimbus.API.DTO;
 using RedNimbus.API.Model;
+using System.Security.Cryptography; 
+using System.Text;
 
 namespace RedNimbus.API.Controllers
 {
@@ -17,6 +19,24 @@ namespace RedNimbus.API.Controllers
     public class AccountController : ControllerBase
     {
         public static Dictionary<string, User> registratedUsers = new Dictionary<string, User>();
+
+        static string ComputeSha256Hash(string rawData)  
+        {  
+            // Create a SHA256   
+            using (SHA256 sha256Hash = SHA256.Create())  
+            {  
+                // ComputeHash - returns byte array  
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));  
+  
+                // Convert byte array to a string   
+                StringBuilder builder = new StringBuilder();  
+                for (int i = 0; i < bytes.Length; i++)  
+                {  
+                    builder.Append(bytes[i].ToString("x2"));  
+                }  
+                return builder.ToString();  
+            }  
+        }
 
         [HttpPost("[action]")]      
         public HttpResponseMessage Register(User user)
@@ -35,6 +55,7 @@ namespace RedNimbus.API.Controllers
                 return response;
             }
 
+            user.Password = ComputeSha256Hash(user.Password);
             registratedUsers.Add(user.Email, user);
             response.StatusCode = HttpStatusCode.Created;
 
@@ -54,7 +75,7 @@ namespace RedNimbus.API.Controllers
             if (registratedUsers.ContainsKey(userDTO.Email))
             {
                 var tempUser = registratedUsers[userDTO.Email];
-                if(tempUser.Password == userDTO.Password)
+                if(tempUser.Password == ComputeSha256Hash(userDTO.Password))
                 {
                     response.StatusCode = HttpStatusCode.OK;
                 }
