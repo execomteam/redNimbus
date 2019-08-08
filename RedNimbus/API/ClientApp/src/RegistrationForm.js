@@ -59,8 +59,8 @@ export default class RegistrationForm extends React.Component{
         
 
 
-        axios.post("http://localhost:59746/api/user/register",{firstName:firstName,lastName:lastName,email:email,password:password}).then(function(response){
-            self.props.history.push("/login");
+        axios.post("http://localhost:49307/api/user",{firstName:firstName,lastName:lastName,email:email,password:password, phoneNumber:phoneNumber}).then(function(response){
+            //self.props.history.push("/login");
         });
 
     }

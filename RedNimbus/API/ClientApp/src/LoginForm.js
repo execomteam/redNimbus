@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { BrowserRouter as Router, Route, Link, withRouter } from "react-router-dom";
 
 class LoginForm extends React.Component {
     constructor(props) {
@@ -9,6 +10,8 @@ class LoginForm extends React.Component {
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleResponse = this.handleResponse.bind(this);
+        this.handleError = this.handleError.bind(this);
     }
 
     handleEmailChange(event) {
@@ -18,13 +21,26 @@ class LoginForm extends React.Component {
     handlePasswordChange(event) {
         this.setState({ email: this.state.email, password: event.target.value });
     }
+    
+    handleResponse(resp) {
+        this.props.changeState(resp);
+        //this.props.history.push("/home");
+    }
+
+    handleError(resp) {
+        alert('Error!');
+    }
 
     handleSubmit(event) {
         const userLogin = {
             Email: this.state.email,
             Password: this.state.password
         };
-        axios.post('http://localhost:59746/api/user/login', {Email:this.state.email , Password:this.state.password}).then(response => { console.log(response) });
+    let self=this;
+        axios.post('http://localhost:49307/api/user/authenticate', { email: this.state.email, password: this.state.password }).then(
+            (response)=>{self.handleResponse(response)}, 
+            (response)=>{self.handleError(response)}
+        );
         event.preventDefault();
     }
 
