@@ -9,6 +9,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RedNimbus.API.Helper;
+using System.Text.RegularExpressions;
 
 namespace RedNimbus.API.Services
 {
@@ -27,14 +29,38 @@ namespace RedNimbus.API.Services
 
         private bool Validate(User user)
         {
+            bool isValid = true;
+
             if (String.IsNullOrWhiteSpace(user.Email)
                 || String.IsNullOrWhiteSpace(user.Password)
                 || String.IsNullOrWhiteSpace(user.FirstName)
-                || String.IsNullOrWhiteSpace(user.LastName))
+                || String.IsNullOrWhiteSpace(user.LastName)) 
             {
-                return false;
+                isValid = false;
             }
-            return true;
+
+            if(!RegexUtilities.IsValidEmail(user.Email))
+            {
+                isValid = false;
+            }
+
+            var hasNumber = new Regex(@"[0-9]+");
+            var hasUpperChar = new Regex(@"[A-Z]+");
+            var hasMiniMaxChars = new Regex(@".{8,24}");
+            var hasLowerChar = new Regex(@"[a-z]+");
+
+            if (!((hasNumber.IsMatch(user.Password)) && (hasUpperChar.IsMatch(user.Password)) && (hasMiniMaxChars.IsMatch(user.Password)) && (hasLowerChar.IsMatch(user.Password))))
+            {
+                isValid = false;
+            }
+
+            if(!(Regex.IsMatch(user.FirstName, @"^[a-zA-Z]+$") && Regex.IsMatch(user.LastName, @"^[a-zA-Z]+$")))
+            {
+                isValid = false;
+            }
+
+
+            return isValid;
         }
 
         public User Create(User user)
@@ -51,14 +77,18 @@ namespace RedNimbus.API.Services
 
         public User Authenticate(User user)
         {
-            if (registeredUsers.ContainsKey(user.Email))
+            if(!(String.IsNullOrWhiteSpace(user.Email) || String.IsNullOrWhiteSpace(user.Password)))
             {
-                var registeredUser = registeredUsers[user.Email];
-                if (registeredUser.Password == HashService.ComputeSha256Hash(user.Password))
+                if (registeredUsers.ContainsKey(user.Email))
                 {
-                    return registeredUser;
+                    var registeredUser = registeredUsers[user.Email];
+                    if (registeredUser.Password == HashService.ComputeSha256Hash(user.Password))
+                    {
+                        return registeredUser;
+                    }
                 }
             }
+            
             return null;
         }
     }

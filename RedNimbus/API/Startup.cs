@@ -1,3 +1,4 @@
+using API.Helper;
 using API.Mappings;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,15 +14,6 @@ using System.Text;
 
 namespace RedNimbus.API
 {
-    public class JwtConfiguration
-    {
-        // TODO: Create a file for this class
-
-        public string Issuer { get; set; }
-        public string Key { get; set; }
-
-    }
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
