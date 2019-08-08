@@ -15,22 +15,17 @@ namespace RedNimbus.API.Services
     public interface IUserService
     {
         User Create(User user);
-        UserDTO Login(UserLoginDTO userLoginDTO);
+        User Authenticate(User user);
     }
 
     public class UserService : IUserService
     {
         private static readonly Dictionary<string, User> registeredUsers = new Dictionary<string, User>();
-        private readonly JwtConfiguration jwtConfiguration;
+        private static int idCounter = 0;
 
-        public UserService(IOptions<JwtConfiguration> config)
-        {
-            jwtConfiguration = config.Value;
-        }
-      
-        #region registration
+        public UserService() {}
 
-        private bool CheckRegistrationData(User user)
+        private bool Validate(User user)
         {
             if (String.IsNullOrWhiteSpace(user.Email)
                 || String.IsNullOrWhiteSpace(user.Password)
@@ -44,51 +39,27 @@ namespace RedNimbus.API.Services
 
         public User Create(User user)
         {
-            if (!CheckRegistrationData(user))
-            {
+            if (!Validate(user) || registeredUsers.ContainsKey(user.Email))
                 return null;
-            }
 
-            if (registeredUsers.ContainsKey(user.Email))
-            {
-                return null;
-            }
-
+            user.Id = idCounter++;
             user.Password = HashService.ComputeSha256Hash(user.Password);
             registeredUsers.Add(user.Email, user);
-            return user;
+
+            return registeredUsers[user.Email];
         }
 
-        #endregion
-
-        #region login
-        private string GenerateJwt()
+        public User Authenticate(User user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.Key));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(jwtConfiguration.Issuer,
-              jwtConfiguration.Issuer,
-              null,
-              expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public UserDTO Login(UserLoginDTO userLoginDTO)
-        {
-            if (registeredUsers.ContainsKey(userLoginDTO.Email))
+            if (registeredUsers.ContainsKey(user.Email))
             {
-                var user = registeredUsers[userLoginDTO.Email];
-                if (user.Password == HashService.ComputeSha256Hash(userLoginDTO.Password))
+                var registeredUser = registeredUsers[user.Email];
+                if (registeredUser.Password == HashService.ComputeSha256Hash(user.Password))
                 {
-                    return new UserDTO(user.FirstName, user.LastName, user.Email, GenerateJwt());
+                    return registeredUser;
                 }
             }
             return null;
         }
-
-        #endregion
     }
 }
