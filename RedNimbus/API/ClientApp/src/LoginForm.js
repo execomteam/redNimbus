@@ -32,10 +32,12 @@ class LoginForm extends React.Component {
         return (
             <form onSubmit={this.handleSubmit}>
                 <table>
-                    <tr><td><h3>Login</h3></td></tr>
-                    <tr><td>E-mail:</td>    <td><input type="email"     value={this.state.email}    onChange={this.handleEmailChange}       placeholder = "E-mail Adress"   required/></td></tr>
-                    <tr><td>Password:</td>  <td><input type="password"  value={this.state.password} onChange={this.handlePasswordChange}    placeholder = "Password"        required /></td></tr>
-                    <tr>                    <td><input type="submit"    value="Sign In" /></td></tr>
+                    <tbody>
+                        <tr><td><h3>Login</h3></td></tr>
+                        <tr><td>E-mail:</td><td><input type="email"     value={this.state.email}    onChange={this.handleEmailChange}       placeholder = "E-mail Adress"   required/></td></tr>
+                        <tr><td>Password:</td><td><input type="password"  value={this.state.password} onChange={this.handlePasswordChange}    placeholder = "Password"        required /></td></tr>
+                        <tr><td><input type="submit"    value="Sign In"/></td></tr>
+                        </tbody>
                 </table>
             </form>
         );

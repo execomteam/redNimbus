@@ -1,5 +1,6 @@
 import React from 'react'
 import axios from 'axios';
+import {Router, Route, Link } from "react-router-dom";
 
 export default class RegistrationForm extends React.Component{
 
@@ -14,6 +15,7 @@ export default class RegistrationForm extends React.Component{
         this.handleRepeatedPasswordChange   = this.handleRepeatedPasswordChange.bind(this);
         this.handlePhoneNumberChange        = this.handlePhoneNumberChange.bind(this);
         this.handleSubmit                   = this.handleSubmit.bind(this);
+        this.render                         = this.render.bind(this);
     }
 
     handleFirstNameChange(event){
@@ -52,14 +54,22 @@ export default class RegistrationForm extends React.Component{
         let email       = this.state.email;
         let password    = this.state.password;
         let phoneNumber = this.state.phoneNumber;
+        
+        let self = this;
+        
 
-        axios.post("http://localhost:59746/api/user/register",{firstName:firstName,lastName:lastName,email:email,passord:password}).then(function(response){console.log("response")});
+
+        axios.post("http://localhost:59746/api/user/register",{firstName:firstName,lastName:lastName,email:email,password:password}).then(function(response){
+            self.props.history.push("/login");
+        });
+
     }
 
-    render(){
+    render(){       
         return(
             <form onSubmit={this.handleSubmit}>
                 <table>
+                   <tbody>
                     <tr><td><h3>Register</h3></td></tr>
                     <tr><td>First Name:</td>        <td><input type="text"       value={this.state.firstName}           onChange={this.handleFirstNameChange}           placeholder="First Name"       required/><br></br></td></tr>
                     <tr><td>Last Name:</td>         <td><input type="text"       value={this.state.lastName}            onChange={this.handleLastNameChange}            placeholder="Last Name"        required/><br></br></td></tr>
@@ -68,9 +78,11 @@ export default class RegistrationForm extends React.Component{
                     <tr><td>Repeat Password:</td>   <td><input type="password"   value={this.state.repeatedPassword}    onChange={this.handleRepeatedPasswordChange}    placeholder="Reapeat Password" required/><br></br></td></tr>
                     <tr><td>Phone Number:</td>      <td><input type="text"       value={this.state.phoneNumber}         onChange={this.handlePhoneNumberChange}         placeholder="Phone Number"     required/><br></br></td></tr>
                     <tr><td><input type="submit" value="Sign Up"/></td></tr>
+                   </tbody>
                 </table>
             </form>
         )
+        
     }
 
     
