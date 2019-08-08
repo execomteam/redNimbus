@@ -1,3 +1,6 @@
+using API.Helper;
+using API.Mappings;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,13 +14,6 @@ using System.Text;
 
 namespace RedNimbus.API
 {
-    public class JwtConfiguration
-    {
-        public string Issuer { get; set; }
-        public string Key { get; set; }
-
-    }
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -45,12 +41,23 @@ namespace RedNimbus.API
                 };
             });
 
+            // Enable CORS
             services.AddCors(c =>
             {
                 c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin()
                                                               .AllowAnyMethod()
                                                               .AllowAnyHeader());
             });
+
+            // Auto Mapper Configuration
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -60,6 +67,7 @@ namespace RedNimbus.API
                 configuration.RootPath = "ClientApp/build";
             });
 
+            // JWT Configuration
             services.Configure<JwtConfiguration>(Configuration.GetSection("Jwt"));
         }
 

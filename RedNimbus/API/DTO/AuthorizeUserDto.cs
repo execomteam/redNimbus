@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RedNimbus.API.DTO
 {
-    public class UserLoginDTO
+    public class AuthorizeUserDto
     {
         public string Email { get; set; }
 
