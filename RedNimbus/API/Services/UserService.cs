@@ -1,29 +1,22 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using RedNimbus.API.DTO;
-using RedNimbus.API.Model;
+﻿
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RedNimbus.API.Helper;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using RedNimbus.API.Model;
 using RedNimbus.API.Services.Interfaces;
+using RedNimbus.API.Helper;
 
 namespace RedNimbus.API.Services
 {
-    
-
     public class UserService : IUserService
     {
         private static readonly Dictionary<string, User> registeredUsers = new Dictionary<string, User>();
         private static int idCounter = 0;
 
         public UserService() {}
+
+        #region Validation functions
 
         private bool IsUserValid(User user)
         {
@@ -58,18 +51,20 @@ namespace RedNimbus.API.Services
 
         private bool IsPasswordValid(User user)
         {
-            var regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,24}$");
-            return regex.IsMatch(user.Password);
+            return Regex.IsMatch(user.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,24}$");
         }
 
         private bool IsNameValid(User user)
         {
-            return (Regex.IsMatch(user.FirstName, @"^[a-zA-Z]+$") && Regex.IsMatch(user.LastName, @"^[a-zA-Z]+$"));
+            return Regex.IsMatch(user.FirstName, @"^[a-z A-Z]+$") && Regex.IsMatch(user.LastName, @"^[a-zA-Z]+$");
         }
 
         private bool IsPhoneValid(User user)
-        {
-            return Regex.IsMatch(user.PhoneNumber, @"^[0-9()-]+$");
+        {   
+            if(!String.IsNullOrWhiteSpace(user.PhoneNumber))
+                return Regex.IsMatch(user.PhoneNumber, @"^[0-9()-]+$");
+
+            return true;
         }
 
         private void CapitalizeFirstLetter(User user)
@@ -77,6 +72,8 @@ namespace RedNimbus.API.Services
             user.FirstName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.FirstName.ToLower());
             user.LastName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.LastName.ToLower());
         }
+
+        # endregion
 
         public User Create(User user)
         {

@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Text;
-using API.Helper;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RedNimbus.API.DTO;
 using RedNimbus.API.Model;
 using RedNimbus.API.Services;
 using RedNimbus.API.Services.Interfaces;
+using RedNimbus.API.Helper;
 
 namespace RedNimbus.API.Controllers
 {

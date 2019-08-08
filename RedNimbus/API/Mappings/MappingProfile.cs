@@ -2,8 +2,7 @@
 using RedNimbus.API.Model;
 using RedNimbus.API.DTO;
 
-
-namespace API.Mappings
+namespace RedNimbus.API.Mappings
 {
     public class MappingProfile : Profile
     {

@@ -1,6 +1,5 @@
-using API.Helper;
-using API.Mappings;
 using AutoMapper;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,7 +9,9 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using RedNimbus.API.Mappings;
+using RedNimbus.API.Helper;
+
 
 namespace RedNimbus.API
 {
