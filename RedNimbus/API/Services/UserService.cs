@@ -11,14 +11,12 @@ using System.Text;
 using System.Threading.Tasks;
 using RedNimbus.API.Helper;
 using System.Text.RegularExpressions;
+using System.Globalization;
+using RedNimbus.API.Services.Interfaces;
 
 namespace RedNimbus.API.Services
 {
-    public interface IUserService
-    {
-        User Create(User user);
-        User Authenticate(User user);
-    }
+    
 
     public class UserService : IUserService
     {
@@ -27,49 +25,68 @@ namespace RedNimbus.API.Services
 
         public UserService() {}
 
-        private bool Validate(User user)
+        private bool IsUserValid(User user)
         {
-            bool isValid = true;
+            if(!IsEmpty(user)
+                && IsEmailValid(user)
+                && IsPasswordValid(user)
+                && IsNameValid(user)
+                && IsPhoneValid(user))
+            {
+                return true;
+            }
 
+            return false;
+        }
+
+        private bool IsEmpty(User user)
+        {
             if (String.IsNullOrWhiteSpace(user.Email)
                 || String.IsNullOrWhiteSpace(user.Password)
                 || String.IsNullOrWhiteSpace(user.FirstName)
-                || String.IsNullOrWhiteSpace(user.LastName)) 
+                || String.IsNullOrWhiteSpace(user.LastName))
             {
-                isValid = false;
+                return true;
             }
+            return false;
+        }
 
-            if(!RegexUtilities.IsValidEmail(user.Email))
-            {
-                isValid = false;
-            }
+        private bool IsEmailValid(User user)
+        {
+            return RegexUtilities.IsValidEmail(user.Email);
+        }
 
-            var hasNumber = new Regex(@"[0-9]+");
-            var hasUpperChar = new Regex(@"[A-Z]+");
-            var hasMiniMaxChars = new Regex(@".{8,24}");
-            var hasLowerChar = new Regex(@"[a-z]+");
+        private bool IsPasswordValid(User user)
+        {
+            var regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,24}$");
+            return regex.IsMatch(user.Password);
+        }
 
-            if (!((hasNumber.IsMatch(user.Password)) && (hasUpperChar.IsMatch(user.Password)) && (hasMiniMaxChars.IsMatch(user.Password)) && (hasLowerChar.IsMatch(user.Password))))
-            {
-                isValid = false;
-            }
+        private bool IsNameValid(User user)
+        {
+            return (Regex.IsMatch(user.FirstName, @"^[a-zA-Z]+$") && Regex.IsMatch(user.LastName, @"^[a-zA-Z]+$"));
+        }
 
-            if(!(Regex.IsMatch(user.FirstName, @"^[a-zA-Z]+$") && Regex.IsMatch(user.LastName, @"^[a-zA-Z]+$")))
-            {
-                isValid = false;
-            }
+        private bool IsPhoneValid(User user)
+        {
+            return Regex.IsMatch(user.PhoneNumber, @"^[0-9()-]+$");
+        }
 
-
-            return isValid;
+        private void CapitalizeFirstLetter(User user)
+        {
+            user.FirstName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.FirstName.ToLower());
+            user.LastName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.LastName.ToLower());
         }
 
         public User Create(User user)
         {
-            if (!Validate(user) || registeredUsers.ContainsKey(user.Email))
+            if (!IsUserValid(user) || registeredUsers.ContainsKey(user.Email))
                 return null;
 
             user.Id = idCounter++;
             user.Password = HashService.ComputeSha256Hash(user.Password);
+
+            CapitalizeFirstLetter(user);
             registeredUsers.Add(user.Email, user);
 
             return registeredUsers[user.Email];

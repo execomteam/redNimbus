@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using RedNimbus.API.DTO;
 using RedNimbus.API.Model;
 using RedNimbus.API.Services;
+using RedNimbus.API.Services.Interfaces;
 
 namespace RedNimbus.API.Controllers
 {
