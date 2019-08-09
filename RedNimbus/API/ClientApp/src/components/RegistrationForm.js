@@ -1,6 +1,7 @@
 import React from 'react'
 import axios from 'axios';
 import { withRouter } from "react-router-dom";
+import './css/RegistrationForm.css'
 
 class RegistrationForm extends React.Component{
 
@@ -86,55 +87,101 @@ class RegistrationForm extends React.Component{
 
     render(){       
         return(
-            <form onSubmit={this.handleSubmit}>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <h3>Register</h3>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>First Name:</td>
-                            <td><input type="text" value={this.state.firstName} onChange={this.handleFirstNameChange} placeholder="First Name" required/></td>
-                        </tr>
-                        <tr>
-                            <td>Last Name:</td>
-                            <td><input type="text"       value={this.state.lastName}            onChange={this.handleLastNameChange}            placeholder="Last Name"        required/></td>
-                        </tr>
-                        <tr>
-                            <td>E-mail:</td>
-                            <td><input type="email"      value={this.state.email}               onChange={this.handleEmailChange}               placeholder="E-mail adress"    required/></td>
-                        </tr>
-                        <tr>
-                            <td>Password:</td>
-                            <td><input type="password"   value={this.state.password}            onChange={this.handlePasswordChange}            placeholder="Password"         required/></td>
-                        </tr>
-                        <tr>
-                            <td>Repeat Password:</td>
-                            <td><input type="password"   value={this.state.repeatedPassword}    onChange={this.handleRepeatedPasswordChange}    placeholder="Reapeat Password" required/></td>
-                        </tr>
-                        <tr>
-                            <td>Phone Number:</td>
-                            <td><input type="text"       value={this.state.phoneNumber}         onChange={this.handlePhoneNumberChange}         placeholder="Phone Number"             /></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span>
-                                <input type='checkbox' name='tosCheckbox' id='tosCheckbox' checked={this.state.tosCheckbox} onChange={this.handleToSCheckboxChange} />
-                                I agree to the Terms of Service
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="button" value="Cancel" onClick={this.redirectToHome}/>
-                                <input type="submit" value="Sign Up" disabled={!this.state.tosCheckbox}/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </form>
+            <div className="global-container">
+                <div className="card register-form">
+                    <div className="card-body">
+                        <h1 className="card-title text-center">Register</h1>
+                        <div className="card-text">
+
+                            <form onSubmit={this.handleSubmit}>
+
+                                <div className="form-group">
+                                    <label htmlFor="firstName">First Name</label>
+                                    <input type="text"
+                                           className="form-control form-control-sm"
+                                           id="firstName"
+                                           value={this.state.firstName}
+                                           onChange={this.handleFirstNameChange}
+                                           placeholder="Enter First Name"
+                                           required
+                                           />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="lastName">Last Name</label>
+                                    <input type="text"
+                                           className="form-control form-control-sm"
+                                           id="lastName"
+                                           value={this.state.lastName}
+                                           onChange={this.handleLastNameChange}
+                                           placeholder="Enter Last Name"
+                                           required
+                                           />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="email">E-mail</label>
+                                    <input type="email"
+                                           className="form-control form-control-sm"
+                                           id="email"
+                                           value={this.state.email}
+                                           onChange={this.handleEmailChange}
+                                           placeholder = "Enter e-mail"
+                                           required
+                                           />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="password">Password</label>
+                                    <input type="password"
+                                           className="form-control form-control-sm"
+                                           id="password"
+                                           value={this.state.password}
+                                           onChange={this.handlePasswordChange}
+                                           placeholder = "Enter password"
+                                           required
+                                           />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="repeatedPassword">Confirm password</label>
+                                    <input type="password"
+                                           className="form-control form-control-sm"
+                                           id="repeatedPassword"
+                                           value={this.state.repeatedPassword}
+                                           onChange={this.handleRepeatedPasswordChange}
+                                           placeholder = "Confirm password"
+                                           required
+                                           />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="phoneNumber">Phone Number</label>
+                                    <input type="text"
+                                           className="form-control form-control-sm"
+                                           id="phoneNumber"
+                                           value={this.state.phoneNumber}
+                                           onChange={this.handlePhoneNumberChange}
+                                           placeholder=""
+                                           />
+                                </div>
+
+                                <div>
+                                    <span><input type='checkbox'
+                                                name='tosCheckbox'
+                                                id='tosCheckbox'
+                                                checked={this.state.tosCheckbox}
+                                                onChange={this.handleToSCheckboxChange} />I agree to the Terms of Service</span>
+                                </div>
+
+                                <button type="submit" className="btn btn-primary btn-block" value="Sign Up" disabled={!this.state.tosCheckbox}>Sign Up</button>
+                                <button className="btn btn-block" value="Cancel" onClick={this.redirectToHome}>Cancel</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
         )
         
     }  

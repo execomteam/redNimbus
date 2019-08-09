@@ -4,6 +4,7 @@ import LoginForm from './LoginForm'
 import RegistrationForm from './RegistrationForm'
 import Home from './Home'
 import SignOut from './SignOut'
+import './css/NavBar.css'
 
 class NavBar extends React.Component {
     constructor(props){
@@ -42,20 +43,18 @@ class NavBar extends React.Component {
         
         if(this.state.isLoggedIn)
             return (
+
                 <div>
                     <Router>
                         <div>
-                            <ul>
-                                <li>
-                                    <Link to="/">Home</Link>
-                                </li>
-                                <li>
-                                    <Link to="/signout">Signout</Link>
-                                </li>
-                            </ul>
+                            <nav>
+                                <ul>
+                                    <li id="home"><Link to="/">Home</Link></li>
+                                    <li id="signout"><Link to="/signout">Sign Out</Link></li>
+                                </ul>
+                            </nav>
 
-                            <hr />
-                            <Route exact path="/" render={(props) => <Home user={this.state} />} />
+                            <Route exact path="/" render={(props) => <Home user={this.state}/>} />
                             <Route path="/signout" render={(props) => <SignOut signOut={this.signOut} />} />
                         </div>
                     </Router>
@@ -66,19 +65,14 @@ class NavBar extends React.Component {
             <div>
                 <Router>
                     <div>
-                        <ul>
-                            <li>
-                                <Link to="/">Home</Link>
-                            </li>
-                            <li>
-                                <Link to="/login">Login</Link>
-                            </li>
-                            <li>
-                                <Link to="/register">Register</Link>
-                            </li>
-                        </ul>
+                        <nav>
+                            <ul>
+                                <li id="home"><Link to="/">Home</Link></li>
+                                <li id="register"><Link to="/register">Sign Up</Link></li>
+                                <li id="login"><Link to="/login">Sign In</Link></li>
 
-                        <hr />
+                            </ul>
+                        </nav>
 
                         <Route exact path="/" render={(props) => <Home user={this.state}/>} />
                         <Route path="/login" render={(props) => <LoginForm changeState={this.changeState} />} />

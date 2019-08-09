@@ -1,20 +1,28 @@
 import React from 'react'
 import { withRouter } from "react-router-dom";
+import './css/Home.css'
 
 class Home extends React.Component {
-    
 
     render(){
         if (this.props.user.isLoggedIn) {
             return (
-                <div>
-                    <h2>Welcome {this.props.user.firstName}</h2>
+                <div className="global-container">
+                    <div className="card register-form">
+                        <div className="card-body">
+                            <h1 className="card-title text-center">Welcome {this.props.user.firstName}</h1>
+                        </div>
+                    </div>
                 </div>
             )
         }
         return (
-            <div>
-                <h2>Home</h2>
+            <div className="global-container">
+                <div className="card register-form">
+                    <div className="card-body">
+                        <h1 className="card-title text-center">Home</h1>
+                    </div>
+                </div>
             </div>
         );
     }
