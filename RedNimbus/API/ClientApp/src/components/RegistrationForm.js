@@ -71,7 +71,7 @@ class RegistrationForm extends React.Component{
         
 
 
-        axios.post("http://localhost:49307/api/user",{firstName:firstName,lastName:lastName,email:email,password:password, phoneNumber:phoneNumber}).then(function(response){
+        axios.post("http://localhost:65000/api/user",{firstName:firstName,lastName:lastName,email:email,password:password, phoneNumber:phoneNumber}).then(function(response){
             self.props.history.push("/login");
         });
 

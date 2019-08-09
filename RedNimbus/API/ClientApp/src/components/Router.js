@@ -1,9 +1,9 @@
 import React from 'react'
 import { BrowserRouter as Router, Route, Link , withRouter} from "react-router-dom";
-import LoginForm from '../LoginForm'
-import RegistrationForm from '../RegistrationForm'
-import Home from '../Home'
-import SignOut from '../SignOut'
+import LoginForm from './LoginForm'
+import RegistrationForm from './RegistrationForm'
+import Home from './Home'
+import SignOut from './SignOut'
 
 class NavBar extends React.Component {
     constructor(props){
@@ -28,6 +28,7 @@ class NavBar extends React.Component {
             key: resp.data.key
         });
         localStorage.setItem('token', this.state.key);
+
     } 
 
     signOut = () => {
