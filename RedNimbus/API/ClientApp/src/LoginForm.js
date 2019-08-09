@@ -24,11 +24,10 @@ class LoginForm extends React.Component {
     
     handleResponse(resp) {
         this.props.changeState(resp);
-        //this.props.history.push("/home");
     }
 
     handleError(resp) {
-        alert('Error!');
+        alert('Error');
     }
 
     handleSubmit(event) {

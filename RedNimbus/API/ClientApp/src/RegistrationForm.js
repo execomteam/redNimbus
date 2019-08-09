@@ -1,8 +1,8 @@
 import React from 'react'
 import axios from 'axios';
-import {Router, Route, Link } from "react-router-dom";
+import { Router, Route, Link, withRouter } from "react-router-dom";
 
-export default class RegistrationForm extends React.Component{
+class RegistrationForm extends React.Component{
 
     constructor(props){
         super(props);
@@ -42,10 +42,13 @@ export default class RegistrationForm extends React.Component{
         this.setState({repeatedPassword : event.target.value});
     }
 
-    handleSubmit(event){
-        //TODO:Check user input i.e. password == repeatedPassword...etc.
-        this.SendRegisterRequest();
+    handleSubmit(event) {
         event.preventDefault();
+
+        if (this.state.password === this.state.repeatedPassword)
+            this.SendRegisterRequest();
+        else
+            alert('Passwords do not match');
     }
 
     SendRegisterRequest(){
@@ -60,7 +63,7 @@ export default class RegistrationForm extends React.Component{
 
 
         axios.post("http://localhost:49307/api/user",{firstName:firstName,lastName:lastName,email:email,password:password, phoneNumber:phoneNumber}).then(function(response){
-            //self.props.history.push("/login");
+            self.props.history.push("/login");
         });
 
     }
@@ -83,7 +86,7 @@ export default class RegistrationForm extends React.Component{
             </form>
         )
         
-    }
-
-    
+    }  
 }
+
+export default withRouter(RegistrationForm);

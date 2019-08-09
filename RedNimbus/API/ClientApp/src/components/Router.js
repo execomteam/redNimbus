@@ -26,9 +26,40 @@ export default class NavBar extends React.Component {
             key: resp.data.key
         });
         localStorage.setItem('token', this.state.key);
+        
     } 
 
-    render(){
+    signOut = () => {
+        this.setState({
+            isLoggedIn:false
+        });
+        localStorage.clear();
+    }
+
+    render() {
+        
+        if(this.state.isLoggedIn)
+            return (
+                <div>
+                    <Router>
+                        <div>
+                            <ul>
+                                <li>
+                                    <Link to="/">{this.state.firstName}</Link>
+                                </li>
+                                <li>
+                                    <Link to="/signout">Signout</Link>
+                                </li>
+                            </ul>
+
+                            <hr />
+                            <Route exact path="/" render={(props) => <Home user={this.state} />} />
+                            <Route path="/signout" render={(props) => <SignOut signOut={this.signOut} />} />
+                        </div>
+                    </Router>
+                </div>
+            );
+
         return (
             <div>
                 <Router>
@@ -57,8 +88,30 @@ export default class NavBar extends React.Component {
     }
   }
 
+class SignOut extends React.Component{
+    constructor(props) {
+        super(props);
+        this.setAnswer = this.setAnswer.bind(this);
+    }
+
+    setAnswer() {
+        this.props.signOut();
+    }
+
+    render(){
+        return (
+            <div>    
+                <h4>Are you sure that you want to sign out?</h4>
+                <button onClick={this.setAnswer}>Yes</button>
+            </div>
+        )
+
+    }
+
+
+}
+
 function Home(props) {
-    console.log(props);
     if (props.user.isLoggedIn) {
         return (
             <div>
