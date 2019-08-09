@@ -56,7 +56,7 @@ namespace RedNimbus.API.Services
 
         private bool IsNameValid(User user)
         {
-            return Regex.IsMatch(user.FirstName, @"^[a-z A-Z]+$") && Regex.IsMatch(user.LastName, @"^[a-zA-Z]+$");
+            return Regex.IsMatch(user.FirstName, @"^[a-z A-Z]+$") && Regex.IsMatch(user.LastName, @"^[a-z A-Z]+$");
         }
 
         private bool IsPhoneValid(User user)

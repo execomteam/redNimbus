@@ -16,7 +16,8 @@ class RegistrationForm extends React.Component{
         this.handlePhoneNumberChange        = this.handlePhoneNumberChange.bind(this);
         this.handleToSCheckboxChange        = this.handleToSCheckboxChange.bind(this);
         this.handleSubmit                   = this.handleSubmit.bind(this);
-        this.redirectToHome                 = this.redirectToHome.bind(this);
+        this.redirectToHome = this.redirectToHome.bind(this);
+        this.handleError = this.handleError.bind(this);
     }
 
     handleFirstNameChange(event){
@@ -60,6 +61,10 @@ class RegistrationForm extends React.Component{
         this.props.history.push("/");
     }
 
+    handleError(resp) {
+        alert('Error');
+    }
+
     SendRegisterRequest(){
         let firstName   = this.state.firstName;
         let lastName    = this.state.lastName;
@@ -71,9 +76,11 @@ class RegistrationForm extends React.Component{
         
 
 
-        axios.post("http://localhost:65000/api/user",{firstName:firstName,lastName:lastName,email:email,password:password, phoneNumber:phoneNumber}).then(function(response){
-            self.props.history.push("/login");
-        });
+        axios.post("http://localhost:65001/api/user",{firstName:firstName,lastName:lastName,email:email,password:password, phoneNumber:phoneNumber}).then(function(response){
+                self.props.history.push("/login");
+            },
+            (response) => { self.handleError(response) }
+        );
 
     }
 
