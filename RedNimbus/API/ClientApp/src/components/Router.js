@@ -1,9 +1,11 @@
 import React from 'react'
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link , withRouter} from "react-router-dom";
 import LoginForm from '../LoginForm'
 import RegistrationForm from '../RegistrationForm'
+import Home from '../Home'
+import SignOut from '../SignOut'
 
-export default class NavBar extends React.Component {
+class NavBar extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -26,7 +28,6 @@ export default class NavBar extends React.Component {
             key: resp.data.key
         });
         localStorage.setItem('token', this.state.key);
-        
     } 
 
     signOut = () => {
@@ -45,7 +46,7 @@ export default class NavBar extends React.Component {
                         <div>
                             <ul>
                                 <li>
-                                    <Link to="/">{this.state.firstName}</Link>
+                                    <Link to="/">Home</Link>
                                 </li>
                                 <li>
                                     <Link to="/signout">Signout</Link>
@@ -88,40 +89,5 @@ export default class NavBar extends React.Component {
     }
   }
 
-class SignOut extends React.Component{
-    constructor(props) {
-        super(props);
-        this.setAnswer = this.setAnswer.bind(this);
-    }
+  export default withRouter(NavBar);
 
-    setAnswer() {
-        this.props.signOut();
-    }
-
-    render(){
-        return (
-            <div>    
-                <h4>Are you sure that you want to sign out?</h4>
-                <button onClick={this.setAnswer}>Yes</button>
-            </div>
-        )
-
-    }
-
-
-}
-
-function Home(props) {
-    if (props.user.isLoggedIn) {
-        return (
-            <div>
-                <h2>Welcome {props.user.firstName}</h2>
-            </div>
-        )
-    }
-    return (
-        <div>
-            <h2>Home</h2>
-        </div>
-    );
-  }

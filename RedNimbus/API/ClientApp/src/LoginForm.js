@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { BrowserRouter as Router, Route, Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 class LoginForm extends React.Component {
     constructor(props) {
@@ -24,6 +24,7 @@ class LoginForm extends React.Component {
     
     handleResponse(resp) {
         this.props.changeState(resp);
+        this.props.history.push("/");
     }
 
     handleError(resp) {
@@ -31,14 +32,12 @@ class LoginForm extends React.Component {
     }
 
     handleSubmit(event) {
-        const userLogin = {
-            Email: this.state.email,
-            Password: this.state.password
-        };
-    let self=this;
+        
+        let self=this;
         axios.post('http://localhost:49307/api/user/authenticate', { email: this.state.email, password: this.state.password }).then(
             (response)=>{self.handleResponse(response)}, 
             (response)=>{self.handleError(response)}
+
         );
         event.preventDefault();
     }
@@ -52,11 +51,11 @@ class LoginForm extends React.Component {
                         <tr><td>E-mail:</td><td><input type="email"     value={this.state.email}    onChange={this.handleEmailChange}       placeholder = "E-mail Adress"   required/></td></tr>
                         <tr><td>Password:</td><td><input type="password"  value={this.state.password} onChange={this.handlePasswordChange}    placeholder = "Password"        required /></td></tr>
                         <tr><td><input type="submit"    value="Sign In"/></td></tr>
-                        </tbody>
+                    </tbody>
                 </table>
             </form>
         );
     }
 }
 
-export default LoginForm;
+export default withRouter(LoginForm);
