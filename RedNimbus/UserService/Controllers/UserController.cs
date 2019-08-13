@@ -29,7 +29,7 @@ namespace RedNimbus.UserService.Controllers
             _userService = new UserService.Services.UserService();
         }
 
-        [HttpPost]      
+        [HttpPost]
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
             var user = _mapper.Map<User>(createUserDto);
