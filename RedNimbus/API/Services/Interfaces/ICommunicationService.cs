@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Services.Interfaces
+namespace RedNimbus.API.Services.Interfaces
 {
-    interface ICommunicationService
+    public interface ICommunicationService
     {
-        Task<TResponseData> Send<TRequestData, TResponseData>(string path, TRequestData data);
+        Task<TResponseData> Send<TRequestData, TResponseData>(string path, TRequestData data) where TResponseData : IResponseData, new();
     }
 }

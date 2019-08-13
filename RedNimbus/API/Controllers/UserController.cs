@@ -1,73 +1,42 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using AutoMapper;
+﻿
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using RedNimbus.API.DTO;
-using RedNimbus.API.Model;
+using RedNimbus.API.Models;
 using RedNimbus.API.Services;
 using RedNimbus.API.Services.Interfaces;
-using RedNimbus.API.Helper;
+using RedNimbus.DTO;
 
 namespace RedNimbus.API.Controllers
 {
     [ApiController]
     [Route("api/user")]
-    [Produces("application/json")]
     public class UserController : ControllerBase
     {
-        private readonly IMapper _mapper;
-        private readonly JwtConfiguration _jwtConfiguration;
-        private IUserService _userService;
+        private readonly ICommunicationService _communicationService;
 
-        public UserController(IMapper mapper, IOptions<JwtConfiguration> jwtConfiguration)
+        public UserController(ICommunicationService communicationService)
         {
-            _mapper = mapper;
-            _jwtConfiguration = jwtConfiguration.Value;
-            _userService = new UserService();
+            _communicationService = communicationService;
         }
 
-        [HttpPost]      
+        [HttpPost]
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
-            var user = _mapper.Map<User>(createUserDto);
-            var result = _userService.Create(user);
+            var response = _communicationService.Send<CreateUserDto, EmptyResponse>("api/user", createUserDto).Result;
 
-            if (result == null)
-                return UnprocessableEntity(new { message = "Invalid user data." });
-
-            return Ok();
+            switch (response.StatusCode)
+            {
+                case System.Net.HttpStatusCode.OK:
+                    return Ok();
+                default:
+                    return BadRequest();
+            }
         }
 
-        [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
-        {
-            var userModel = _mapper.Map<User>(userLoginDTO);
-            var user = _userService.Authenticate(userModel);
+        //[HttpPost("authenticate")]
+        //public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
+        //{
+        //    var response =  _communicationService.Send<AuthorizeUserDto, UserDto>("api/authenticate", userLoginDTO).Result;
 
-            if (user == null)
-                return UnprocessableEntity(new { message = "Username or password incorrect." });
-
-            UserDto userData = _mapper.Map<UserDto>(user);
-            userData.Key = GenerateJwt();
-
-            return Ok(userData);
-        }
-
-        private string GenerateJwt()
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.Key));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-
-            var token = new JwtSecurityToken(_jwtConfiguration.Issuer,
-              _jwtConfiguration.Issuer,
-              null,
-              expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+        //}
     }
 }
