@@ -1,4 +1,5 @@
-﻿using RedNimbus.API.Services.Interfaces;
+﻿using RedNimbus.API.Interfaces;
+using RedNimbus.API.Services.Interfaces;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -23,16 +24,12 @@ namespace RedNimbus.API.Services
                 new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
             HttpResponseMessage response = await client.PostAsJsonAsync(path, data);
-            TResponseData result = await response.Content.ReadAsAsync<TResponseData>();
+            TResponseData toReturn = new TResponseData();
 
-            if(result == null)
-            {
-                result = new TResponseData();
-            }
+            toReturn.Value = await response.Content.ReadAsAsync<object>();
+            toReturn.StatusCode = response.StatusCode;
 
-            result.StatusCode = response.StatusCode;
-
-            return result;
+            return toReturn;
         }
     }
 }

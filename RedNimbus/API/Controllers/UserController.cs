@@ -28,15 +28,22 @@ namespace RedNimbus.API.Controllers
                 case System.Net.HttpStatusCode.OK:
                     return Ok();
                 default:
-                    return BadRequest();
+                    return UnprocessableEntity();
             }
         }
 
-        //[HttpPost("authenticate")]
-        //public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
-        //{
-        //    var response =  _communicationService.Send<AuthorizeUserDto, UserDto>("api/authenticate", userLoginDTO).Result;
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
+        {
+            var response = _communicationService.Send<AuthorizeUserDto, DtoResponse>("api/user/authenticate", userLoginDTO).Result; 
+            switch (response.StatusCode)
+            {
+                case System.Net.HttpStatusCode.OK:
+                    return Ok(response.Value);
+                default:
+                    return UnprocessableEntity();
+            }
 
-        //}
+        }
     }
 }

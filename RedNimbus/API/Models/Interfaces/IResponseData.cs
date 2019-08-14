@@ -1,9 +1,10 @@
 ﻿using System.Net;
 
-namespace RedNimbus.API.Services
+namespace RedNimbus.API.Interfaces
 {
     public interface IResponseData
     {
         HttpStatusCode StatusCode { get; set; }
+        object Value { get; set; }
     }
 }
