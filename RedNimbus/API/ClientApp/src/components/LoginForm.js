@@ -6,7 +6,7 @@ import './css/LoginForm.css'
 class LoginForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { email: '', password: '' };
+        this.state = { email: 'enisnerbajin@gmail.com', password: '@Testiranje97' };
 
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);

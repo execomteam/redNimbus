@@ -7,7 +7,9 @@ class RegistrationForm extends React.Component{
 
     constructor(props){
         super(props);
-        this.state = {firstName : '',lastName : '', email : '', phoneNumber : '', password : '', repeatedPassword : '', tosCheckbox : false};
+
+        // States have been hardcoded to ease further feature testings
+        this.state = {firstName : 'Emil',lastName : 'Nisner Bajin', email : 'enisnerbajin@gmail.com', phoneNumber : '0615787890', password : '@Testiranje97', repeatedPassword : '@Testiranje97', tosCheckbox : true};
 
         this.handleFirstNameChange          = this.handleFirstNameChange.bind(this);
         this.handleLastNameChange           = this.handleLastNameChange.bind(this);
