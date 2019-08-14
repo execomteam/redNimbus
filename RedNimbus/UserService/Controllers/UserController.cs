@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RedNimbus.UserService.Model;
-using RedNimbus.UserService.Services;
 using RedNimbus.UserService.Services.Interfaces;
 using RedNimbus.UserService.Helper;
 using RedNimbus.DTO;
