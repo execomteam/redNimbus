@@ -39,7 +39,9 @@ namespace RedNimbus.API
                 configuration.RootPath = "ClientApp/build";
             });
 
-            services.AddSingleton(typeof(ICommunicationService), new CommunicationService("http://localhost:61253/"));
+
+            //Dependency Injection of object that implements ICommunicationService interface
+            services.AddSingleton(typeof(ICommunicationService), new CommunicationService("http://localhost:65000/"));
 
         }
 
