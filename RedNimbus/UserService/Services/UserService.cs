@@ -113,7 +113,7 @@ namespace RedNimbus.UserService.Services
         }
 
         public User GetUserByToken(string token) {
-            if (!tokenEmailPairs.ContainsKey(token))
+            if (token==null || !tokenEmailPairs.ContainsKey(token))
                 return null;
 
             string email = tokenEmailPairs[token];

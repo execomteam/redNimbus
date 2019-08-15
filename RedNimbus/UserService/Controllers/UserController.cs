@@ -61,8 +61,10 @@ namespace RedNimbus.UserService.Controllers
         {
             User user = _userService.GetUserByToken(keyData.Key);
             UserDto userData = _mapper.Map<UserDto>(user);
+            if(userData==null)
+                return UnprocessableEntity(new { message = "Token not found." });
             userData.Key = keyData.Key;
-            return Ok(user);
+            return Ok(userData);
         }
 
     }

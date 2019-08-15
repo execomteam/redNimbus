@@ -1,20 +1,36 @@
 import React from 'react';
 import NavBar from './components/Router'
+import axios from 'axios';
 
 export default class App extends React.Component{
 
   constructor(props) {
       super(props);
-      this.state = {
-        isLoggedIn: false,
-        firstName:'',
-        lastName:'',
-        email:'',
-        id:'',
-        key:''
-    };
+      if (localStorage.getItem('token') === null) {
+          this.state = {
+              isLoggedIn: false,
+              firstName: '',
+              lastName: '',
+              email: '',
+              id: '',
+              key: ''
+          };
+      } else {
+          let token = localStorage.getItem('token');
+          let self = this;
+          this.state = {
+              isLoggedIn: false
+          }
+          axios.post('http://localhost:65001/api/user/get', { key: token }).then(
+              (response) => { self.changeState(response) },
+              (response) => { self.handleError(response) }
+          );
+      }
   }
 
+    handleError(response) {
+        alert("Error");
+    }
   changeState = (resp) => {
     this.setState({
         isLoggedIn: true,
@@ -24,7 +40,8 @@ export default class App extends React.Component{
         id: resp.data.id,
         key: resp.data.key
     });
-    localStorage.setItem('token', this.state.key);
+      localStorage.setItem('token', this.state.key);
+      //alert(localStorage.getItem('token'));
 } 
 
   signOut = () => {

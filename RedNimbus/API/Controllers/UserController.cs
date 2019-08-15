@@ -49,7 +49,7 @@ namespace RedNimbus.API.Controllers
         [HttpPost("get")]
         public IActionResult GetUser([FromBody]KeyDto keyData)
         {
-            var response = _communicationService.Send<KeyDto, DtoResponse>("api/user/get", keyData).Result;
+            var response = _communicationService.Send<KeyDto, UserDto>("api/user/get", keyData).Result;
             switch (response.StatusCode)
             {
                 case System.Net.HttpStatusCode.OK:
