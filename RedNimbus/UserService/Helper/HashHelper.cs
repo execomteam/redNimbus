@@ -1,11 +1,11 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace RedNimbus.UserService.Services
+namespace RedNimbus.UserService.Helper
 {
-    public static class HashService
+    public static class HashHelper
     {
-        public static string ComputeSha256Hash(string rawData)
+        public static string ComputeHash(string rawData)
         {
             using (SHA256 sha256Hash = SHA256.Create())
             {

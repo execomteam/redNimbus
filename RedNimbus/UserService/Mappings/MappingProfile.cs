@@ -14,6 +14,8 @@ namespace RedNimbus.UserService.Mappings
             CreateMap<CreateUserDto, User>();
             CreateMap<User, AuthorizeUserDto>();
             CreateMap<AuthorizeUserDto, User>();
+            CreateMap<UserDto, KeyDto>();
+            CreateMap<KeyDto, UserDto>();
         }
     }
 }

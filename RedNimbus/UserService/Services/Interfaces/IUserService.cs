@@ -6,5 +6,7 @@ namespace RedNimbus.UserService.Services.Interfaces
     {
         User Create(User user);
         User Authenticate(User user);
+        void AddAuthenticatedUser(string token, string email);
+        User GetUserByToken(string token);
     }
 }

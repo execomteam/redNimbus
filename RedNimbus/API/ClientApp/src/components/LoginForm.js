@@ -25,7 +25,11 @@ class LoginForm extends React.Component {
     }
     
     handleResponse(resp) {
-        this.props.changeState(resp);
+        let self = this;
+        axios.post('http://localhost:65001/api/user/get', { key: resp.data.key }).then(
+            (response) => { self.props.changeState(response) },
+            (response) => { self.handleError(response) }                                                                        
+        );
         this.props.history.push("/");
     }
 
@@ -40,10 +44,9 @@ class LoginForm extends React.Component {
     handleSubmit(event) {
         
         let self=this;
-        axios.post('http://localhost:65000/api/user/authenticate', { email: this.state.email, password: this.state.password }).then(
+        axios.post('http://localhost:65001/api/user/authenticate', { email: this.state.email, password: this.state.password }).then(
             (response)=>{self.handleResponse(response)}, 
             (response)=>{self.handleError(response)}
-
         );
         event.preventDefault();
     }

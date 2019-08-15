@@ -16,6 +16,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RedNimbus.UserService.Helper;
 using RedNimbus.UserService.Mappings;
+using RedNimbus.UserService.Services;
+using RedNimbus.UserService.Services.Interfaces;
 
 namespace UserService
 {
@@ -58,6 +60,17 @@ namespace UserService
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.Configure<JwtConfiguration>(Configuration.GetSection("Jwt"));
+
+            //token d.i.
+            var section = Configuration.GetSection("Jwt");
+            JwtConfiguration jwtConfig = new JwtConfiguration();
+            jwtConfig.Key = section.GetValue<string>("Key");
+            jwtConfig.Issuer = section.GetValue<string>("Issuer");
+            ITokenService tokenService = new TokenService(jwtConfig);
+            services.AddSingleton(tokenService);
+
+            IUserService userService = new RedNimbus.UserService.Services.UserService();
+            services.AddSingleton(userService);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

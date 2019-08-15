@@ -19,14 +19,14 @@ namespace RedNimbus.UserService.Controllers
     public class UserController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly JwtConfiguration _jwtConfiguration;
-        private IUserService _userService;
+        private readonly ITokenService _tokenService;
+        private readonly IUserService _userService;
 
-        public UserController(IMapper mapper, IOptions<JwtConfiguration> jwtConfiguration)
+        public UserController(IMapper mapper, IUserService userService, ITokenService tokenService)
         {
             _mapper = mapper;
-            _jwtConfiguration = jwtConfiguration.Value;
-            _userService = new UserService.Services.UserService();
+            _tokenService = tokenService;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -51,23 +51,20 @@ namespace RedNimbus.UserService.Controllers
                 return UnprocessableEntity(new { message = "Username or password incorrect." });
 
             UserDto userData = _mapper.Map<UserDto>(user);
-            userData.Key = GenerateJwt();
-
-            return Ok(userData);
+            userData.Key = _tokenService.GenerateToken();
+            _userService.AddAuthenticatedUser(userData.Key, userData.Email);
+            KeyDto keyData = _mapper.Map<KeyDto>(userData);
+            return Ok(keyData);
         }
 
-        private string GenerateJwt()
+        [HttpPost("get")]
+        public IActionResult GetUser([FromBody]KeyDto keyData)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.Key));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-
-            var token = new JwtSecurityToken(_jwtConfiguration.Issuer,
-              _jwtConfiguration.Issuer,
-              null,
-              expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            User user = _userService.GetUserByToken(keyData.Key);
+            UserDto userData = _mapper.Map<UserDto>(user);
+            userData.Key = keyData.Key;
+            return Ok(user);
         }
+
     }
 }
