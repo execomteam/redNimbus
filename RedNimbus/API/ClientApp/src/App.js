@@ -6,7 +6,7 @@ export default class App extends React.Component{
 
   constructor(props) {
       super(props);
-      if (localStorage.getItem('token') === null) {
+      if (localStorage.getItem('token') === null ){
           this.state = {
               isLoggedIn: false,
               firstName: '',
