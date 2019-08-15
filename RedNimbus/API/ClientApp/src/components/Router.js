@@ -9,41 +9,12 @@ import './css/NavBar.css'
 class NavBar extends React.Component {
     constructor(props){
         super(props);
-        this.state = {
-            isLoggedIn: false,
-            firstName:'',
-            lastName:'',
-            email:'',
-            id:'',
-            key:''
-        };
-    }
-
-    changeState = (resp) => {
-        this.setState({
-            isLoggedIn: true,
-            firstName: resp.data.firstName,
-            lastName: resp.data.lastName,
-            email: resp.data.email,
-            id: resp.data.id,
-            key: resp.data.key
-        });
-        localStorage.setItem('token', this.state.key);
-
-    } 
-
-    signOut = () => {
-        this.setState({
-            isLoggedIn:false
-        });
-        localStorage.clear();
     }
 
     render() {
         
-        if(this.state.isLoggedIn)
+        if(this.props.state.isLoggedIn)
             return (
-
                 <div>
                     <Router>
                         <div>
@@ -54,8 +25,8 @@ class NavBar extends React.Component {
                                 </ul>
                             </nav>
 
-                            <Route exact path="/" render={(props) => <Home user={this.state}/>} />
-                            <Route path="/signout" render={(props) => <SignOut signOut={this.signOut} />} />
+                            <Route exact path="/" render={(props) => <Home user={this.props.state}/>} />
+                            <Route path="/signout" render={(props) => <SignOut signOut={this.props.signOut} />} />
                         </div>
                     </Router>
                 </div>
@@ -74,8 +45,8 @@ class NavBar extends React.Component {
                             </ul>
                         </nav>
 
-                        <Route exact path="/" render={(props) => <Home user={this.state}/>} />
-                        <Route path="/login" render={(props) => <LoginForm changeState={this.changeState} />} />
+                        <Route exact path="/" render={(props) => <Home user={this.props.state}/>} />
+                        <Route path="/login" render={(props) => <LoginForm changeState={this.props.changeState} />} />
                         <Route path="/register" render={(props) => <RegistrationForm />} />
                     </div>
                 </Router>

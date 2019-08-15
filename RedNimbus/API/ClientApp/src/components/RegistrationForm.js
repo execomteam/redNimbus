@@ -11,32 +11,12 @@ class RegistrationForm extends React.Component{
         // States have been hardcoded to ease further feature testings
         this.state = {firstName : 'Emil',lastName : 'Nisner Bajin', email : 'enisnerbajin@gmail.com', phoneNumber : '0615787890', password : '@Testiranje97', repeatedPassword : '@Testiranje97', tosCheckbox : true};
 
-        this.handleFirstNameChange          = this.handleFirstNameChange.bind(this);
-        this.handleLastNameChange           = this.handleLastNameChange.bind(this);
-        this.handleEmailChange              = this.handleEmailChange.bind(this);
         this.handlePasswordChange           = this.handlePasswordChange.bind(this);
         this.handleRepeatedPasswordChange   = this.handleRepeatedPasswordChange.bind(this);
-        this.handlePhoneNumberChange        = this.handlePhoneNumberChange.bind(this);
         this.handleToSCheckboxChange        = this.handleToSCheckboxChange.bind(this);
         this.handleSubmit                   = this.handleSubmit.bind(this);
-        this.redirectToHome = this.redirectToHome.bind(this);
+        this.redirectToHome                 = this.redirectToHome.bind(this);
         this.handleError = this.handleError.bind(this);
-    }
-
-    handleFirstNameChange(event){
-        this.setState({firstName : event.target.value});
-    }
-
-    handleLastNameChange(event){
-        this.setState({lastName : event.target.value});
-    }
-
-    handleEmailChange(event){
-        this.setState({email : event.target.value});
-    }
-
-    handlePhoneNumberChange(event){
-        this.setState({phoneNumber : event.target.value});
     }
 
     handlePasswordChange(event){
@@ -67,19 +47,20 @@ class RegistrationForm extends React.Component{
     handleError(resp) {
         alert('Error');
     }
-
+    
     SendRegisterRequest(){
-        let firstName   = this.state.firstName;
-        let lastName    = this.state.lastName;
-        let email       = this.state.email;
-        let password    = this.state.password;
-        let phoneNumber = this.state.phoneNumber;
+        let firstName           = this.state.firstName;
+        let lastName            = this.state.lastName;
+        let phoneNumber         = this.state.phoneNumber;
+        let email               = this.state.email;
+        let password            = this.state.password;
+        let repeatedPassword    = this.state.repeatedPassword;
         
         let self = this;
         
 
 
-        axios.post("http://localhost:65001/api/user",{firstName:firstName,lastName:lastName,email:email,password:password, phoneNumber:phoneNumber}).then(function(response){
+        axios.post("http://localhost:65001/api/user",{firstName:firstName,lastName:lastName,email:email,password:password, repeatedPassword:repeatedPassword, phoneNumber:phoneNumber}).then(function(response){
                 self.props.history.push("/login");
             },
             (response) => { self.handleError(response) }
@@ -103,7 +84,6 @@ class RegistrationForm extends React.Component{
                                            className="form-control form-control-sm"
                                            id="firstName"
                                            value={this.state.firstName}
-                                           onChange={this.handleFirstNameChange}
                                            placeholder="Enter First Name"
                                            required
                                            />
@@ -115,7 +95,6 @@ class RegistrationForm extends React.Component{
                                            className="form-control form-control-sm"
                                            id="lastName"
                                            value={this.state.lastName}
-                                           onChange={this.handleLastNameChange}
                                            placeholder="Enter Last Name"
                                            required
                                            />
@@ -127,7 +106,6 @@ class RegistrationForm extends React.Component{
                                            className="form-control form-control-sm"
                                            id="email"
                                            value={this.state.email}
-                                           onChange={this.handleEmailChange}
                                            placeholder = "Enter e-mail"
                                            required
                                            />
@@ -163,7 +141,6 @@ class RegistrationForm extends React.Component{
                                            className="form-control form-control-sm"
                                            id="phoneNumber"
                                            value={this.state.phoneNumber}
-                                           onChange={this.handlePhoneNumberChange}
                                            placeholder=""
                                            />
                                 </div>

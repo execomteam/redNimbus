@@ -5,7 +5,7 @@ class SignOut extends React.Component{
     constructor(props) {
         super(props);
         this.setAnswerToYes = this.setAnswerToYes.bind(this);
-        this.setAnswerToNo = this.setAnswerToNo.bind(this);
+        this.setAnswerToNo  = this.setAnswerToNo.bind(this);
     }
 
     setAnswerToYes() {

@@ -1,4 +1,4 @@
-﻿using RedNimbus.API.Interfaces;
+﻿using RedNimbus.API.Models;
 using RedNimbus.API.Services.Interfaces;
 using System;
 using System.Net.Http;
@@ -14,8 +14,7 @@ namespace RedNimbus.API.Services
             _address = address;
         }      
 
-        public async Task<TResponseData> Send<TRequestData, TResponseData>(string path, TRequestData data)
-            where TResponseData : IResponseData, new()
+        public async Task<Response<TResponseData>> Send<TRequest, TResponseData>(string path, TRequest data)
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(_address);
@@ -24,9 +23,9 @@ namespace RedNimbus.API.Services
                 new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
             HttpResponseMessage response = await client.PostAsJsonAsync(path, data);
-            TResponseData toReturn = new TResponseData();
+            Response<TResponseData> toReturn = new Response<TResponseData>();
 
-            toReturn.Value = await response.Content.ReadAsAsync<object>();
+            toReturn.Value = await response.Content.ReadAsAsync<TResponseData>();
             toReturn.StatusCode = response.StatusCode;
 
             return toReturn;

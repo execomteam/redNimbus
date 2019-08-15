@@ -3,14 +3,9 @@ using System.Net;
 
 namespace RedNimbus.API.Models
 {
-    public class EmptyResponse : IResponseData
+    public class Response<TValue> : IResponse<TValue>
     {
-        public EmptyResponse()
-        {
-
-        }
-
         public HttpStatusCode StatusCode { get; set; }
-        public object Value { get; set; }
+        public TValue Value { get; set; }
     }
 }

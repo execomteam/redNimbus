@@ -1,7 +1,5 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using RedNimbus.API.Models;
-using RedNimbus.API.Services;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.DTO;
 
@@ -21,7 +19,7 @@ namespace RedNimbus.API.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
-            var response = _communicationService.Send<CreateUserDto, EmptyResponse>("api/user", createUserDto).Result;
+            var response = _communicationService.Send<CreateUserDto, Response<Empty>>("api/user", createUserDto).Result;
 
             switch (response.StatusCode)
             {
@@ -38,7 +36,7 @@ namespace RedNimbus.API.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
         {
-            var response = _communicationService.Send<AuthorizeUserDto, DtoResponse>("api/user/authenticate", userLoginDTO).Result; 
+            var response = _communicationService.Send<AuthorizeUserDto, UserDto>("api/user/authenticate", userLoginDTO).Result; 
             switch (response.StatusCode)
             {
                 case System.Net.HttpStatusCode.OK:
@@ -46,7 +44,6 @@ namespace RedNimbus.API.Controllers
                 default:
                     return UnprocessableEntity();
             }
-
         }
 
         [HttpPost("get")]

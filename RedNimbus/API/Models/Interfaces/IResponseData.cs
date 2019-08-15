@@ -2,9 +2,9 @@
 
 namespace RedNimbus.API.Interfaces
 {
-    public interface IResponseData
+    public interface IResponse<TValue>
     {
         HttpStatusCode StatusCode { get; set; }
-        object Value { get; set; }
+        TValue Value { get; set; }
     }
 }
