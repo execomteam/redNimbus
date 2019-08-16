@@ -82,7 +82,7 @@ namespace RedNimbus.UserService.Services
             user.Id = Guid.NewGuid();
             user.Password = HashHelper.ComputeHash(user.Password);
 
-            CapitalizeFirstLetter(user);
+           //CapitalizeFirstLetter(user);
             registeredUsers.Add(user.Email, user);
 
             return registeredUsers[user.Email];

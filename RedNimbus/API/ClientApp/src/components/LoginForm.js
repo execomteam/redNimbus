@@ -6,7 +6,7 @@ import './css/LoginForm.css'
 class LoginForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { email: 'enisnerbajin@gmail.com', password: '@Testiranje97' };
+        this.state = { email: '', password: '' };
 
         this.redirectToRegistration = this.redirectToRegistration.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -31,14 +31,20 @@ class LoginForm extends React.Component {
         alert('Error');
     }
 
-    handleSubmit(event) {
-        
-        let self=this;
+    sendRequest() {
+        let self = this;
         axios.post('http://localhost:65001/api/user/authenticate', { email: this.state.email, password: this.state.password }).then(
-            (response)=>{self.handleResponse(response)}, 
-            (response)=>{self.handleError(response)}
+            (response) => { self.handleResponse(response) },
+            (response) => { self.handleError(response) }
         );
+    }
+
+    handleSubmit(event) {
         event.preventDefault();
+        this.setState({
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        }, this.sendRequest);
     }
 
     render() {
@@ -55,7 +61,6 @@ class LoginForm extends React.Component {
                                     <input type="email"
                                            className="form-control form-control-sm"
                                            id="email"
-                                           value={this.state.email}
                                            placeholder = "Enter e-mail"
                                            required
                                            />
@@ -65,7 +70,6 @@ class LoginForm extends React.Component {
                                     <input type="password"
                                     className="form-control form-control-sm"
                                            id="password"
-                                           value={this.state.password}
                                            placeholder = "Enter password"
                                            required
                                            />
