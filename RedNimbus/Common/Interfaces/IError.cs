@@ -1,6 +1,6 @@
-﻿using RedNimbus.DTO.Enums;
+﻿using RedNimbus.Common.Enums;
 
-namespace RedNimbus.DTO.Interfaces
+namespace RedNimbus.Common.Interfaces
 {
     public interface IError
     {
