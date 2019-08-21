@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Globalization;
@@ -12,8 +11,7 @@ namespace RedNimbus.UserService.Services
     public class UserService : IUserService
     {
         private static readonly Dictionary<string, User> registeredUsers = new Dictionary<string, User>();
-        private static int idCounter = 0;
-
+        private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
         public UserService() {}
 
         #region Validation functions
@@ -79,11 +77,12 @@ namespace RedNimbus.UserService.Services
         {
             if (!IsUserValid(user) || registeredUsers.ContainsKey(user.Email))
                 return null;
+            
+            
+            user.Id = Guid.NewGuid();
+            user.Password = HashHelper.ComputeHash(user.Password);
 
-            user.Id = idCounter++;
-            user.Password = HashService.ComputeSha256Hash(user.Password);
-
-            CapitalizeFirstLetter(user);
+           //CapitalizeFirstLetter(user);
             registeredUsers.Add(user.Email, user);
 
             return registeredUsers[user.Email];
@@ -96,7 +95,7 @@ namespace RedNimbus.UserService.Services
                 if (registeredUsers.ContainsKey(user.Email))
                 {
                     var registeredUser = registeredUsers[user.Email];
-                    if (registeredUser.Password == HashService.ComputeSha256Hash(user.Password))
+                    if (registeredUser.Password == HashHelper.ComputeHash(user.Password))
                     {
                         return registeredUser;
                     }
@@ -104,6 +103,23 @@ namespace RedNimbus.UserService.Services
             }
             
             return null;
+        }
+
+        public void AddAuthenticatedUser(string token, string email)
+        {
+            if (tokenEmailPairs.ContainsKey(token))
+                return;
+            tokenEmailPairs.Add(token, email);
+        }
+
+        public User GetUserByToken(string token) {
+            if (token==null || !tokenEmailPairs.ContainsKey(token))
+                return null;
+
+            string email = tokenEmailPairs[token];
+            if (!registeredUsers.ContainsKey(email))
+                return null;
+            return registeredUsers[email];
         }
     }
 }

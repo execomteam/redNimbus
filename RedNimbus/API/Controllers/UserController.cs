@@ -30,6 +30,9 @@ namespace RedNimbus.API.Controllers
             }
         }
 
+
+
+
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
         {
@@ -42,5 +45,20 @@ namespace RedNimbus.API.Controllers
                     return UnprocessableEntity();
             }
         }
+
+        [HttpPost("get")]
+        public IActionResult GetUser([FromBody]KeyDto keyData)
+        {
+            var response = _communicationService.Send<KeyDto, UserDto>("api/user/get", keyData).Result;
+            switch (response.StatusCode)
+            {
+                case System.Net.HttpStatusCode.OK:
+                    return Ok(response.Value);
+                default:
+                    return UnprocessableEntity();
+            }
+
+        }
+
     }
 }

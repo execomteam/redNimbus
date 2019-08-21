@@ -1,8 +1,10 @@
-﻿namespace RedNimbus.UserService.Model
+﻿using System;
+
+namespace RedNimbus.UserService.Model
 {
     public class User
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string FirstName { get; set; }
 

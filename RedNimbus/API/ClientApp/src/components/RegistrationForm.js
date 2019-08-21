@@ -9,7 +9,7 @@ class RegistrationForm extends React.Component{
         super(props);
 
         // States have been hardcoded to ease further feature testings
-        this.state = {firstName : 'Emil',lastName : 'Nisner Bajin', email : 'enisnerbajin@gmail.com', phoneNumber : '0615787890', password : '@Testiranje97', repeatedPassword : '@Testiranje97', tosCheckbox : true};
+        this.state = {firstName : '',lastName : '', email : '', phoneNumber : '', password : '', repeatedPassword : ''};
 
         this.handlePasswordChange           = this.handlePasswordChange.bind(this);
         this.handleRepeatedPasswordChange   = this.handleRepeatedPasswordChange.bind(this);
@@ -33,11 +33,20 @@ class RegistrationForm extends React.Component{
 
     handleSubmit(event) {
         event.preventDefault();
-
-        if (this.state.password === this.state.repeatedPassword)
-            this.SendRegisterRequest();
-        else
-            alert('Passwords do not match');
+        let self = this;
+        this.setState({
+            firstName:      document.getElementById('firstName').value,
+            lastName:       document.getElementById('lastName').value,
+            email:          document.getElementById('email').value,
+            phoneNumber:    document.getElementById('phoneNumber').value
+        }, () => {
+            if (self.state.password === self.state.repeatedPassword) {
+                self.SendRegisterRequest();
+            }
+            else {
+                alert('Passwords do not match');
+            }
+        });
     }
 
     redirectToHome(){
@@ -60,10 +69,13 @@ class RegistrationForm extends React.Component{
         
 
 
-        axios.post("http://localhost:65001/api/user",{firstName:firstName,lastName:lastName,email:email,password:password, repeatedPassword:repeatedPassword, phoneNumber:phoneNumber}).then(function(response){
+        axios.post("http://localhost:65001/api/user", { firstName: firstName, lastName: lastName, email: email, password: password, repeatedPassword: repeatedPassword, phoneNumber: phoneNumber }).then(
+            (response) => {
                 self.props.history.push("/login");
             },
-            (response) => { self.handleError(response) }
+            (response) => {
+                self.handleError(response)
+            }
         );
 
     }
@@ -83,7 +95,6 @@ class RegistrationForm extends React.Component{
                                     <input type="text"
                                            className="form-control form-control-sm"
                                            id="firstName"
-                                           value={this.state.firstName}
                                            placeholder="Enter First Name"
                                            required
                                            />
@@ -94,7 +105,6 @@ class RegistrationForm extends React.Component{
                                     <input type="text"
                                            className="form-control form-control-sm"
                                            id="lastName"
-                                           value={this.state.lastName}
                                            placeholder="Enter Last Name"
                                            required
                                            />
@@ -105,7 +115,6 @@ class RegistrationForm extends React.Component{
                                     <input type="email"
                                            className="form-control form-control-sm"
                                            id="email"
-                                           value={this.state.email}
                                            placeholder = "Enter e-mail"
                                            required
                                            />
@@ -140,7 +149,6 @@ class RegistrationForm extends React.Component{
                                     <input type="text"
                                            className="form-control form-control-sm"
                                            id="phoneNumber"
-                                           value={this.state.phoneNumber}
                                            placeholder=""
                                            />
                                 </div>
@@ -150,11 +158,25 @@ class RegistrationForm extends React.Component{
                                                 name='tosCheckbox'
                                                 id='tosCheckbox'
                                                 checked={this.state.tosCheckbox}
-                                                onChange={this.handleToSCheckboxChange} />I agree to the Terms of Service</span>
+                                                onChange={this.handleToSCheckboxChange} 
+                                                />I agree to the Terms of Service</span>
                                 </div>
 
-                                <button type="submit" className="btn btn-primary btn-block" value="Sign Up" disabled={!this.state.tosCheckbox}>Sign Up</button>
-                                <button className="btn btn-block" value="Cancel" onClick={this.redirectToHome}>Cancel</button>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary btn-block"
+                                    value="Sign Up"
+                                    disabled={
+                                        !this.state.tosCheckbox
+                                    }>
+                                    Sign Up
+                                </button>
+                                <button
+                                    className="btn btn-block"
+                                    value="Cancel"
+                                    onClick={this.redirectToHome}>
+                                    Cancel
+                                </button>
                             </form>
                             
                         </div>
