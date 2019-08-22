@@ -18,6 +18,7 @@ using RedNimbus.UserService.Helper;
 using RedNimbus.UserService.Mappings;
 using RedNimbus.UserService.Services;
 using RedNimbus.UserService.Services.Interfaces;
+using RedNimbus.Either;
 
 namespace UserService
 {
@@ -56,8 +57,9 @@ namespace UserService
 
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
-
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddEitherServiceMapper(); //D.I. EitherMapper
 
             services.Configure<JwtConfiguration>(Configuration.GetSection("Jwt"));
 

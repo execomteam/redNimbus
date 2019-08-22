@@ -1,6 +1,6 @@
 ﻿using RedNimbus.DTO.Enums;
 
-namespace RedNimbus.DTO.Interfaces
+namespace RedNimbus.Either.Errors
 {
     public interface IError
     {

@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
-using Either;
-using RedNimbus.DTO.Interfaces;
 using RedNimbus.Either.Errors;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace RedNimbus.Either
+namespace RedNimbus.Either.Mappings
 {
-    public class EitherMapper
+    public class EitherMapper : IEitherMapper
     {
         private IMapper _mapper;
 
@@ -17,9 +13,8 @@ namespace RedNimbus.Either
             _mapper = mapper;
         }
 
-        public  Either<IError, TDestination> Map<TDestination>(object source)
+        public Either<IError, TDestination> Map<TDestination>(object source)
         {
-            
             try
             {
                 return new Right<IError, TDestination>(_mapper.Map<TDestination>(source));

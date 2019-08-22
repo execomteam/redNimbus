@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Either
+namespace RedNimbus.Either
 {
     public class Either<TLeft, TRight>
     {

@@ -1,4 +1,4 @@
-﻿namespace Either
+﻿namespace RedNimbus.Either
 {
     public class Right<TLeft, TRight> : Either<TLeft, TRight>
     {

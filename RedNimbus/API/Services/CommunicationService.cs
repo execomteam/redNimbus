@@ -1,5 +1,9 @@
-﻿using RedNimbus.API.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using RedNimbus.API.Models;
 using RedNimbus.API.Services.Interfaces;
+using RedNimbus.DTO.Interfaces;
+using RedNimbus.Either;
+using RedNimbus.Either.Errors;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -14,7 +18,7 @@ namespace RedNimbus.API.Services
             _address = address;
         }      
 
-        public async Task<Response<TResponseData>> Send<TRequest, TResponseData>(string path, TRequest data)
+        public async Task<Either<IError, TSuccess>> Send<TRequest, TSuccess>(string path, TRequest data)
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(_address);
@@ -23,12 +27,8 @@ namespace RedNimbus.API.Services
                 new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
             HttpResponseMessage response = await client.PostAsJsonAsync(path, data);
-            Response<TResponseData> toReturn = new Response<TResponseData>();
-
-            toReturn.Value = await response.Content.ReadAsAsync<TResponseData>();
-            toReturn.StatusCode = response.StatusCode;
-
-            return toReturn;
+            var result = await response.Content.ReadAsAsync<TSuccess>();
+            return result;
         }
     }
 }

@@ -5,6 +5,8 @@ using System.Globalization;
 using RedNimbus.UserService.Model;
 using RedNimbus.UserService.Services.Interfaces;
 using RedNimbus.UserService.Helper;
+using RedNimbus.Either.Errors;
+using RedNimbus.Either;
 
 namespace RedNimbus.UserService.Services
 {
@@ -72,6 +74,23 @@ namespace RedNimbus.UserService.Services
         }
 
         # endregion
+
+        //public Either<IError,User> Create(User user)
+        //{
+        //    if (!IsUserValid(user))
+        //    {
+        //        return new Left();
+        //    }
+
+
+        //    user.Id = Guid.NewGuid();
+        //    user.Password = HashHelper.ComputeHash(user.Password);
+
+        //    //CapitalizeFirstLetter(user);
+        //    registeredUsers.Add(user.Email, user);
+
+        //    return registeredUsers[user.Email];
+        //}
 
         public User Create(User user)
         {

@@ -1,4 +1,4 @@
-﻿namespace RedNimbus.API.Controllers
+﻿namespace RedNimbus.DTO
 {
     public class Empty
     {

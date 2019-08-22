@@ -10,13 +10,13 @@ namespace RedNimbus.DTO.Enums
         NullReference = 0,
         EmailAlreadyUsed,
         EmailWrongFormat,
-        PasswordWrongFormat,
-        PasswordsDoNotMatch,
-        PasswordMustHaveUpperCase,
-        PasswordMustHaveLowerCase,
-        PasswordMustHaveSpecialCharacter,
-        PasswordMustHaveDigit,
-        PasswordTooShort,
+        PasswordWrongFormat,    //unproc.ent
+        PasswordsDoNotMatch,    //unproc.ent
+        PasswordMustHaveUpperCase,  //unproc.ent
+        PasswordMustHaveLowerCase,  //unproc.ent
+        PasswordMustHaveSpecialCharacter,   //unproc.ent
+        PasswordMustHaveDigit,              //unproc.ent
+        PasswordTooShort,                   //unproc.ent
         FirstNameNullEmptyOrWhiteSpace,
         LastNameNullEmptyOrWhiteSpace
     }

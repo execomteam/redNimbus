@@ -6,5 +6,7 @@ namespace RedNimbus.DTO.Interfaces
 {
     public interface ISuccess
     {
+
+
     }
 }
