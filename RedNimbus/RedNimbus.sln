@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus", "EventBus\EventB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Communication", "Communication\Communication.csproj", "{CF4419B4-F2B8-42EC-B24A-21C3B792A8AF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Facade", "Facade\Facade.csproj", "{7C1FCB1F-EA26-44F1-9FD8-CB0A7015C2D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{CF4419B4-F2B8-42EC-B24A-21C3B792A8AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF4419B4-F2B8-42EC-B24A-21C3B792A8AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF4419B4-F2B8-42EC-B24A-21C3B792A8AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C1FCB1F-EA26-44F1-9FD8-CB0A7015C2D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C1FCB1F-EA26-44F1-9FD8-CB0A7015C2D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C1FCB1F-EA26-44F1-9FD8-CB0A7015C2D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C1FCB1F-EA26-44F1-9FD8-CB0A7015C2D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

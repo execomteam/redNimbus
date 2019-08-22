@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using NetMQ;
 using NetMQ.Sockets;
 
@@ -11,6 +10,7 @@ namespace RedNimbus.Communication
     /// </summary>
     public abstract class BaseService : IDisposable
     {
+        // TODO: Set addresses
         private const string _publisherAddress = "";
         private const string _dealerAddress = "";
 
@@ -18,9 +18,12 @@ namespace RedNimbus.Communication
         private DealerSocket _dealerSocket;
         private NetMQPoller _poller;
 
-        private Dictionary<string, Action<NetMQMessage>> _topicsToActions;
+        private IDictionary<string, Action<NetMQMessage>> _topicsToActions;
 
-        public bool IsRunning { get; private set; }
+        /// <summary>True if the service is up and running, else False.</summary>
+        public bool IsRunning { get; protected set; }
+
+        /// <summary>False if the service is up and running, else True.</summary>
         public bool IsStopped => !IsRunning;
 
         /// <summary>
