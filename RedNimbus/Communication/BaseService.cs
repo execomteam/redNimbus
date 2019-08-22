@@ -19,7 +19,10 @@ namespace RedNimbus.Communication
         private NetMQPoller _poller;
 
         private Dictionary<string, Action<NetMQMessage>> _topicsToActions;
-        
+
+        public bool IsRunning { get; private set; }
+        public bool IsStopped => !IsRunning;
+
         /// <summary>
         /// BaseService constructor initializing the Subscriber and Dealer sockets.
         /// </summary>
@@ -39,12 +42,17 @@ namespace RedNimbus.Communication
         /// </summary>
         public void Start()
         {
-            _subscriberSocket.Connect(_publisherAddress);
-            _dealerSocket.Connect(_dealerAddress);
+            if(IsStopped)
+            {
+                _subscriberSocket.Connect(_publisherAddress);
+                _dealerSocket.Connect(_dealerAddress);
 
-            _subscriberSocket.ReceiveReady += ReceiveMessageEventHandler;
+                _subscriberSocket.ReceiveReady += ReceiveMessageEventHandler;
 
-            _poller.Run();
+                _poller.Run();
+
+                IsRunning = true;
+            }
         }
 
         /// <summary>
@@ -52,10 +60,15 @@ namespace RedNimbus.Communication
         /// </summary>
         public void Pause()
         {
-            _subscriberSocket.Disconnect(_publisherAddress);
-            _dealerSocket.Disconnect(_dealerAddress);
+            if(IsRunning)
+            {
+                _subscriberSocket.Disconnect(_publisherAddress);
+                _dealerSocket.Disconnect(_dealerAddress);
 
-            _poller.Stop();
+                _poller.Stop();
+
+                IsRunning = false;
+            }
         }
 
         /// <summary>
@@ -63,16 +76,20 @@ namespace RedNimbus.Communication
         /// </summary>
         public void Stop()
         {
-            try
+            if(IsRunning)
             {
-                _subscriberSocket.Dispose();
-                _dealerSocket.Dispose();
+                try
+                {
+                    _subscriberSocket.Dispose();
+                    _dealerSocket.Dispose();
 
-                _poller.Dispose();
-            }
-            finally
-            {
-                NetMQConfig.Cleanup();
+                    _poller.Dispose();
+                }
+                finally
+                {
+                    IsRunning = false;
+                    NetMQConfig.Cleanup();
+                }
             }
         }
 
