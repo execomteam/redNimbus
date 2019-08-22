@@ -14,13 +14,14 @@ namespace RedNimnus.EventBus
         private PublisherSocket _publisherSocket;
         private NetMQPoller _poller;
 
-        private readonly string _subscriberAdress = "";
-        private readonly string _dealerAdress = "";
+        private const string _subscriberAdress = "";
+        private const string _dealerAdress = "";
 
         public EventBus()
         {
             _dealerSocket = new DealerSocket();
             _publisherSocket = new PublisherSocket();
+            _poller = new NetMQPoller { _dealerSocket };
         }
 
         private void HandleReceiveEvent(object sender, NetMQSocketEventArgs e)
@@ -34,7 +35,6 @@ namespace RedNimnus.EventBus
             _dealerSocket.Bind(_dealerAdress);
             _publisherSocket.Bind(_subscriberAdress);
 
-            _poller = new NetMQPoller { _dealerSocket };
             _dealerSocket.ReceiveReady += HandleReceiveEvent;
 
             _poller.Run();
