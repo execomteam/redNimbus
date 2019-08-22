@@ -1,8 +1,8 @@
-﻿using Either;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using RedNimbus.API.Models;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.DTO;
+using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 
 namespace RedNimbus.API.Controllers
@@ -32,17 +32,18 @@ namespace RedNimbus.API.Controllers
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
             // var response = _communicationService.Send<CreateUserDto, Response<Empty>>("api/user", createUserDto).Result;
-
             var a = _communicationService.Send<CreateUserDto, Empty>("api/user", createUserDto)
                  .Result;
-            var b = a
-                 .Map(AllOk);
-            var c = b
-                 .Reduce(x => UnprocessableEntityErr(x));
+            var b = a.Map(AllOk);
+            var c = b.Reduce(UnprocessableEntityErr);
             return c;
-            
-        }
 
+            //return _communicationService.Send<CreateUserDto, Empty>("api/user", createUserDto)
+            //     .Result
+            //     .Map(Created)
+            //     .Reduce(UnprocessableEntityErr);
+        }
+          
 
 
 

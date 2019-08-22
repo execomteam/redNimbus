@@ -3,39 +3,74 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Either
+namespace RedNimbus.Either
 {
     public static class EitherAdapters
     {
         
         public static Either<TLeft, TRightResult> Map<TLeft, TRight, TRightResult>(this Either<TLeft, TRight> either, Func<TRight, TRightResult> func)
         {
-            return  either is Right<TLeft, TRight> right ?
-                    (Either<TLeft,TRightResult>)func(right) :
-                    (TLeft)(Left<TLeft,TRight>)either;
+            if(either is Right<TLeft, TRight>)
+            {
+                Right<TLeft, TRight> right = (Right<TLeft, TRight>)either;
+                return (Either<TLeft, TRightResult>)func(right);
+            }
+            return (TLeft)(Left<TLeft,TRight>)either;
         }
         public static Either<TLeft, TRightResult> Map<TLeft, TRight, TRightResult>(this Either<TLeft,TRight> either, Func<TRight, Either<TLeft, TRightResult>> func)
         {
-            return  either is Right<TLeft, TRight> right ?
-                    func(right) :
-                    (TLeft)(Left<TLeft, TRight>)either;
+            if(either is Right<TLeft, TRight>)
+            {
+                Right<TLeft, TRight> right = (Right<TLeft, TRight>)either;
+                return func(right);
+            }
+            return (TLeft)(Left<TLeft, TRight>)either;
         }
 
         public static Either<TLeft, TRightResult> Map<TLeft, TRight, TRightResult>(this Either<TLeft, TRight> either, Func<TRightResult> func)
         {
-            return either is Right<TLeft, TRight> ? 
-                   (Either<TLeft, TRightResult>) func() :
-                   (TLeft)(Left<TLeft, TRight>)either;
+            if(either is Right<TLeft, TRight>)
+            {
+                return func();
+            }
+            else if (either is Left<TLeft, TRight>)
+            {
+                var x = (Left<TLeft, TRight>)either;
+                return (TLeft)x;
+            }else if (either == null)
+            {
+                return null;
+            }else
+            {
+                var a = either.GetType();
+
+                return null;
+            }
         }
 
         public static TRight Reduce<TLeft, TRight>(this Either<TLeft, TRight> either, Func<TLeft, TRight> func)
         {
-            return either is Left<TLeft, TRight> left ?
-                   func(left) :
-                   (Right<TLeft, TRight>)either;
+            if(either is Left<TLeft, TRight>)
+            {
+                Left<TLeft, TRight> left = (Left<TLeft, TRight>)either;
+                return func(left);
+            }
+
+            return (Right<TLeft, TRight>)either;
         }
 
-        
+        public static Either<TLeft, TRight> Reduce<TLeft, TRight>(this Either<TLeft, TRight> either, Func<TLeft, TRight> func, Func<TLeft, bool> when)
+        {
+            if (either is Left<TLeft, TRight>)
+            {
+                Left<TLeft, TRight> left = (Left<TLeft, TRight>)either;
+                if (when(left))
+                {
+                    return func(left);
+                }
+            }
 
+            return (Right<TLeft, TRight>)either;
+        }
     }
 }

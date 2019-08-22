@@ -7,6 +7,7 @@ using RedNimbus.UserService.Services.Interfaces;
 using RedNimbus.UserService.Helper;
 using RedNimbus.Either.Errors;
 using RedNimbus.Either;
+using RedNimbus.DTO;
 
 namespace RedNimbus.UserService.Services
 {
@@ -20,16 +21,9 @@ namespace RedNimbus.UserService.Services
 
         private bool IsUserValid(User user)
         {
-            if(!IsEmpty(user)
-                && IsEmailValid(user)
-                && IsPasswordValid(user)
-                && IsNameValid(user)
-                && IsPhoneValid(user))
-            {
-                return true;
-            }
+            return !IsEmpty(user) && IsEmailValid(user)
+                && IsPasswordValid(user) && IsNameValid(user) && IsPhoneValid(user);
 
-            return false;
         }
 
         private bool IsEmpty(User user)
@@ -67,68 +61,84 @@ namespace RedNimbus.UserService.Services
             return true;
         }
 
-        private void CapitalizeFirstLetter(User user)
-        {
-            user.FirstName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.FirstName.ToLower());
-            user.LastName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.LastName.ToLower());
-        }
-
         # endregion
 
-        //public Either<IError,User> Create(User user)
-        //{
-        //    if (!IsUserValid(user))
-        //    {
-        //        return new Left();
-        //    }
 
-
-        //    user.Id = Guid.NewGuid();
-        //    user.Password = HashHelper.ComputeHash(user.Password);
-
-        //    //CapitalizeFirstLetter(user);
-        //    registeredUsers.Add(user.Email, user);
-
-        //    return registeredUsers[user.Email];
-        //}
-
-        public User Create(User user)
+        public Either<IError, User> Create(User user)
         {
-            if (!IsUserValid(user) || registeredUsers.ContainsKey(user.Email))
-                return null;
-            
-            
+            if (IsEmpty(user))
+            {
+                return new Left<IError, User>(new UnacceptableFormatErr() { Message = "Requirerd field is empty!" });
+            }
+
+            if (!IsEmailValid(user))
+            {
+                return new Left<IError, User>(new UnacceptableFormatErr() { Message = "Email format is unacceptable!" });
+            }
+
+            if (!IsPasswordValid(user))
+            {
+                return new Left<IError, User>(new UnacceptableFormatErr() { Message = "Password format is unacceptable!" });
+            }
+
             user.Id = Guid.NewGuid();
             user.Password = HashHelper.ComputeHash(user.Password);
 
-           //CapitalizeFirstLetter(user);
             registeredUsers.Add(user.Email, user);
 
-            return registeredUsers[user.Email];
+            return new Right<IError, User>(registeredUsers[user.Email]);
         }
 
-        public User Authenticate(User user)
+        public Either<IError, User> Authenticate(User user)
         {
-            if(!(String.IsNullOrWhiteSpace(user.Email) || String.IsNullOrWhiteSpace(user.Password)))
+
+            if (!String.IsNullOrWhiteSpace(user.Email))
             {
-                if (registeredUsers.ContainsKey(user.Email))
-                {
-                    var registeredUser = registeredUsers[user.Email];
-                    if (registeredUser.Password == HashHelper.ComputeHash(user.Password))
-                    {
-                        return registeredUser;
-                    }
-                }
+                return new UnacceptableFormatErr() { Message = "Email field empty!" };
             }
-            
-            return null;
+
+            if (String.IsNullOrWhiteSpace(user.Password)){
+                return new UnacceptableFormatErr() { Message = "Password field empty!" };
+            }
+
+            if (registeredUsers.ContainsKey(user.Email))
+            {
+                var registeredUser = registeredUsers[user.Email];
+                if (registeredUser.Password == HashHelper.ComputeHash(user.Password))
+                {
+                    return registeredUser;
+                }
+
+            }
+
+            return new UnacceptableFormatErr() { Message = "Email or Password is incorect" };
+
         }
 
-        public void AddAuthenticatedUser(string token, string email)
+        //public User Authenticate(User user)
+        //{
+
+        //    if(!(String.IsNullOrWhiteSpace(user.Email) || String.IsNullOrWhiteSpace(user.Password)))
+        //    {
+        //        if (registeredUsers.ContainsKey(user.Email))
+        //        {
+        //            var registeredUser = registeredUsers[user.Email];
+        //            if (registeredUser.Password == HashHelper.ComputeHash(user.Password))
+        //            {
+        //                return registeredUser;
+        //            }
+        //        }
+        //    }
+
+        //    return null;
+        //}
+
+        public UserDto AddAuthenticatedUser(UserDto user)
         {
-            if (tokenEmailPairs.ContainsKey(token))
-                return;
-            tokenEmailPairs.Add(token, email);
+            if (!tokenEmailPairs.ContainsKey(user.Key)) {
+                tokenEmailPairs.Add(user.Key, user.Email);
+            }
+            return user;
         }
 
         public User GetUserByToken(string token) {

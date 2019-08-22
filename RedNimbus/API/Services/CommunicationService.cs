@@ -5,6 +5,7 @@ using RedNimbus.DTO.Interfaces;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -26,8 +27,25 @@ namespace RedNimbus.API.Services
             client.DefaultRequestHeaders.Accept.Add(
                 new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
+            Either<IError, TSuccess> result = null;
             HttpResponseMessage response = await client.PostAsJsonAsync(path, data);
-            var result = await response.Content.ReadAsAsync<TSuccess>();
+            if (response.IsSuccessStatusCode)
+            {
+                result = await response.Content.ReadAsAsync<TSuccess>();
+            }
+            else if(response.StatusCode == HttpStatusCode.UnprocessableEntity)
+            {
+                result = await response.Content.ReadAsAsync<UnacceptableFormatErr>();
+            }
+            
+            if(result is Right<IError, TSuccess>)
+            {
+                Console.WriteLine();
+            }
+            else if(result is Left<IError, TSuccess>)
+            {
+                Console.WriteLine();
+            }
             return result;
         }
     }

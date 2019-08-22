@@ -1,12 +1,15 @@
-﻿using RedNimbus.UserService.Model;
+﻿using RedNimbus.DTO;
+using RedNimbus.Either;
+using RedNimbus.Either.Errors;
+using RedNimbus.UserService.Model;
 
 namespace RedNimbus.UserService.Services.Interfaces
 {
     public interface IUserService
     {
-        User Create(User user);
-        User Authenticate(User user);
-        void AddAuthenticatedUser(string token, string email);
+        Either<IError,User> Create(User user);
+        Either<IError, User> Authenticate(User user);
+        UserDto AddAuthenticatedUser(UserDto user);
         User GetUserByToken(string token);
     }
 }
