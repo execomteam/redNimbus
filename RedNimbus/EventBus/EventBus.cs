@@ -19,8 +19,8 @@ namespace RedNimnus.EventBus
 
         public EventBus()
         {
-            _poller = new NetMQPoller { _dealerSocket };
-            _dealerSocket.ReceiveReady += HandleReceiveEvent;
+            _dealerSocket = new DealerSocket();
+            _publisherSocket = new PublisherSocket();
         }
 
         private void HandleReceiveEvent(object sender, NetMQSocketEventArgs e)
@@ -33,18 +33,21 @@ namespace RedNimnus.EventBus
         {
             _dealerSocket.Bind(_dealerAdress);
             _publisherSocket.Bind(_subscriberAdress);
-            _poller.Run();
 
+            _poller = new NetMQPoller { _dealerSocket };
+            _dealerSocket.ReceiveReady += HandleReceiveEvent;
+
+            _poller.Run();
         }
 
         public void Stop()
         {
             _dealerSocket.Unbind(_dealerAdress);
             _publisherSocket.Unbind(_subscriberAdress);
+
             _poller.Stop();
         }
 
-        //or template?
         public void Publish(NetMQMessage msg)
         {
             _publisherSocket.SendMultipartMessage(msg);
