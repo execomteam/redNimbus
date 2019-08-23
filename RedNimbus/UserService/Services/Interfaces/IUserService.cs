@@ -10,6 +10,6 @@ namespace RedNimbus.UserService.Services.Interfaces
         Either<IError,User> Create(User user);
         Either<IError, User> Authenticate(User user);
         UserDto AddAuthenticatedUser(UserDto user);
-        User GetUserByToken(string token);
+        Either<IError,User> GetUserByToken(string token);
     }
 }

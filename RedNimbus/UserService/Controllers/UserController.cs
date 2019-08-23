@@ -6,6 +6,7 @@ using RedNimbus.Either.Mappings;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace RedNimbus.UserService.Controllers
 {
@@ -36,14 +37,24 @@ namespace RedNimbus.UserService.Controllers
         }
 
 
-        private IActionResult UnprocessableEntityErr(IError error)
-        {
-            return UnprocessableEntity(error);
-        }
-
-        private IActionResult InternalServisErr(IError error)
+        private IActionResult BadRequestErrorHandler(IError error)
         {
             return BadRequest(error);
+        }
+
+        private IActionResult InternalServisErrorHandler(IError error)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, error);
+        }
+
+        private IActionResult NotFoundErrorHandler(IError error)
+        {
+            return NotFound(error);
+        }
+
+        private IActionResult AuthenticationErrorHandler(IError error)
+        {
+            return StatusCode(StatusCodes.Status406NotAcceptable, error);
         }
 
         private UserDto InsertToken(UserDto u)
@@ -58,41 +69,37 @@ namespace RedNimbus.UserService.Controllers
             return _mapper.Map<User>(createUserDto)
                 .Map(_userService.Create)
                 .Map(()=>AllOk())
-                .Reduce(UnprocessableEntityErr, err => err is UnacceptableFormatErr)
-                .Reduce(x=>InternalServisErr(x));
+                .Reduce(BadRequestErrorHandler, err => err is FormatError)
+                .Reduce(InternalServisErrorHandler); //ako bude greska vrati u lambdu
         }
 
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
         {
-               return _mapper.Map<UserDto>(
-                    _mapper.Map<User>(userLoginDTO) //form AuthUserDto to User
-                    .Map(_userService.Authenticate) //auth
-               )
+            return _mapper.Map<User>(userLoginDTO) //form AuthUserDto to User
+               .Map(_userService.Authenticate)
+               .Map(_mapper.Map<UserDto>)
                .Map(InsertToken)
                .Map(_userService.AddAuthenticatedUser)
-               .Map(x => AllOk(x.Key))
-               .Reduce(UnprocessableEntityErr, err => err is UnacceptableFormatErr)
-               .Reduce(x => InternalServisErr(x));
+               .Map(x => AllOk(new KeyDto() { Key = x.Key }))
+               .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
+               .Reduce(InternalServisErrorHandler); 
 
              //KeyDto keyData = _mapper.Map<KeyDto>(userData);
              //return Ok(keyData);
             
         }
 
+        //greskaaaaa get ne post
+
         [HttpPost("get")]
         public IActionResult GetUser([FromBody]KeyDto keyData)
         {
-            /*
-            User user = _userService.GetUserByToken(keyData.Key);
-            UserDto userData = _mapper.Map<UserDto>(user);
-            if(userData==null)
-                return UnprocessableEntity(new { message = "Token not found." });
-            userData.Key = keyData.Key;
-            return Ok(userData);
-            */
-            return null;
+            return _userService.GetUserByToken(keyData.Key)
+                .Map(_mapper.Map<UserDto>)
+                .Map((either) => AllOk(either))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);           
         }
-
     }
 }

@@ -29,23 +29,28 @@ namespace RedNimbus.API.Services
 
             Either<IError, TSuccess> result = null;
             HttpResponseMessage response = await client.PostAsJsonAsync(path, data);
+
             if (response.IsSuccessStatusCode)
             {
                 result = await response.Content.ReadAsAsync<TSuccess>();
             }
-            else if(response.StatusCode == HttpStatusCode.UnprocessableEntity)
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
             {
-                result = await response.Content.ReadAsAsync<UnacceptableFormatErr>();
+                result = await response.Content.ReadAsAsync<FormatError>();
+            }
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                result = await response.Content.ReadAsAsync<NotFoundError>();
+            }
+            else if (response.StatusCode == HttpStatusCode.NotAcceptable)
+            {
+                result = await response.Content.ReadAsAsync<AuthenticationError>();
+            }
+            else 
+            {
+                result = await response.Content.ReadAsAsync<InternalServisError>();
             }
             
-            if(result is Right<IError, TSuccess>)
-            {
-                Console.WriteLine();
-            }
-            else if(result is Left<IError, TSuccess>)
-            {
-                Console.WriteLine();
-            }
             return result;
         }
     }

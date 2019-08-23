@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RedNimbus.DTO.Enums;
 using RedNimbus.Either.Errors;
 using System;
 
@@ -21,7 +22,7 @@ namespace RedNimbus.Either.Mappings
             }
             catch(Exception e)
             {
-                return new Left<IError, TDestination>(new MappingError(e.Message));
+                return new Left<IError, TDestination>(new MappingError(e.Message, ErrorCode.MappingError));
             }
         }
     }

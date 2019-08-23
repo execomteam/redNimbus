@@ -15,5 +15,7 @@ namespace RedNimbus.UserService.Model
         public string Password { get; set; }
 
         public string PhoneNumber { get; set; }
+
+        public string Key { get; set; }
     }
 }

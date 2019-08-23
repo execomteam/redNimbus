@@ -1,19 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using RedNimbus.DTO.Enums;
 
 namespace RedNimbus.Either.Errors
 {
-    public class InternalServisErr : IError
+    public class InternalServisError : IError
     {
         private string _message;
-        public InternalServisErr(string message)
+        private ErrorCode _code;
+
+        public InternalServisError(string message, ErrorCode code)
         {
             _message = message;
+            _code = code;
         }
         public string Message
         {
             get { return _message; }
+        }
+
+        public ErrorCode Code
+        {
+            get { return _code; }
         }
     }
 }

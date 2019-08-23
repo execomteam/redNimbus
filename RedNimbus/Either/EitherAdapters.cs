@@ -72,5 +72,17 @@ namespace RedNimbus.Either
 
             return (Right<TLeft, TRight>)either;
         }
+
+        //reduce either del without args
+        public static TRight Reduce<TLeft, TRight>(this Either<TLeft, TRight> either, Func<TRight> func)
+        {
+            if (either is Left<TLeft, TRight>)
+            {
+                Left<TLeft, TRight> left = (Left<TLeft, TRight>)either;
+                return func();
+            }
+
+            return (Right<TLeft, TRight>)either;
+        }
     }
 }

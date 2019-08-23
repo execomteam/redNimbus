@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using RedNimbus.API.Models;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.DTO;
@@ -20,28 +21,46 @@ namespace RedNimbus.API.Controllers
 
         private IActionResult AllOk()
         {
-            return Ok();
+            return Ok(new Empty());
         }
 
-        private IActionResult UnprocessableEntityErr(IError error)
+        private IActionResult AllOk(object obj)
         {
-            return UnprocessableEntity(error.Message);
+            return Ok(obj);
         }
+
+
+        private IActionResult BadRequestErrorHandler(IError error)
+        {
+            return BadRequest(error.Message);
+        }
+
+        private IActionResult InternalServisErrorHandler(IError error)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
+        }
+
+        private IActionResult NotFoundErrorHandler(IError error)
+        {
+            return NotFound(error.Message);
+        }
+
+        private IActionResult AuthenticationErrorHandler(IError error)
+        {
+            return StatusCode(StatusCodes.Status406NotAcceptable, error.Message);
+        }
+
+
 
         [HttpPost]
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
             // var response = _communicationService.Send<CreateUserDto, Response<Empty>>("api/user", createUserDto).Result;
-            var a = _communicationService.Send<CreateUserDto, Empty>("api/user", createUserDto)
-                 .Result;
-            var b = a.Map(AllOk);
-            var c = b.Reduce(UnprocessableEntityErr);
-            return c;
-
-            //return _communicationService.Send<CreateUserDto, Empty>("api/user", createUserDto)
-            //     .Result
-            //     .Map(Created)
-            //     .Reduce(UnprocessableEntityErr);
+            return _communicationService.Send<CreateUserDto, Empty>("api/user", createUserDto)
+                 .Result
+                 .Map(() => AllOk())
+                 .Reduce(BadRequestErrorHandler, x => x is FormatError)
+                 .Reduce(InternalServisErrorHandler);
         }
           
 
@@ -50,29 +69,21 @@ namespace RedNimbus.API.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
         {
-            /*var response = _communicationService.Send<AuthorizeUserDto, UserDto>("api/user/authenticate", userLoginDTO).Result; 
-            switch (response.StatusCode)
-            {
-                case System.Net.HttpStatusCode.OK:
-                    return Ok(response.Value);
-                default:
-                    return UnprocessableEntity();
-            }*/
-            return null;
+            return _communicationService.Send<AuthorizeUserDto, UserDto>("api/user/authenticate", userLoginDTO)
+                .Result
+                .Map(x => AllOk(x))
+                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
+                .Reduce(InternalServisErrorHandler);
         }
 
         [HttpPost("get")]
         public IActionResult GetUser([FromBody]KeyDto keyData)
         {
-            /*var response = _communicationService.Send<KeyDto, UserDto>("api/user/get", keyData).Result;
-            switch (response.StatusCode)
-            {
-                case System.Net.HttpStatusCode.OK:
-                    return Ok(response.Value);
-                default:
-                    return UnprocessableEntity();
-            }*/
-            return null;
+            return _communicationService.Send<KeyDto, UserDto>("api/user/get", keyData)
+                .Result
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
         }
 
     }

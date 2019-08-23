@@ -8,6 +8,7 @@ using RedNimbus.UserService.Helper;
 using RedNimbus.Either.Errors;
 using RedNimbus.Either;
 using RedNimbus.DTO;
+using RedNimbus.DTO.Enums;
 
 namespace RedNimbus.UserService.Services
 {
@@ -19,25 +20,6 @@ namespace RedNimbus.UserService.Services
 
         #region Validation functions
 
-        private bool IsUserValid(User user)
-        {
-            return !IsEmpty(user) && IsEmailValid(user)
-                && IsPasswordValid(user) && IsNameValid(user) && IsPhoneValid(user);
-
-        }
-
-        private bool IsEmpty(User user)
-        {
-            if (String.IsNullOrWhiteSpace(user.Email)
-                || String.IsNullOrWhiteSpace(user.Password)
-                || String.IsNullOrWhiteSpace(user.FirstName)
-                || String.IsNullOrWhiteSpace(user.LastName))
-            {
-                return true;
-            }
-            return false;
-        }
-
         private bool IsEmailValid(User user)
         {
             return RegexUtilities.IsValidEmail(user.Email);
@@ -45,12 +27,16 @@ namespace RedNimbus.UserService.Services
 
         private bool IsPasswordValid(User user)
         {
-            return Regex.IsMatch(user.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,24}$");
+            return Regex.IsMatch(user.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,24}$") && !String.IsNullOrWhiteSpace(user.Password);
         }
 
-        private bool IsNameValid(User user)
+        private bool IsFirstNameValid(User user)
         {
-            return Regex.IsMatch(user.FirstName, @"^[a-z A-Z]+$") && Regex.IsMatch(user.LastName, @"^[a-z A-Z]+$");
+            return Regex.IsMatch(user.FirstName, @"^[a-z A-Z]+$");
+        }
+        private bool IsLastNameValid(User user)
+        {
+            return Regex.IsMatch(user.LastName, @"^[a-z A-Z]+$");
         }
 
         private bool IsPhoneValid(User user)
@@ -66,25 +52,42 @@ namespace RedNimbus.UserService.Services
 
         public Either<IError, User> Create(User user)
         {
-            if (IsEmpty(user))
+            if (!IsFirstNameValid(user))
             {
-                return new Left<IError, User>(new UnacceptableFormatErr() { Message = "Requirerd field is empty!" });
+                return new Left<IError, User>(new FormatError("Firstname is empty!", ErrorCode.FirstNameNullEmptyOrWhiteSpace));
+            }
+
+            if (!IsLastNameValid(user))
+            {
+                return new Left<IError, User>(new FormatError("Lastname is empty!", ErrorCode.LastNameNullEmptyOrWhiteSpace));
             }
 
             if (!IsEmailValid(user))
             {
-                return new Left<IError, User>(new UnacceptableFormatErr() { Message = "Email format is unacceptable!" });
+                return new Left<IError, User>(new FormatError("Email format is unacceptable!", ErrorCode.EmailWrongFormat));
             }
 
             if (!IsPasswordValid(user))
             {
-                return new Left<IError, User>(new UnacceptableFormatErr() { Message = "Password format is unacceptable!" });
+                return new Left<IError, User>(new FormatError("Password format is unacceptable!", ErrorCode.PasswordWrongFormat));
             }
 
             user.Id = Guid.NewGuid();
+            
             user.Password = HashHelper.ComputeHash(user.Password);
 
-            registeredUsers.Add(user.Email, user);
+            try
+            {
+                registeredUsers.Add(user.Email, user);
+            }
+            catch (ArgumentException)
+            {
+                return new Left<IError, User>(new FormatError("Email already exist", ErrorCode.EmailAlreadyUsed) );
+            }
+            catch (Exception)
+            {
+                return new Left<IError, User>(new InternalServisError("ServiceError", ErrorCode.InternalServerError));
+            }
 
             return new Right<IError, User>(registeredUsers[user.Email]);
         }
@@ -92,13 +95,13 @@ namespace RedNimbus.UserService.Services
         public Either<IError, User> Authenticate(User user)
         {
 
-            if (!String.IsNullOrWhiteSpace(user.Email))
+            if (String.IsNullOrWhiteSpace(user.Email))
             {
-                return new UnacceptableFormatErr() { Message = "Email field empty!" };
+                return new AuthenticationError("Password field empty!", ErrorCode.IncorrectEmailOrPassword);
             }
 
             if (String.IsNullOrWhiteSpace(user.Password)){
-                return new UnacceptableFormatErr() { Message = "Password field empty!" };
+                return new AuthenticationError("Password field empty!", ErrorCode.IncorrectEmailOrPassword);
             }
 
             if (registeredUsers.ContainsKey(user.Email))
@@ -111,7 +114,7 @@ namespace RedNimbus.UserService.Services
 
             }
 
-            return new UnacceptableFormatErr() { Message = "Email or Password is incorect" };
+            return new AuthenticationError("Email or Password is incorect", ErrorCode.IncorrectEmailOrPassword);
 
         }
 
@@ -141,14 +144,22 @@ namespace RedNimbus.UserService.Services
             return user;
         }
 
-        public User GetUserByToken(string token) {
-            if (token==null || !tokenEmailPairs.ContainsKey(token))
-                return null;
+        public Either<IError, User> GetUserByToken(string token) {
+            if (token == null || !tokenEmailPairs.ContainsKey(token))
+            {
+                return new NotFoundError("Requested user data not found", ErrorCode.UserNotFound);
+            }
 
             string email = tokenEmailPairs[token];
             if (!registeredUsers.ContainsKey(email))
-                return null;
-            return registeredUsers[email];
+            {
+                return new NotFoundError("Requested user data not found", ErrorCode.UserNotRegistrated);
+            }
+
+            User registeredUser = registeredUsers[email];
+            registeredUser.Key = token;
+
+            return registeredUser;
         }
     }
 }
