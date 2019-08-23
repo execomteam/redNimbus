@@ -20,6 +20,15 @@ namespace RedNimbus.Communication
 
         private IDictionary<string, Action<NetMQMessage>> _topicsToActions;
 
+        /// <summary>
+        /// Use this NetMQPoller instance to observe sockets.
+        /// </summary>
+        protected NetMQPoller Poller
+        {
+            get { return _poller; }
+            private set { }
+        }
+
         /// <summary>True if the service is up and running, else False.</summary>
         public bool IsRunning { get; protected set; }
 
@@ -34,8 +43,7 @@ namespace RedNimbus.Communication
             _subscriberSocket = new SubscriberSocket();
             _dealerSocket = new DealerSocket();
 
-            _poller = new NetMQPoller();
-            _poller.Add(_subscriberSocket);
+            _poller = new NetMQPoller { _subscriberSocket };
 
             _topicsToActions = new Dictionary<string, Action<NetMQMessage>>();
         }
@@ -59,15 +67,12 @@ namespace RedNimbus.Communication
         }
 
         /// <summary>
-        /// Temporarily pauses the service instance disconnecting the sockets from specified endpoints.
+        /// Temporarily pauses the service instance by stopping the poller.
         /// </summary>
         public void Pause()
         {
             if(IsRunning)
             {
-                _subscriberSocket.Disconnect(_publisherAddress);
-                _dealerSocket.Disconnect(_dealerAddress);
-
                 _poller.Stop();
 
                 IsRunning = false;
@@ -83,10 +88,13 @@ namespace RedNimbus.Communication
             {
                 try
                 {
-                    _subscriberSocket.Dispose();
-                    _dealerSocket.Dispose();
+                    _poller.Stop();
+                    _subscriberSocket.Disconnect(_publisherAddress);
+                    _dealerSocket.Disconnect(_dealerAddress);
 
                     _poller.Dispose();
+                    _subscriberSocket.Dispose();
+                    _dealerSocket.Dispose();
                 }
                 finally
                 {
@@ -99,7 +107,7 @@ namespace RedNimbus.Communication
         /// <summary>
         /// Subscribe the service to the specified topic to receive messages related to that topic.
         /// </summary>
-        /// <param name="topic">String prefix of the topic.</param>
+        /// <param name="topic">String prefix of the topic.</paramfg>
         /// <param name="action">Action that should be performed when a message for specified topic is received.</param>
         public void Subscribe(string topic, Action<NetMQMessage> action)
         {
@@ -136,6 +144,8 @@ namespace RedNimbus.Communication
         /// <param name="e"></param>
         private void ReceiveMessageEventHandler(object sender, NetMQSocketEventArgs e)
         {
+
+            // TODO: Wildcard topic
             NetMQMessage receivedMessage = null;
 
             while(e.Socket.TryReceiveMultipartMessage(ref receivedMessage))

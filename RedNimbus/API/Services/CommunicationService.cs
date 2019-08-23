@@ -10,6 +10,8 @@ namespace RedNimbus.API.Services
     {
         private readonly string _address;
 
+        // TODO: REQ socket
+
         public CommunicationService(string address) {
             _address = address;
         }      

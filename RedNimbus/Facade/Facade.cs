@@ -11,10 +11,9 @@ namespace RedNimbus.Facade
     public class Facade : BaseService
     {
         // TODO: Set address
-        private const string _requestAddress = "";
+        private const string _facadeAddress = "";
 
         private RouterSocket _routerSocket;
-        private NetMQPoller _poller;
 
         /// <summary>
         /// Facade constructor calling the base class constructor, and initializing the Router socket.
@@ -23,8 +22,7 @@ namespace RedNimbus.Facade
         {
             _routerSocket = new RouterSocket();
 
-            _poller = new NetMQPoller();
-            _poller.Add(_routerSocket);
+            Poller.Add(_routerSocket);
         }
 
         /// <summary>
@@ -36,31 +34,9 @@ namespace RedNimbus.Facade
             {
                 base.Start();
 
-                _routerSocket.Connect(_requestAddress);
+                _routerSocket.Bind(_facadeAddress);
 
                 _routerSocket.ReceiveReady += ReceiveRequestEventHandler;
-
-                _poller.Run();
-
-                IsRunning = true;
-            }
-
-        }
-
-        /// <summary>
-        /// Temporarily pauses the service instance disconnecting the sockets from specified endpoints.
-        /// </summary>
-        new public void Pause()
-        {
-            if (IsRunning)
-            {
-                base.Pause();
-
-                _routerSocket.Disconnect(_requestAddress);
-
-                _poller.Stop();
-
-                IsRunning = false;
             }
         }
 
@@ -71,11 +47,11 @@ namespace RedNimbus.Facade
         {
             if (IsRunning)
             {
+                base.Stop();
+
                 try
                 {
                     _routerSocket.Dispose();
-
-                    _poller.Dispose();
                 }
                 finally
                 {
@@ -134,7 +110,6 @@ namespace RedNimbus.Facade
                 SendMessage(ToDealerMessage(receivedMessage));
             }
         }
-
 
 
         public void SendResponse(NetMQMessage message)
