@@ -16,6 +16,13 @@ namespace RedNimbus.BucketService.Services
         public BucketService(string path) : base()
         {
             _path = path;
+
+            Subscribe("bucket/listBucketContent", ListBucketContent);
+            Subscribe("bucket/createBucket", CreateBucket);
+            Subscribe("bucket/deleteBucket", DeleteBucket);
+            Subscribe("bucket/putFile", PutFile);
+            Subscribe("bucket/getFile", GetFile);
+            Subscribe("bucket/deleteFile", DeleteFile);
         }
 
         public void ListBucketContent(NetMQMessage message)

@@ -10,17 +10,6 @@ namespace RedNimbus.BucketService
         {
             Services.BucketService bucketService = new Services.BucketService("/");
             bucketService.Start();
-            bucketService.Subscribe("bucket/listBucketContent", bucketService.ListBucketContent);
-            bucketService.Subscribe("bucket/createBucket", bucketService.CreateBucket);
-            bucketService.Subscribe("bucket/deleteBucket", bucketService.CreateBucket);
-            bucketService.Subscribe("bucket/putFile", bucketService.PutFile);
-            bucketService.Subscribe("bucket/getFile", bucketService.GetFile);
-            bucketService.Subscribe("bucket/deleteFile", bucketService.DeleteFile);
-            while(true)
-            {
-
-            }
-
         }
     }
 }
