@@ -7,9 +7,6 @@ import SignOut from './SignOut'
 import './css/NavBar.css'
 
 class NavBar extends React.Component {
-    constructor(props){
-        super(props);
-    }
 
     render() {
         

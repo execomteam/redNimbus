@@ -69,7 +69,7 @@ namespace RedNimbus.UserService.Services
 
             if (!IsPasswordValid(user))
             {
-                return new Left<IError, User>(new FormatError("Password format is unacceptable!", ErrorCode.PasswordWrongFormat));
+                return new Left<IError, User>(new FormatError("Password must have at least 8 characters, one uppercase letter, one lowcase letter, one number and one special character!", ErrorCode.PasswordWrongFormat));
             }
 
             user.Id = Guid.NewGuid();

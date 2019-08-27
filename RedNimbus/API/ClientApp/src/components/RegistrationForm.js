@@ -8,9 +8,21 @@ class RegistrationForm extends React.Component{
     constructor(props){
         super(props);
 
-        // States have been hardcoded to ease further feature testings
-        this.state = {firstName : '',lastName : '', email : '', phoneNumber : '', password : '', repeatedPassword : ''};
-
+        this.state = {
+            firstName: '',
+            lastName: '',
+            email: '',
+            phoneNumber: '',
+            password: '',
+            repeatedPassword: '',
+            errorFirstName: '',
+            errorLastName: '',
+            errorPassword: '',
+            errorRepeatedPassword: '',
+            errorPhonePassword: '',
+            errorUnknown: '',
+            tosCheckbox: false
+        };
         this.handlePasswordChange           = this.handlePasswordChange.bind(this);
         this.handleRepeatedPasswordChange   = this.handleRepeatedPasswordChange.bind(this);
         this.handleToSCheckboxChange        = this.handleToSCheckboxChange.bind(this);
@@ -40,12 +52,73 @@ class RegistrationForm extends React.Component{
             email:          document.getElementById('email').value,
             phoneNumber:    document.getElementById('phoneNumber').value
         }, () => {
-            if (self.state.password === self.state.repeatedPassword) {
-                self.SendRegisterRequest();
+                this.setState({
+                    errorFirstName: '',
+                    errorLastName: '',
+                    errorEmail: '',
+                    errorPassword: '',
+                    errorRepeatedPassword: ''
+                });
+            var isError = false;
+            if (self.state.password !== self.state.repeatedPassword) {
+                self.setState({
+                    errorPassword: 'Passwords do not match'
+                });
+                return;
             }
-            else {
-                alert('Passwords do not match');
+            if (self.state.password == null || self.state.password.trim() === '') {
+                self.setState({
+                    errorPassword: 'Passwords can not be empty',
+                });
+                return;
+
             }
+            if (self.state.repeatedPassword == null || self.state.repeatedPassword.trim() === '') {
+                self.setState({
+                    errorRepeatedPassword: 'Passwords can not be empty',
+                });
+                return;
+            }
+            if (self.state.firstName == null || self.state.firstName.trim() === '') //check null empty or whitespace
+            {
+                self.setState({
+                    errorFirstName: 'Firstname can not be empty'
+                });
+                return;
+            }
+            if (self.state.lastName == null || self.state.lastName.trim() === '')
+            {
+                self.setState({
+                    errorLastName: 'Lastname can not be empty'
+                });
+                return;
+            }
+            if (self.state.email == null || self.state.email.trim() === '') {
+                self.setState({
+                    errorEmail: 'Email must be in following format: example@provier.domain'
+                });
+                return;
+            } else {
+                var parts = self.state.email.split('@');
+                if (parts.length == 2) {
+                    var rightParts = parts[1].split('.');
+                    if (rightParts.length != 2) {
+                        self.setState({
+                            errorEmailName: 'Email must be in following format: example@provicer.domain'
+                        });
+                        return;
+                    }
+                }
+                else {
+                    self.setState({
+                        errorEmailName: 'Email must be in following format: example@provicer.domain'
+                    });
+                    return;
+                }
+            }
+
+            self.SendRegisterRequest();
+            
         });
     }
 
@@ -54,7 +127,43 @@ class RegistrationForm extends React.Component{
     }
 
     handleError(resp) {
-        alert('Error');
+        switch (resp.response.data.code) {
+            case 1:
+                this.setState({
+                    errorFirstName: resp.response.data.message
+                });
+                break;
+            case 2:
+                this.setState({
+                    errorLastName: resp.response.data.message
+                });
+                break;
+            case 3:
+                this.setState({
+                    errorEmail: resp.response.data.message
+                });
+                break;
+            case 4:
+                this.setState({
+                    errorEmail: resp.response.data.message
+                });
+                break;
+            case 5:
+                this.setState({
+                    errorPassword: resp.response.data.message
+                });
+                break;
+            case 6:
+                this.setState({
+                    errorPassword: resp.response.data.message,
+                    errorRepeatedPassword: resp.response.data.message
+                });
+                break;
+            default:
+                this.setState({
+                    errorUnknown: "Internal service error"
+                });
+        }
     }
     
     SendRegisterRequest(){
@@ -96,8 +205,8 @@ class RegistrationForm extends React.Component{
                                            className="form-control form-control-sm"
                                            id="firstName"
                                            placeholder="Enter First Name"
-                                           required
-                                           />
+                                    />
+                                    <label style={{ color: 'red' }}>{this.state.errorFirstName}</label>
                                 </div>
 
                                 <div className="form-group">
@@ -106,8 +215,8 @@ class RegistrationForm extends React.Component{
                                            className="form-control form-control-sm"
                                            id="lastName"
                                            placeholder="Enter Last Name"
-                                           required
-                                           />
+                                    />
+                                    <label style={{ color: 'red' }}>{this.state.errorLastName}</label>
                                 </div>
 
                                 <div className="form-group">
@@ -116,8 +225,8 @@ class RegistrationForm extends React.Component{
                                            className="form-control form-control-sm"
                                            id="email"
                                            placeholder = "Enter e-mail"
-                                           required
-                                           />
+                                    />
+                                    <label style={{ color: 'red' }}>{this.state.errorEmail}</label>
                                 </div>
 
                                 <div className="form-group">
@@ -128,8 +237,8 @@ class RegistrationForm extends React.Component{
                                            value={this.state.password}
                                            onChange={this.handlePasswordChange}
                                            placeholder = "Enter password"
-                                           required
-                                           />
+                                    />
+                                    <label style={{ color: 'red' }}>{this.state.errorPassword}</label>
                                 </div>
 
                                 <div className="form-group">
@@ -140,8 +249,8 @@ class RegistrationForm extends React.Component{
                                            value={this.state.repeatedPassword}
                                            onChange={this.handleRepeatedPasswordChange}
                                            placeholder = "Confirm password"
-                                           required
-                                           />
+                                    />
+                                    <label style={{ color: 'red' }}>{this.state.errorRepeatedPassword}</label>
                                 </div>
 
                                 <div className="form-group">
@@ -150,7 +259,8 @@ class RegistrationForm extends React.Component{
                                            className="form-control form-control-sm"
                                            id="phoneNumber"
                                            placeholder=""
-                                           />
+                                    />
+                                    <label style={{ color: 'red' }}>{this.state.errorPhoneNumber}</label>
                                 </div>
 
                                 <div>

@@ -29,17 +29,15 @@ namespace RedNimbus.API.Controllers
             return Ok(obj);
         }
 
-
         private IActionResult BadRequestErrorHandler(IError error)
         {
-            return BadRequest(error.Message);
+            return BadRequest(error);
         }
 
         private IActionResult InternalServisErrorHandler(IError error)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, error);
         }
-
         private IActionResult NotFoundErrorHandler(IError error)
         {
             return NotFound(error.Message);
@@ -47,10 +45,8 @@ namespace RedNimbus.API.Controllers
 
         private IActionResult AuthenticationErrorHandler(IError error)
         {
-            return StatusCode(StatusCodes.Status406NotAcceptable, error.Message);
+            return StatusCode(StatusCodes.Status406NotAcceptable, error);
         }
-
-
 
         [HttpPost]
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
@@ -62,9 +58,6 @@ namespace RedNimbus.API.Controllers
                  .Reduce(BadRequestErrorHandler, x => x is FormatError)
                  .Reduce(InternalServisErrorHandler);
         }
-          
-
-
 
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
@@ -85,6 +78,5 @@ namespace RedNimbus.API.Controllers
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         }
-
     }
 }
