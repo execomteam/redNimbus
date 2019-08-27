@@ -69,10 +69,10 @@ namespace RedNimbus.API.Controllers
                 .Reduce(InternalServisErrorHandler);
         }
 
-        [HttpPost("get")]
-        public IActionResult GetUser([FromBody]KeyDto keyData)
+        [HttpGet]
+        public IActionResult Get()
         {
-            return _communicationService.Send<KeyDto, UserDto>("api/user/get", keyData)
+            return _communicationService.Get<UserDto>("api/user", Request.Headers["token"])
                 .Result
                 .Map(x => AllOk(x))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)

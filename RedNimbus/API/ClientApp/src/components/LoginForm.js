@@ -22,7 +22,14 @@ class LoginForm extends React.Component {
 
     handleResponse(resp) {
         let self = this;
-        axios.post('http://localhost:65001/api/user/get', { key: resp.data.key }).then(
+        localStorage.setItem('token', resp.data.key);
+
+        const options = {
+            headers: { 'token': resp.data.key}
+        };
+
+
+        axios.get('http://localhost:65001/api/user', options).then(
             (response) => {
                 self.props.changeState(response);
                 this.setState({

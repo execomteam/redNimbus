@@ -21,7 +21,10 @@ export default class App extends React.Component{
             this.state = {
                 isLoggedIn: false
             }
-            axios.post('http://localhost:65001/api/user/get', { key: token }).then(
+            const options = {
+                headers: { 'token': token }
+            };
+            axios.get('http://localhost:65001/api/user', options).then(
                 (response) => { self.changeState(response) }
                 //(response) => { self.handleError(response) }
             );
