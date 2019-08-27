@@ -83,7 +83,9 @@ namespace RedNimbus.UserService.Services
             {
                 using(context = new UserDbContext())
                 {
+                    context.Database.EnsureCreated();
                     context.Add(user);
+                    context.SaveChanges();
                 }
             }
             catch (MySqlException)
@@ -95,7 +97,7 @@ namespace RedNimbus.UserService.Services
                 return new Left<IError, User>(new InternalServisError("ServiceError", ErrorCode.InternalServerError));
             }
 
-            return new Right<IError, User>(registeredUsers[user.Email]);
+            return new Right<IError, User>(user);
         }
 
         public Either<IError, User> Authenticate(User user)
