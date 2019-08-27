@@ -22,8 +22,6 @@ namespace RedNimbus.Facade
             _routerSocket = new RouterSocket();
             
             Poller.Add(_routerSocket);
-
-            
         }
 
         /// <summary>
@@ -33,13 +31,13 @@ namespace RedNimbus.Facade
         {
             if (IsStopped)
             {
-                base.Start();
-
                 _routerSocket.Bind(_facadeAddress);
 
                 _routerSocket.ReceiveReady += ReceiveRequestEventHandler;
 
-                Subscribe("response", SendResponse);
+                base.Start();
+
+                Subscribe("Response", SendResponse);
             }
         }
 

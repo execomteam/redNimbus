@@ -36,7 +36,9 @@ namespace RedNimbus.Communication
             // TODO: Check if this should be wrapped with try/catch
 
             Topic = message.Pop().ConvertToString();            // TODO: Define topic string format
-            Id = new Guid(message.Pop().ToByteArray());
+
+            if (!message.First.IsEmpty)
+                Id = new Guid(message.Pop().ToByteArray());
 
             NetMQFrame data = message.Pop();
             Data.MergeFrom(data.ToByteArray());

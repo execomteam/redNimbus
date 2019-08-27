@@ -62,7 +62,7 @@ namespace RedNimbus.API.Controllers
                  .Reduce(BadRequestErrorHandler, x => x is FormatError)
                  .Reduce(InternalServisErrorHandler);
         }
-          
+
 
 
 
@@ -84,6 +84,14 @@ namespace RedNimbus.API.Controllers
                 .Map(x => AllOk(x))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
+        }
+
+        [HttpGet("test")]
+        public string TestGet()
+        {
+            string data = _communicationService.SendTestRequest();
+
+            return data;
         }
 
     }
