@@ -9,6 +9,8 @@ using RedNimbus.Either.Errors;
 using RedNimbus.Either;
 using RedNimbus.DTO;
 using RedNimbus.DTO.Enums;
+using UserService.Database;
+using MySql.Data.MySqlClient;
 
 namespace RedNimbus.UserService.Services
 {
@@ -17,6 +19,7 @@ namespace RedNimbus.UserService.Services
         private static readonly Dictionary<string, User> registeredUsers = new Dictionary<string, User>();
         private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
         public UserService() {}
+        private UserDbContext context;
 
         #region Validation functions
 
@@ -78,9 +81,12 @@ namespace RedNimbus.UserService.Services
 
             try
             {
-                registeredUsers.Add(user.Email, user);
+                using(context = new UserDbContext())
+                {
+                    context.Add(user);
+                }
             }
-            catch (ArgumentException)
+            catch (MySqlException)
             {
                 return new Left<IError, User>(new FormatError("Email already exist", ErrorCode.EmailAlreadyUsed) );
             }
