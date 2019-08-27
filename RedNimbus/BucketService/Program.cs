@@ -1,24 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using RedNimbus.BucketService.Helper;
+using RedNimbus.BucketService.Services;
 
-namespace BucketService
+namespace RedNimbus.BucketService
 {
-    public class Program
+    class Program
     {
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
-        }
+            Services.BucketService bucketService = new Services.BucketService("/");
+            bucketService.Start();
+            bucketService.Subscribe("bucket/listBucketContent", bucketService.ListBucketContent);
+            bucketService.Subscribe("bucket/createBucket", bucketService.CreateBucket);
+            bucketService.Subscribe("bucket/deleteBucket", bucketService.CreateBucket);
+            bucketService.Subscribe("bucket/putFile", bucketService.PutFile);
+            bucketService.Subscribe("bucket/getFile", bucketService.GetFile);
+            bucketService.Subscribe("bucket/deleteFile", bucketService.DeleteFile);
+            while(true)
+            {
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+            }
+
+        }
     }
 }
