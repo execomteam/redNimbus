@@ -14,6 +14,10 @@ namespace RedNimbus.API.Services
 {
     public class UserService : IUserService
     {
+        public UserService()
+        {
+
+        }
         public Either<IError, TSuccess> RegisterUser<TRequest, TSuccess>(CreateUserDto createUserDto)
         {
             Message<UserMessage> message = new Message<UserMessage>("RegisterUser");
@@ -22,9 +26,16 @@ namespace RedNimbus.API.Services
             message.Data.LastName = createUserDto.LastName;
             message.Data.Email = createUserDto.Email;
             message.Data.Password = createUserDto.Password;
-            message.Data.PhoneNumber = createUserDto.PhoneNumber;
+            //message.Data.PhoneNumber = createUserDto.PhoneNumber;
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            // TODO: Fix message constructor
+
+            NetMQMessage temp = message.ToNetMQMessage();
+            NetMQFrame topicFrame = temp.Pop();
+            NetMQFrame emptyFrame = temp.Pop();
+            temp.Push(topicFrame);
+        
+            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
 
             Either<IError, TSuccess> result = null;
 
