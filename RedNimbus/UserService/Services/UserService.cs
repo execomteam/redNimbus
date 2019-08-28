@@ -11,15 +11,21 @@ using RedNimbus.DTO;
 using RedNimbus.DTO.Enums;
 using UserService.Database;
 using MySql.Data.MySqlClient;
+using RedNimbus.Either.Mappings;
+using UserService.DatabaseModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace RedNimbus.UserService.Services
 {
     public class UserService : IUserService
     {
-        private static readonly Dictionary<string, User> registeredUsers = new Dictionary<string, User>();
-        private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
-        public UserService() {}
-        private UserDbContext context;
+        private UserDatabaseUtils userDatabaseUtils;
+        public UserService()
+        {
+            userDatabaseUtils = new UserDatabaseUtils();
+        }
+        private static readonly Dictionary<string, User>    registeredUsers = new Dictionary<string, User>();
+        private static readonly Dictionary<string, string>  tokenEmailPairs = new Dictionary<string, string>();
 
         #region Validation functions
 
@@ -81,14 +87,9 @@ namespace RedNimbus.UserService.Services
 
             try
             {
-                using(context = new UserDbContext())
-                {
-                    context.Database.EnsureCreated();
-                    context.Add(user);
-                    context.SaveChanges();
-                }
+                userDatabaseUtils.RegisterUser(user);
             }
-            catch (MySqlException)
+            catch (DbUpdateException)
             {
                 return new Left<IError, User>(new FormatError("Email already exist", ErrorCode.EmailAlreadyUsed) );
             }
@@ -112,9 +113,10 @@ namespace RedNimbus.UserService.Services
                 return new AuthenticationError("Password field empty!", ErrorCode.IncorrectEmailOrPassword);
             }
 
-            if (registeredUsers.ContainsKey(user.Email))
+
+            if (userDatabaseUtils.CheckIfAlreadyRegistered(user.Email))
             {
-                var registeredUser = registeredUsers[user.Email];
+                var registeredUser = userDatabaseUtils.getUserByEmail(user.Email);
                 if (registeredUser.Password == HashHelper.ComputeHash(user.Password))
                 {
                     return registeredUser;
@@ -159,12 +161,12 @@ namespace RedNimbus.UserService.Services
             }
 
             string email = tokenEmailPairs[token];
-            if (!registeredUsers.ContainsKey(email))
+            if (!userDatabaseUtils.CheckIfAlreadyRegistered(email))
             {
                 return new NotFoundError("Requested user data not found", ErrorCode.UserNotRegistrated);
             }
 
-            User registeredUser = registeredUsers[email];
+            User registeredUser = userDatabaseUtils.getUserByEmail(email);
             registeredUser.Key = token;
 
             return registeredUser;

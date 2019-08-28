@@ -74,22 +74,6 @@ namespace UserService
 
             IUserService userService = new RedNimbus.UserService.Services.UserService();
 
-            // TEST
-            User u = new User
-            {
-                FirstName = "Emil",
-                Email = "enisnerbajin@gmail.com",
-                LastName = "Nisner Bajin",
-                PhoneNumber = "432141243",
-                Password = "@Testiranje97"
-            };
-
-            userService.Create(u);
-            //TEST - Fin
-
-            Console.WriteLine("Check");
-
-
             services.AddSingleton(userService);
         }
 
