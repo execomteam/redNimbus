@@ -15,12 +15,14 @@ namespace RedNimbus.BucketService.Services
             List<string> returnValue = new List<string>();
             foreach (string entry in Directory.GetDirectories(path))
             {
-                returnValue.Add(entry);
+                string[] val = entry.Split('/');
+                returnValue.Add(val[val.Length-1]);
             }
 
             foreach (string entry in Directory.GetFiles(path))
             {
-                returnValue.Add(entry);
+                string[] val = entry.Split('/');
+                returnValue.Add(val[val.Length - 1]);
             }
             return returnValue;
         }
