@@ -67,7 +67,27 @@ namespace UserService.Database
             {
                user = context.Users.First(u => u.Email.Equals(email));
             }
-            User result = new User
+
+            User result = convertUserDBToUser(user);
+            return result;
+        }
+
+        private User convertUserDBToUser(UserDB userdb)
+        {
+            User user = new User
+            {
+                FirstName   = userdb.FirstName,
+                LastName    = userdb.LastName,
+                Email       = userdb.Email,
+                PhoneNumber = userdb.PhoneNumber,
+                Password    = userdb.Password
+            };
+            return user;
+        }
+
+        private UserDB convertUserToUserDB(User user)
+        {
+            UserDB userdb = new UserDB
             {
                 FirstName   = user.FirstName,
                 LastName    = user.LastName,
@@ -75,7 +95,7 @@ namespace UserService.Database
                 PhoneNumber = user.PhoneNumber,
                 Password    = user.Password
             };
-            return result;
+            return userdb;
         }
     }
 }

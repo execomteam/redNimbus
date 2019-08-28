@@ -24,7 +24,6 @@ namespace RedNimbus.UserService.Services
         {
             userDatabaseUtils = new UserDatabaseUtils();
         }
-        private static readonly Dictionary<string, User>    registeredUsers = new Dictionary<string, User>();
         private static readonly Dictionary<string, string>  tokenEmailPairs = new Dictionary<string, string>();
 
         #region Validation functions
