@@ -20,7 +20,9 @@ namespace RedNimbus.Facade
         public Facade() : base()
         {
             _routerSocket = new RouterSocket();
-            
+
+            Subscribe("Response", SendResponse);
+
             Poller.Add(_routerSocket);
         }
 
@@ -36,8 +38,6 @@ namespace RedNimbus.Facade
                 _routerSocket.ReceiveReady += ReceiveRequestEventHandler;
 
                 base.Start();
-
-                Subscribe("Response", SendResponse);
             }
         }
 
@@ -70,13 +70,16 @@ namespace RedNimbus.Facade
         /// <returns>The transformed message.</returns>
         public NetMQMessage ToDealerMessage(NetMQMessage message)
         {
-            NetMQFrame idFrame = message.Pop();
-            NetMQFrame topicFrame = message.Pop();
+            NetMQFrame idFrame = message[0];
+            NetMQFrame topicFrame = message[2];
+            NetMQFrame dataFrame = message[3];
 
-            message.Push(idFrame);
-            message.Push(topicFrame);
+            NetMQMessage dealerMessage = new NetMQMessage();
+            dealerMessage.Append(topicFrame);
+            dealerMessage.Append(idFrame);
+            dealerMessage.Append(dataFrame);
 
-            return message;
+            return dealerMessage;
         }
 
         /// <summary>
@@ -87,13 +90,16 @@ namespace RedNimbus.Facade
         /// <returns>The transformed message.</returns>
         public NetMQMessage ToRouterMessage(NetMQMessage message)
         {
-            NetMQFrame topicFrame = message.Pop();
-            NetMQFrame idFrame = message.Pop();
+            NetMQMessage routerMessage = new NetMQMessage();
 
-            message.Push(topicFrame);
-            message.Push(idFrame);
+            NetMQFrame idFrame = message[1];
+            NetMQFrame dataFrame = message[2];
 
-            return message;
+            routerMessage.Append(idFrame);
+            routerMessage.AppendEmptyFrame();
+            routerMessage.Append(dataFrame);
+
+            return routerMessage;
         }
 
         /// <summary>
