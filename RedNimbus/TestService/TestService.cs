@@ -16,7 +16,7 @@ namespace TestService
 
         private void HandleTestTopicAction(NetMQMessage obj)
         {
-            Message<TestMessage> message = new Message<TestMessage>(obj);
+        Message<TestMessage> message = new Message<TestMessage>(obj);
 
             message.Data.Value = "Yay! :)";
             message.Topic = "Response";

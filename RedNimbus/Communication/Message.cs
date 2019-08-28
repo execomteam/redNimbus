@@ -27,6 +27,12 @@ namespace RedNimbus.Communication
         /// </summary>
         public T Data { get; set; } = new T();
 
+        // TODO: Summary
+        public Message(string topic)
+        {
+            Topic = topic;
+        }
+
         /// <summary>
         /// Create a new Message instance.
         /// </summary>

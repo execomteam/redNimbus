@@ -13,10 +13,12 @@ namespace RedNimbus.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly ICommunicationService _communicationService;
+        private readonly IUserService _userService;
 
-        public UserController(ICommunicationService communicationService)
+        public UserController(ICommunicationService communicationService, IUserService userService)
         {
             _communicationService = communicationService;
+            _userService = userService;
         }
 
         #region IActionResult
@@ -63,16 +65,16 @@ namespace RedNimbus.API.Controllers
                  .Reduce(InternalServisErrorHandler);
         }
 
-        [HttpPost]
+        [HttpPost("messaging")]
         public IActionResult RegisterUser([FromBody]CreateUserDto createUserDto)
         {
-            string topic = "RegisterUser";
+            // TODO: Dodaj Singleton u startup
 
-            // - Dodeliti topic
-            // - Konvertovati DTO u nas protobuf message
-            // - Od toga napraviti NetMQMessage
-            // - Poslati preko socket factory zahtev
-            // - kad stigne response uraditi nesto
+            return _userService.RegisterUser<CreateUserDto, Empty>(createUserDto)
+                 .Map(() => AllOk())
+                 .Reduce(BadRequestErrorHandler, x => x is FormatError)
+                 .Reduce(InternalServisErrorHandler);
+
         }
 
         [HttpPost("authenticate")]
