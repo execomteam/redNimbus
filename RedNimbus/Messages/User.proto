@@ -1,0 +1,10 @@
+﻿syntax = "proto3";
+package RedNimbus.Messages;
+
+message User {
+	optional string FirstName = 1;
+	optional string LastName = 2;
+	optional string Email = 3;
+	optional string Password = 4;
+	optional string PhoneNumber = 5;
+}

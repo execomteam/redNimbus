@@ -149,7 +149,7 @@ namespace RedNimbus.Communication
 
             while(e.Socket.TryReceiveMultipartMessage(ref receivedMessage))
             {
-                string topic = receivedMessage.Pop().ConvertToString();
+                string topic = receivedMessage.First.ConvertToString();
 
                 _topicsToActions.TryGetValue(topic, out Action<NetMQMessage> action);
 

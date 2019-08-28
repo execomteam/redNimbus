@@ -19,6 +19,8 @@ namespace RedNimbus.API.Controllers
             _communicationService = communicationService;
         }
 
+        #region IActionResult
+
         private IActionResult AllOk()
         {
             return Ok(new Empty());
@@ -28,7 +30,6 @@ namespace RedNimbus.API.Controllers
         {
             return Ok(obj);
         }
-
 
         private IActionResult BadRequestErrorHandler(IError error)
         {
@@ -50,12 +51,11 @@ namespace RedNimbus.API.Controllers
             return StatusCode(StatusCodes.Status406NotAcceptable, error.Message);
         }
 
-
+        #endregion
 
         [HttpPost]
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
-            // var response = _communicationService.Send<CreateUserDto, Response<Empty>>("api/user", createUserDto).Result;
             return _communicationService.Send<CreateUserDto, Empty>("api/user", createUserDto)
                  .Result
                  .Map(() => AllOk())
@@ -63,8 +63,17 @@ namespace RedNimbus.API.Controllers
                  .Reduce(InternalServisErrorHandler);
         }
 
+        [HttpPost]
+        public IActionResult RegisterUser([FromBody]CreateUserDto createUserDto)
+        {
+            string topic = "RegisterUser";
 
-
+            // - Dodeliti topic
+            // - Konvertovati DTO u nas protobuf message
+            // - Od toga napraviti NetMQMessage
+            // - Poslati preko socket factory zahtev
+            // - kad stigne response uraditi nesto
+        }
 
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
@@ -85,14 +94,5 @@ namespace RedNimbus.API.Controllers
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         }
-
-        [HttpGet("test")]
-        public string TestGet()
-        {
-            string data = _communicationService.SendTestRequest();
-
-            return data;
-        }
-
     }
 }
