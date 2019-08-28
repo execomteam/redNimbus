@@ -10,8 +10,7 @@ namespace RedNimbus.Facade
 {
     public class Facade : BaseService
     {
-        // TODO: Set address
-        private const string _facadeAddress = "";
+        private const string _facadeAddress = "tcp://*:8000";
 
         private RouterSocket _routerSocket;
 
@@ -21,7 +20,7 @@ namespace RedNimbus.Facade
         public Facade() : base()
         {
             _routerSocket = new RouterSocket();
-
+            
             Poller.Add(_routerSocket);
         }
 
@@ -30,13 +29,15 @@ namespace RedNimbus.Facade
         /// </summary>
         new public void Start()
         {
-            if(IsStopped)
+            if (IsStopped)
             {
-                base.Start();
-
                 _routerSocket.Bind(_facadeAddress);
 
                 _routerSocket.ReceiveReady += ReceiveRequestEventHandler;
+
+                base.Start();
+
+                Subscribe("Response", SendResponse);
             }
         }
 
@@ -91,7 +92,7 @@ namespace RedNimbus.Facade
 
             message.Push(topicFrame);
             message.Push(idFrame);
-            
+
             return message;
         }
 
@@ -113,10 +114,10 @@ namespace RedNimbus.Facade
 
 
         public void SendResponse(NetMQMessage message)
-        {   
-            // TODO: SUBSCRIBE TO RESPONSE EVENT
-
+        {
             _routerSocket.SendMultipartMessage(ToRouterMessage(message));
         }
+
+       
     }
 }

@@ -10,9 +10,8 @@ namespace RedNimbus.Communication
     /// </summary>
     public abstract class BaseService : IDisposable
     {
-        // TODO: Set addresses
-        private const string _publisherAddress = "";
-        private const string _dealerAddress = "";
+        private const string _publisherAddress = "tcp://127.0.0.1:8081";
+        private const string _dealerAddress = "tcp://127.0.0.1:8080";
 
         private SubscriberSocket _subscriberSocket;
         private DealerSocket _dealerSocket;

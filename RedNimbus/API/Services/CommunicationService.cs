@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NetMQ;
+using NetMQ.Sockets;
 using RedNimbus.API.Models;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.DTO.Interfaces;
@@ -8,18 +10,60 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using RedNimbus.Messages;
+using RedNimbus.Communication;
 
 namespace RedNimbus.API.Services
 {
     public class CommunicationService : ICommunicationService
     {
-        private readonly string _address;
+        
+        private const string _facadeAddress = "tcp://127.0.0.1:8000";
 
-        // TODO: REQ socket
+        private RequestSocket _requestSocket;
+
+
+        public string SendTestRequest()
+        {
+            //TODO 1: Create NetMQMessage
+            //TODO 2: Send using request socket
+            //TODO 3: wait for response message
+
+            NetMQMessage testMessage = new NetMQMessage();
+            testMessage.PushEmptyFrame();
+            testMessage.Push(new NetMQFrame("TestTopic"));
+
+            Message<TestMessage> message = new Message<TestMessage>(testMessage);
+            message.Data.Value = "Test Message Data Value";
+
+            _requestSocket.SendMultipartMessage(message.ToNetMQMessage());
+
+            NetMQMessage receivedMessage = null;
+
+            string returnData = "No Value";
+
+            receivedMessage = _requestSocket.ReceiveMultipartMessage();
+            
+            returnData = receivedMessage[2].ConvertToString();
+
+            
+
+            return returnData;
+        }
+
+
+
+        #region httpService
+
+        private readonly string _address;
 
         public CommunicationService(string address) {
             _address = address;
-        }      
+
+            // TODO
+            _requestSocket = new RequestSocket();
+            _requestSocket.Connect(_facadeAddress);
+        }  
 
         public async Task<Either<IError, TSuccess>> Send<TRequest, TSuccess>(string path, TRequest data)
         {
@@ -55,5 +99,7 @@ namespace RedNimbus.API.Services
             
             return result;
         }
+        #endregion 
+        
     }
 }

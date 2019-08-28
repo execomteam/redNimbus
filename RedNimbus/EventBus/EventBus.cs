@@ -14,13 +14,14 @@ namespace RedNimbus.EventBus
         private PublisherSocket _publisherSocket;
         private NetMQPoller _poller;
 
-        private const string _subscriberAdress = "";
-        private const string _dealerAdress = "";
+        private const string _publisherAddress = "tcp://*:8081";
+        private const string _dealerAddress = "tcp://*:8080";
 
         public EventBus()
         {
             _dealerSocket = new DealerSocket();
             _publisherSocket = new PublisherSocket();
+
             _poller = new NetMQPoller { _dealerSocket };
         }
 
@@ -32,20 +33,35 @@ namespace RedNimbus.EventBus
 
         public void Start()
         {
-            _dealerSocket.Bind(_dealerAdress);
-            _publisherSocket.Bind(_subscriberAdress);
+            _dealerSocket.Bind(_dealerAddress);
+            _publisherSocket.Bind(_publisherAddress);
 
             _dealerSocket.ReceiveReady += HandleReceiveEvent;
 
             _poller.Run();
         }
 
+        public void Pause()
+        {
+           _poller.Stop();
+        }
+
         public void Stop()
         {
-            _dealerSocket.Unbind(_dealerAdress);
-            _publisherSocket.Unbind(_subscriberAdress);
+            try
+            {
+                _poller.Stop();
+                _publisherSocket.Disconnect(_publisherAddress);
+                _dealerSocket.Disconnect(_dealerAddress);
 
-            _poller.Stop();
+                _poller.Dispose();
+                _publisherSocket.Dispose();
+                _dealerSocket.Dispose();
+            }
+            finally
+            {
+                NetMQConfig.Cleanup();
+            }
         }
 
         public void Publish(NetMQMessage msg)
