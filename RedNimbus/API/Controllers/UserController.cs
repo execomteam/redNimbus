@@ -62,7 +62,7 @@ namespace RedNimbus.API.Controllers
                  .Reduce(BadRequestErrorHandler, x => x is FormatError)
                  .Reduce(InternalServisErrorHandler);
         }
-
+        /*
         [HttpPost]
         public IActionResult RegisterUser([FromBody]CreateUserDto createUserDto)
         {
@@ -74,7 +74,7 @@ namespace RedNimbus.API.Controllers
             // - Poslati preko socket factory zahtev
             // - kad stigne response uraditi nesto
         }
-
+        */
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
         {

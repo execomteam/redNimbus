@@ -13,14 +13,20 @@ namespace RedNimbus.BucketService.Services
             List<string> returnValue = new List<string>();
             foreach (string entry in Directory.GetDirectories(path))
             {
+                //TODO: Change this shit
                 string[] val = entry.Split('/');
-                returnValue.Add(val[val.Length-1]);
+                string last = val[val.Length - 1];
+                string[] splitedLast = last.Split('\\');
+                returnValue.Add(splitedLast[splitedLast.Length - 1]);
             }
             returnValue.Add("*");
             foreach (string entry in Directory.GetFiles(path))
             {
+                //TODO: Change this shit
                 string[] val = entry.Split('/');
-                returnValue.Add(val[val.Length - 1]);
+                string last = val[val.Length - 1];
+                string[] splitedLast = last.Split('\\');
+                returnValue.Add(splitedLast[splitedLast.Length - 1]);
             }
             return returnValue;
         }
