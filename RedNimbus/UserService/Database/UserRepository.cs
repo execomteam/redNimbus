@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using RedNimbus.DTO.Enums;
 using RedNimbus.Either.Errors;
+using RedNimbus.UserService.Mappings;
 using RedNimbus.UserService.Model;
 using System;
 using System.Collections.Generic;
@@ -72,6 +74,7 @@ namespace UserService.Database
 
         private User ConvertUserDBToUser(UserDB userdb)
         {
+            // TODO [enisnerbajin][29/08/2019]: Use automapper
             return new User
             {
                 FirstName   = userdb.FirstName,
@@ -84,6 +87,7 @@ namespace UserService.Database
 
         private UserDB ConvertUserToUserDB(User user)
         {
+            // TODO [enisnerbajin][29/08/2019]: Use automapper
             return new UserDB
             {
                 FirstName   = user.FirstName,

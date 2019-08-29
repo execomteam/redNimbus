@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RedNimbus.UserService.Model;
 using RedNimbus.DTO;
+using UserService.DatabaseModel;
 
 namespace RedNimbus.UserService.Mappings
 {
@@ -16,6 +17,8 @@ namespace RedNimbus.UserService.Mappings
             CreateMap<AuthorizeUserDto, User>();
             CreateMap<UserDto, KeyDto>();
             CreateMap<KeyDto, UserDto>();
+            CreateMap<User, UserDB>();
+            CreateMap<UserDB, User>();
         }
     }
 }
