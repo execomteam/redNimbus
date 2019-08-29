@@ -8,10 +8,10 @@ class FileGroup extends React.Component {
 
     render() {
         return (
-            <div class="card-group">
+            <div className="card-group">
                 {
                     this.props.content.map((value, index) => {
-                        return <File name={value}/>
+                        return <File key={index} name={value}/>
                     })
                 }
             </div>

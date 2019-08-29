@@ -57,30 +57,32 @@ namespace API.Controllers
         {
             List<string> toReturn;
             BucketMessage Data;
+
+            NetMQMessage netMqMsg = new NetMQMessage();
+            netMqMsg.Append("bucket/listBucketContent");
+
+            BucketMessage msg = new BucketMessage();
+            msg.Path = "/";
+            //msg.Token = Request.Headers["token"];
+
+            MemoryStream stream = new MemoryStream();
+            msg.WriteTo(stream);
+
+            NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
+            netMqMsg.Append(dataFrame);
+
+            NetMQMessage responseMessage = null;
+
             using (var requestSocket = new RequestSocket("tcp://localhost:8000"))
             {
-
-                NetMQMessage netMqMsg = new NetMQMessage();
-                netMqMsg.Append("bucket/listBucketContent");
-
-                BucketMessage msg = new BucketMessage();
-                msg.Path = "/";
-                //msg.Token = Request.Headers["token"];
-
-                MemoryStream stream = new MemoryStream();
-                msg.WriteTo(stream);
-
-                NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
-                netMqMsg.Append(dataFrame);
-
                 requestSocket.SendMultipartMessage(netMqMsg);
-
-                NetMQMessage responseMessage = requestSocket.ReceiveMultipartMessage();
-                NetMQFrame data = responseMessage.Pop();
-                Data = new BucketMessage();
-                Data.MergeFrom(data.ToByteArray());
-
+                responseMessage = requestSocket.ReceiveMultipartMessage();
             }
+
+            NetMQFrame data = responseMessage.Pop();
+            Data = new BucketMessage();
+            Data.MergeFrom(data.ToByteArray());
+
             if (Data.Successful)
             {
                 toReturn = new List<string>(Data.ReturnItems);
@@ -88,7 +90,7 @@ namespace API.Controllers
             }
             return BadRequest();
         }
-        /*
+        
         [HttpGet("{id}")]
         public IActionResult ListBucketContent(string id)
         {
@@ -125,8 +127,8 @@ namespace API.Controllers
             }
             return BadRequest();
         }
-        */
-
+        
+        /*
         [HttpGet("vezba")]
         public IActionResult Vezba() {
             BucketMessage Data;
@@ -155,6 +157,7 @@ namespace API.Controllers
             }
             return AllOk();
         }
+        */
 
     }
 }

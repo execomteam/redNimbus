@@ -44,7 +44,7 @@ namespace RedNimbus.BucketService.Services
                 Directory.CreateDirectory(path);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -60,7 +60,7 @@ namespace RedNimbus.BucketService.Services
                 Directory.Delete(path);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

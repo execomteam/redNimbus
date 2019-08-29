@@ -8,10 +8,10 @@ class FolderGroup extends React.Component {
 
     render() {
         return(
-            <div class="card-group">
+            <div className="card-group">
                 {
                     this.props.content.map((value, index) => {
-                        return <Folder name={value}/>
+                        return <Folder key={index} name={value}/>
                     })
                 }
             </div>
