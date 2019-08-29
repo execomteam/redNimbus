@@ -55,106 +55,114 @@ namespace API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            List<string> toReturn;
-            BucketMessage Data;
+            //Allocating variables
+            NetMQMessage netMqMsg = new NetMQMessage();
+
+            netMqMsg.Append("bucket/listBucketContent");
+
+            //Initializating message 
+            BucketMessage msg = new BucketMessage();
+            msg.Path = "/";
+            //msg.Token = Request.Headers["token"];
+
+            //From BucketMessage to NetMqMessage
+            MemoryStream stream = new MemoryStream();
+            msg.WriteTo(stream);
+            NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
+            netMqMsg.Append(dataFrame);
+
             using (var requestSocket = new RequestSocket("tcp://localhost:8000"))
             {
-
-                NetMQMessage netMqMsg = new NetMQMessage();
-                netMqMsg.Append("bucket/listBucketContent");
-
-                BucketMessage msg = new BucketMessage();
-                msg.Path = "/";
-                //msg.Token = Request.Headers["token"];
-
-                MemoryStream stream = new MemoryStream();
-                msg.WriteTo(stream);
-
-                NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
-                netMqMsg.Append(dataFrame);
-
                 requestSocket.SendMultipartMessage(netMqMsg);
-
-                NetMQMessage responseMessage = requestSocket.ReceiveMultipartMessage();
-                NetMQFrame data = responseMessage.Pop();
-                Data = new BucketMessage();
-                Data.MergeFrom(data.ToByteArray());
-
+                netMqMsg = requestSocket.ReceiveMultipartMessage();
             }
+
+            //From NetMqMessage to BucketMessage
+            NetMQFrame recivedData = netMqMsg.Pop();
+            BucketMessage Data = new BucketMessage();
+            Data.MergeFrom(recivedData.ToByteArray());
+
             if (Data.Successful)
             {
-                toReturn = new List<string>(Data.ReturnItems);
+                List<string>  toReturn = new List<string>(Data.ReturnItems);
                 return AllOk(toReturn);
             }
             return BadRequest();
         }
-        /*
+        
         [HttpGet("{id}")]
         public IActionResult ListBucketContent(string id)
         {
-            List<string> toReturn;
-            BucketMessage Data;
+            //Allocating variables
+            NetMQMessage netMqMsg = new NetMQMessage();
+
+            netMqMsg.Append("bucket/listBucketContent");
+
+            //Initializating message 
+            BucketMessage msg = new BucketMessage();
+            msg.Path = "/" + id;
+            //msg.Token = Request.Headers["token"];
+
+            //From BucketMessage to NetMqMessage
+            MemoryStream stream = new MemoryStream();
+            msg.WriteTo(stream);
+            NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
+            netMqMsg.Append(dataFrame);
+
             using (var requestSocket = new RequestSocket("tcp://localhost:8000"))
             {
-
-                NetMQMessage netMqMsg = new NetMQMessage();
-                netMqMsg.Append("bucket/listBucketContent");
-
-                BucketMessage msg = new BucketMessage();
-                msg.Path = "/" + id;
-                //msg.Token = Request.Headers["token"];
-
-                MemoryStream stream = new MemoryStream();
-                msg.WriteTo(stream);
-
-                NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
-                netMqMsg.Append(dataFrame);
-
                 requestSocket.SendMultipartMessage(netMqMsg);
-
-                NetMQMessage responseMessage = requestSocket.ReceiveMultipartMessage();
-                NetMQFrame data = responseMessage.Pop();
-                Data = new BucketMessage();
-                Data.MergeFrom(data.ToByteArray());
-
+                netMqMsg = requestSocket.ReceiveMultipartMessage();
             }
+
+            //From NetMqMessage to BucketMessage
+            NetMQFrame recivedData = netMqMsg.Pop();
+            BucketMessage Data = new BucketMessage();
+            Data.MergeFrom(recivedData.ToByteArray());
+
             if (Data.Successful)
             {
-                toReturn = new List<string>(Data.ReturnItems);
+                List<string>  toReturn = new List<string>(Data.ReturnItems);
                 return AllOk(toReturn);
             }
             return BadRequest();
         }
-        */
+        
+        [HttpPost("createBucket")]
+        public IActionResult CreateBucket([FromBody]StringDto bucketName)
+        {
+            //Allocating variables
+            NetMQMessage netMqMsg = new NetMQMessage();
 
-        [HttpGet("vezba")]
-        public IActionResult Vezba() {
-            BucketMessage Data;
+            netMqMsg.Append("bucket/createBucket");
+
+            //Initializating message 
+            BucketMessage msg = new BucketMessage();
+            msg.Path = "/" + bucketName.Value;
+            //msg.Token = Request.Headers["token"];
+
+            //From BucketMessage to NetMqMessage
+            MemoryStream stream = new MemoryStream();
+            msg.WriteTo(stream);
+            NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
+            netMqMsg.Append(dataFrame);
+
             using (var requestSocket = new RequestSocket("tcp://localhost:8000"))
             {
-
-                NetMQMessage netMqMsg = new NetMQMessage();
-                netMqMsg.Append("bucket/putFile");
-
-                BucketMessage msg = new BucketMessage();
-                msg.Path = "/proba.txt";
-                //msg.Token = Request.Headers["token"];
-                msg.File = ByteString.CopyFrom(System.IO.File.ReadAllBytes("C:\\Users\\praksa\\Desktop\\deoKod.txt"));
-                MemoryStream stream = new MemoryStream();
-                msg.WriteTo(stream);
-
-                NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
-                netMqMsg.Append(dataFrame);
-
                 requestSocket.SendMultipartMessage(netMqMsg);
-
-                NetMQMessage responseMessage = requestSocket.ReceiveMultipartMessage();
-                NetMQFrame data = responseMessage.Pop();
-                Data = new BucketMessage();
-                Data.MergeFrom(data.ToByteArray());
+                netMqMsg = requestSocket.ReceiveMultipartMessage();
             }
-            return AllOk();
-        }
 
+            //From NetMqMessage to BucketMessage
+            NetMQFrame recivedData = netMqMsg.Pop();
+            BucketMessage Data = new BucketMessage();
+            Data.MergeFrom(recivedData.ToByteArray());
+
+            if (Data.Successful)
+            {
+                return AllOk();
+            }
+            return BadRequest();
+        }
     }
 }
