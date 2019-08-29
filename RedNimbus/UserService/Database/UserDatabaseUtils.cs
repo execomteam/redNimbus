@@ -12,8 +12,6 @@ namespace UserService.Database
     {
         private DatabaseContext context;
 
-        //Constructor
-        public UserDatabaseUtils(){ }
 
         /// <summary>
         /// Adds a user to the database
@@ -22,13 +20,8 @@ namespace UserService.Database
         /// <param name="newUser"></param>
         public void RegisterUser(User newUser)
         {
-            UserDB userDB = new UserDB();
+            UserDB userDB = ConvertUserToUserDB(newUser);
 
-            userDB.FirstName        = newUser.FirstName;
-            userDB.LastName         = newUser.LastName;
-            userDB.Password         = newUser.Password;
-            userDB.PhoneNumber      = newUser.PhoneNumber;
-            userDB.Email            = newUser.Email;
             userDB.Id               = newUser.Id;
             userDB.ActiveAccount    = 1;   
 
@@ -49,12 +42,12 @@ namespace UserService.Database
         {
             using(context = new DatabaseContext())
             {
-                UserDB user = context.Users.First(u => u.Email.Equals(email));
-                if (user != null)
+                try
                 {
+                    UserDB user = context.Users.First(u => u.Email.Equals(email));
                     return true;
                 }
-                else
+                catch (InvalidOperationException)
                 {
                     return false;
                 }
@@ -66,7 +59,11 @@ namespace UserService.Database
             UserDB user;
             using (context = new DatabaseContext())
             {
-               user = context.Users.First(u => u.Email.Equals(email));
+                user = context.Users.First(u => u.Email.Equals(email));
+                if(user == null)
+                {
+                    return null;
+                }
             }
             if(user.ActiveAccount == 0)
             {
@@ -81,7 +78,7 @@ namespace UserService.Database
 
         private User ConvertUserDBToUser(UserDB userdb)
         {
-            User user = new User
+            return new User
             {
                 FirstName   = userdb.FirstName,
                 LastName    = userdb.LastName,
@@ -89,12 +86,11 @@ namespace UserService.Database
                 PhoneNumber = userdb.PhoneNumber,
                 Password    = userdb.Password
             };
-            return user;
         }
 
         private UserDB ConvertUserToUserDB(User user)
         {
-            UserDB userdb = new UserDB
+            return new UserDB
             {
                 FirstName   = user.FirstName,
                 LastName    = user.LastName,
@@ -102,17 +98,6 @@ namespace UserService.Database
                 PhoneNumber = user.PhoneNumber,
                 Password    = user.Password
             };
-            return userdb;
-        }
-
-        public bool DeactivateUserAccount(String userEmail)
-        {
-            return true;  
-        }
-
-        public bool ActivateUserAccount(String userEmail)
-        {
-            return true;
         }
     }
 }

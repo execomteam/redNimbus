@@ -12,7 +12,6 @@ namespace UserService.Database
         public DbSet<UserDB> Users { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // TODO: Read connection parameters from config file
             optionsBuilder.UseMySQL("server=localhost;database=rednimbususerdb;user=root;password=root");
         }
 
@@ -20,7 +19,6 @@ namespace UserService.Database
         {
             base.OnModelCreating(modelBuilder);
 
-            // This is Fluent API, Alternate keys can be set using data annotations
             modelBuilder.Entity<UserDB>().HasAlternateKey(e => e.Email);
 
         }
