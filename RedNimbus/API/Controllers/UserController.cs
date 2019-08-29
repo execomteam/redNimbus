@@ -61,24 +61,28 @@ namespace RedNimbus.API.Controllers
         public IActionResult Post([FromBody]CreateUserDto createUserDto) => _mapper.Map<User>(createUserDto)
                 .Map(_userService.RegisterUser)
                 .Map(() => AllOk())
-                .Reduce(BadRequestErrorHandler, err => err is FormatError)
-                .Reduce(InternalServisErrorHandler);
+                .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed)
+                .Reduce(this.InternalServisErrorHandler);
 
-        [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthenticateUserDto userLoginDTO)
+        private static bool EmailAlreadyUsed(IError err)
         {
-            //return _mapper.Map<User>(userLoginDTO)
-            //   .Map(_userService.Authenticate)
-            //   .Map(_mapper.Map<UserDto>)
-            //   .Map(InsertToken)
-            //   .Map(_userService.AddAuthenticatedUser)
-            //   .Map(x => AllOk(new KeyDto() { Key = x.Key }))
-            //   .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
-            //   .Reduce(InternalServisErrorHandler);
-
-            return null;
+            return err is FormatError formatError && formatError.Code == RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed;
         }
 
-        // TODO: GET
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto) => _mapper.Map<User>(authenticateUserDto)
+               .Map(_userService.Authenticate)
+               .Map(x => AllOk(new KeyDto() { Key = x.Key }))
+               .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
+               .Reduce(InternalServisErrorHandler);
+
+        [HttpPost("get")]
+        public IActionResult Get([FromBody]KeyDto keyDto)
+        {
+            return _userService.GetUserByToken(keyDto.Key)
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+        }
     }
 }

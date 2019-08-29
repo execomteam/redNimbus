@@ -8,8 +8,8 @@ namespace RedNimbus.API.Services.Interfaces
     public interface IUserService
     {
         Either<IError, User> RegisterUser(User user);
-        Either<IError, User> Authenticate(User user);
-        //UserDto AddAuthenticatedUser(UserDto user);
-        //Either<IError, User> GetUserByToken(string token);
+        Either<IError, KeyDto> Authenticate(User user);
+
+        Either<IError, User> GetUserByToken(string token);
     }
 }
