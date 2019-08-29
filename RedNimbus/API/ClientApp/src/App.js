@@ -1,12 +1,16 @@
 import React from 'react';
-import NavBar from './components/Router'
+import Routes from './components/Router'
 import axios from 'axios';
+import { Link, BrowserRouter as Router } from "react-router-dom";
+import { Nav, Navbar, NavItem } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
+
 
 export default class App extends React.Component{
 
     constructor(props) {
         super(props);
-        if (localStorage.getItem('token') === null ){
+        if (localStorage.getItem('token') === null || localStorage.getItem('token') === undefined ){
             this.state = {
                 isLoggedIn: false,
                 firstName: '',
@@ -26,7 +30,6 @@ export default class App extends React.Component{
             };
             axios.get('http://localhost:65001/api/user', options).then(
                 (response) => { self.changeState(response) }
-                //(response) => { self.handleError(response) }
             );
         }
     }
@@ -58,10 +61,66 @@ export default class App extends React.Component{
 
     render()
     {
-        return(
-            <div>
-                <NavBar changeState={this.changeState} signOut={this.signOut} state={this.state}/>
-            </div>
-        );
+        if(this.state.isLoggedIn){
+            return (
+                <Router>
+                <div className="App container">
+                    <Navbar fluid collapseOnSelect>
+                        <Navbar.Header>
+                            <Navbar.Brand>
+                                    <Link to="/">RedNimbus</Link>
+                            </Navbar.Brand>
+                            <Navbar.Toggle />
+                        </Navbar.Header>
+                        <Nav> 
+                            <LinkContainer to="/bucket">
+                                <NavItem>Bucket</NavItem>
+                            </LinkContainer>
+                        </Nav>
+                        <Navbar.Collapse>
+                            <Nav pullRight>
+                                
+                                <LinkContainer to="/signout">
+                                    <NavItem>signOut</NavItem>
+                                </LinkContainer>
+                            </Nav>
+                        </Navbar.Collapse>
+                    </Navbar>
+                    
+                    <Routes changeState={this.changeState} user={this.state} signOut={this.signOut}/>
+                    </div>
+                </Router>
+            );
+        }else{
+            return (
+                <Router>
+                <div className="App container">
+                    <Navbar fluid collapseOnSelect>
+                        <Navbar.Header>
+                            <Navbar.Brand>
+                                <LinkContainer to="/">
+                                    <Link to="/">Home</Link>
+                                </LinkContainer>
+                            </Navbar.Brand>
+                            <Navbar.Toggle />
+                        </Navbar.Header>
+                        <Navbar.Collapse>
+                            <Nav pullRight>
+                                <LinkContainer to="/login">
+                                    <NavItem>Login</NavItem>
+                                </LinkContainer>
+                                <LinkContainer to="/register">
+                                    <NavItem>Signup</NavItem>
+                                </LinkContainer>
+                            </Nav>
+                        </Navbar.Collapse>
+                    </Navbar>
+                    
+                    <Routes changeState={this.changeState} user={this.state} signOut={this.signOut}/>
+                    
+                </div>
+                </Router>
+            );
+        }
     }
 }
