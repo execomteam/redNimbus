@@ -60,7 +60,7 @@ namespace RedNimbus.BucketService.Services
             }
             else
             {
-                msg.Data.Successful = true;
+                msg.Data.Successful = false;
                 msg.Data.ErrorMessage = "Ugh";
                 SendMessage(msg.ToNetMQMessage());
             }
@@ -84,7 +84,7 @@ namespace RedNimbus.BucketService.Services
             }
             else
             {
-                msg.Data.Successful = true;
+                msg.Data.Successful = false;
                 msg.Data.ErrorMessage = "Ugh";
                 SendMessage(msg.ToNetMQMessage());
             }
@@ -114,6 +114,7 @@ namespace RedNimbus.BucketService.Services
 
             byte[] fileAsByteArray = FileSystemService.FileToByteArray(absolutePath);
             msg.Topic = "Response";
+            msg.Data.Successful = true;
             msg.Data.File = ByteString.CopyFrom(fileAsByteArray);
             SendMessage(msg.ToNetMQMessage());
         }
