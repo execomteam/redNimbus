@@ -11,23 +11,31 @@ namespace RedNimbus.BucketService.Services
         public static List<string> ListContent(string path)
         {
             List<string> returnValue = new List<string>();
-            foreach (string entry in Directory.GetDirectories(path))
+            try
             {
-                //TODO: Change this shit
-                string[] val = entry.Split('/');
-                string last = val[val.Length - 1];
-                string[] splitedLast = last.Split('\\');
-                returnValue.Add(splitedLast[splitedLast.Length - 1]);
+                foreach (string entry in Directory.GetDirectories(path))
+                {
+                    //TODO: Change this shit
+                    string[] val = entry.Split('/');
+                    string last = val[val.Length - 1];
+                    string[] splitLast = last.Split('\\');
+                    returnValue.Add(splitLast[splitLast.Length - 1]);
+                }
+                returnValue.Add("*");
+                foreach (string entry in Directory.GetFiles(path))
+                {
+                    //TODO: Change this shit
+                    string[] val = entry.Split('/');
+                    string last = val[val.Length - 1];
+                    string[] splitLast = last.Split('\\');
+                    returnValue.Add(splitLast[splitLast.Length - 1]);
+                }
             }
-            returnValue.Add("*");
-            foreach (string entry in Directory.GetFiles(path))
+            catch (Exception)
             {
-                //TODO: Change this shit
-                string[] val = entry.Split('/');
-                string last = val[val.Length - 1];
-                string[] splitedLast = last.Split('\\');
-                returnValue.Add(splitedLast[splitedLast.Length - 1]);
+                return null;
             }
+            finally { }
             return returnValue;
         }
 
@@ -68,16 +76,45 @@ namespace RedNimbus.BucketService.Services
 
         }
 
-        public static void ByteArrayToFile(string path, byte[] fileAsByteArray)
+        public static bool ByteArrayToFile(string path, byte[] fileAsByteArray)
         {
-            File.WriteAllBytes(path, fileAsByteArray);
+            try
+            {
+                File.WriteAllBytes(path, fileAsByteArray);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally { }
         }
 
-        public static byte[] FileToByteArray(string path) => File.ReadAllBytes(path);
-
-        public static void DeleteFile(string path)
+        public static byte[] FileToByteArray(string path)
         {
-            File.Delete(path);
+            try
+            {
+                return File.ReadAllBytes(path);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally { }
+        }
+
+        public static bool DeleteFile(string path)
+        {
+            try
+            {
+                File.Delete(path);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally { }
         }
     }
 }

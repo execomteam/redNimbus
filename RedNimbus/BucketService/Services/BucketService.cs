@@ -36,10 +36,19 @@ namespace RedNimbus.BucketService.Services
             string absolutePath = _path + userGuid + relativePath;
 
             List<string> contentList = FileSystemService.ListContent(absolutePath);
-
-            msg.Data.ReturnItems.AddRange(contentList);
+            msg.Data.Successful = (contentList != null);
             msg.Topic = "Response";
-            msg.Data.Successful = true;
+
+            if (msg.Data.Successful)
+            {
+                msg.Data.ReturnItems.AddRange(contentList);
+
+            }
+            else
+            {
+                msg.Data.ErrorMessage = "Ugh";
+            }
+            
             SendMessage(msg.ToNetMQMessage());
         }
 
@@ -50,20 +59,15 @@ namespace RedNimbus.BucketService.Services
             string userGuid = MessageHelper.Decode(msg.Data.Token);
             string absolutePath = _path + userGuid + relativePath;
 
-            bool successfulCreate = FileSystemService.CreateBucket(absolutePath);
+            msg.Data.Successful = FileSystemService.CreateBucket(absolutePath);
             msg.Topic = "Response";
-            if (successfulCreate)
-            {
-                msg.Data.Successful=true;
-                
-                SendMessage(msg.ToNetMQMessage());
-            }
-            else
-            {
-                msg.Data.Successful = false;
+
+            if (!msg.Data.Successful)
+            { 
                 msg.Data.ErrorMessage = "Ugh";
-                SendMessage(msg.ToNetMQMessage());
             }
+
+            SendMessage(msg.ToNetMQMessage());
         }
 
         //Bucket must be empty for deleting
@@ -74,20 +78,15 @@ namespace RedNimbus.BucketService.Services
             string userGuid = MessageHelper.Decode(msg.Data.Token);
             string absolutePath = _path + userGuid + relativePath;
 
-            bool successfulDelete = FileSystemService.DeleteBucket(absolutePath);
+            msg.Data.Successful = FileSystemService.DeleteBucket(absolutePath);
             msg.Topic = "Response";
-            if (successfulDelete)
-            {
-                msg.Data.Successful = true;
 
-                SendMessage(msg.ToNetMQMessage());
-            }
-            else
+            if (!msg.Data.Successful)
             {
-                msg.Data.Successful = false;
                 msg.Data.ErrorMessage = "Ugh";
-                SendMessage(msg.ToNetMQMessage());
             }
+            
+            SendMessage(msg.ToNetMQMessage());
         }
 
         public void PutFile(NetMQMessage message)
@@ -98,9 +97,13 @@ namespace RedNimbus.BucketService.Services
             string absolutePath = _path + userGuid + relativePath;
             byte[] fileAsByteArray = msg.Data.File.ToByteArray();
 
-            FileSystemService.ByteArrayToFile(absolutePath, fileAsByteArray);
+            msg.Data.Successful = FileSystemService.ByteArrayToFile(absolutePath, fileAsByteArray);
             msg.Topic = "Response";
-            msg.Data.Successful = true;
+
+            if (!msg.Data.Successful)
+            {
+                msg.Data.ErrorMessage = "Ugh";
+            }
 
             SendMessage(msg.ToNetMQMessage());
         }
@@ -114,8 +117,18 @@ namespace RedNimbus.BucketService.Services
 
             byte[] fileAsByteArray = FileSystemService.FileToByteArray(absolutePath);
             msg.Topic = "Response";
-            msg.Data.Successful = true;
-            msg.Data.File = ByteString.CopyFrom(fileAsByteArray);
+
+            if (fileAsByteArray != null)
+            {
+                msg.Data.Successful = true;
+                msg.Data.File = ByteString.CopyFrom(fileAsByteArray);
+            }
+            else
+            {
+                msg.Data.Successful = false;
+                msg.Data.ErrorMessage = "Ugh";
+            }
+
             SendMessage(msg.ToNetMQMessage());
         }
 
@@ -126,9 +139,14 @@ namespace RedNimbus.BucketService.Services
             string userGuid = MessageHelper.Decode(msg.Data.Token); ;
             string absolutePath = _path + userGuid + relativePath;
 
-            FileSystemService.DeleteFile(absolutePath);
+            msg.Data.Successful = FileSystemService.DeleteFile(absolutePath);
             msg.Topic = "Response";
-            msg.Data.Successful = true;
+
+            if (!msg.Data.Successful)
+            {
+                msg.Data.ErrorMessage = "Ugh";
+            }
+            
             SendMessage(msg.ToNetMQMessage());
         }
     }
