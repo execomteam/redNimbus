@@ -80,6 +80,7 @@ namespace RedNimbus.API.Controllers
         public IActionResult Get([FromBody]KeyDto keyDto)
         {
             return _userService.GetUserByToken(keyDto.Key)
+                .Map(_mapper.Map<UserDto>)
                 .Map(x => AllOk(x))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);

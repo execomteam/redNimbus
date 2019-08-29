@@ -186,23 +186,26 @@ namespace UserService
                 SendErrorMessage("Requested user data not found", RedNimbus.Either.Enums.ErrorCode.UserNotFound, tokenMessage.Id);
             }
 
-            string email = tokenEmailPairs[tokenMessage.Data.Token];
-            if (!registeredUsers.ContainsKey(email))
+            if(tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
             {
-                SendErrorMessage("Requested user data not found", RedNimbus.Either.Enums.ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                string email = tokenEmailPairs[tokenMessage.Data.Token];
+                if (!registeredUsers.ContainsKey(email))
+                {
+                    SendErrorMessage("Requested user data not found", RedNimbus.Either.Enums.ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                }
+
+                User registeredUser = registeredUsers[email];
+                registeredUser.Key = tokenMessage.Data.Token;
+
+                Message<UserMessage> userMessage = new Message<UserMessage>("Response");
+
+                userMessage.Id = tokenMessage.Id;
+                userMessage.Data.FirstName = registeredUser.FirstName;
+                userMessage.Data.LastName = registeredUser.LastName;
+
+                NetMQMessage msg = userMessage.ToNetMQMessage();
+                SendMessage(msg);
             }
-
-            User registeredUser = registeredUsers[email];
-            registeredUser.Key = tokenMessage.Data.Token;
-
-            Message<UserMessage> userMessage = new Message<UserMessage>("Response");
-
-            userMessage.Id = tokenMessage.Id;
-            userMessage.Data.FirstName = registeredUser.FirstName;
-            userMessage.Data.LastName = registeredUser.LastName;
-
-            NetMQMessage msg = userMessage.ToNetMQMessage();
-            SendMessage(msg);
         }
     }
 }

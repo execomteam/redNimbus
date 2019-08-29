@@ -93,7 +93,10 @@ namespace RedNimbus.API.Services
                 case RedNimbus.Either.Enums.ErrorCode.EmailWrongFormat:
                 case RedNimbus.Either.Enums.ErrorCode.PasswordWrongFormat:
                 case RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed:
+                case RedNimbus.Either.Enums.ErrorCode.PasswordsDoNotMatch:
                     return new FormatError(errorMessage.Data.MessageText, errorCode);
+                case RedNimbus.Either.Enums.ErrorCode.IncorrectEmailOrPassword:
+                    return new AuthenticationError(errorMessage.Data.MessageText, errorCode);
                 case RedNimbus.Either.Enums.ErrorCode.UserNotFound:
                 case RedNimbus.Either.Enums.ErrorCode.UserNotRegistrated:
                     return new NotFoundError(errorMessage.Data.MessageText, errorCode);
