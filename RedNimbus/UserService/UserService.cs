@@ -37,20 +37,32 @@ namespace UserService
             try
             {
                 registeredUsers.Add(user.Email, user);
+
+                userMessage.Topic = "Response";
+
+                NetMQMessage msg = userMessage.ToNetMQMessage();
+                SendMessage(msg);
             }
             catch (ArgumentException)
             {
-                // TODO: Handle email taken
+                Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
+
+                errorMessage.Id = userMessage.Id;
+                errorMessage.Data.Message = "Email already exists";
+
+                NetMQMessage msg = errorMessage.ToNetMQMessage();
+                SendMessage(msg);
             }
             catch (Exception)
             {
-                // TODO: Handle internal server error
+                Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
+
+                errorMessage.Id = userMessage.Id;
+                errorMessage.Data.Message = "Internal server error.";
+
+                NetMQMessage msg = errorMessage.ToNetMQMessage();
+                SendMessage(msg);
             }
-
-            userMessage.Topic = "Response";
-
-            NetMQMessage msg = userMessage.ToNetMQMessage();
-            SendMessage(msg);
         }
 
         private void HandleAuthenticateUser(NetMQMessage message)

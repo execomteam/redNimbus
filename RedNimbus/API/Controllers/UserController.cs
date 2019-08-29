@@ -1,21 +1,26 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RedNimbus.API.Services.Interfaces;
+using RedNimbus.Domain;
 using RedNimbus.DTO;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
+using RedNimbus.Either.Mappings;
 
 namespace RedNimbus.API.Controllers
 {
     [ApiController]
     [Route("api/v2/user")]
+    [Produces("application/json")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IEitherMapper _mapper;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IEitherMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         #region IActionResult
@@ -53,22 +58,27 @@ namespace RedNimbus.API.Controllers
         #endregion
 
         [HttpPost]
-        public IActionResult Post([FromBody]CreateUserDto createUserDto)
-        {
-            return _userService.RegisterUser<CreateUserDto, Empty>(createUserDto)
-                 .Map(() => AllOk())
-                 .Reduce(BadRequestErrorHandler, x => x is FormatError)
-                 .Reduce(InternalServisErrorHandler);
-
-        }
+        public IActionResult Post([FromBody]CreateUserDto createUserDto) => _mapper.Map<User>(createUserDto)
+                .Map(_userService.RegisterUser)
+                .Map(() => AllOk())
+                .Reduce(BadRequestErrorHandler, err => err is FormatError)
+                .Reduce(InternalServisErrorHandler);
 
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthenticateUserDto userLoginDTO)
         {
-            return _userService.AuthenticateUser<AuthenticateUserDto, UserDto>(userLoginDTO)
-                .Map(x => AllOk(x))
-                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
-                .Reduce(InternalServisErrorHandler);
+            //return _mapper.Map<User>(userLoginDTO)
+            //   .Map(_userService.Authenticate)
+            //   .Map(_mapper.Map<UserDto>)
+            //   .Map(InsertToken)
+            //   .Map(_userService.AddAuthenticatedUser)
+            //   .Map(x => AllOk(new KeyDto() { Key = x.Key }))
+            //   .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
+            //   .Reduce(InternalServisErrorHandler);
+
+            // TODO
+
+            return null;
         }
         
 

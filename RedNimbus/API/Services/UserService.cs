@@ -4,6 +4,7 @@ using RedNimbus.Either.Errors;
 using RedNimbus.Messages;
 using RedNimbus.Communication;
 using RedNimbus.DTO;
+using RedNimbus.Domain;
 using NetMQ;
 
 namespace RedNimbus.API.Services
@@ -15,15 +16,15 @@ namespace RedNimbus.API.Services
 
         }
 
-        public Either<IError, TSuccess> RegisterUser<TRequest, TSuccess>(CreateUserDto createUserDto)
+        public Either<IError, User> RegisterUser(User user)
         {
             Message<UserMessage> message = new Message<UserMessage>("RegisterUser");
 
-            message.Data.FirstName = createUserDto.FirstName;
-            message.Data.LastName = createUserDto.LastName;
-            message.Data.Email = createUserDto.Email;
-            message.Data.Password = createUserDto.Password;
-            //message.Data.PhoneNumber = createUserDto.PhoneNumber;
+            message.Data.FirstName = user.FirstName;
+            message.Data.LastName = user.LastName;
+            message.Data.Email = user.Email;
+            message.Data.Password = user.Password;
+            //message.Data.PhoneNumber = user.PhoneNumber;
 
             // TODO: Fix message constructor
 
@@ -34,11 +35,24 @@ namespace RedNimbus.API.Services
         
             NetMQMessage response = RequestSocketFactory.SendRequest(temp);
 
-            Either<IError, TSuccess> result = null;
+            string responseTopic = response.First.ConvertToString();
+
+
 
             // TODO: Convert response to result (type of Either)
 
-            return result;
+            if (responseTopic.Equals("Response"))
+            {
+                Message<UserMessage> successMessage = new Message<UserMessage>(response);
+
+                // TODO: Ne vracati user objekat
+
+                return new Right<IError, User>(user);
+            }
+
+            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>(response);
+            return new Left<IError, User>(new FormatError(errorMessage.Data.Message, Either.Enums.ErrorCode.EmailAlreadyUsed));
+            
         }
 
         public Either<IError, TSuccess> AuthenticateUser<TRequest, TSuccess>(AuthenticateUserDto authenticateUserDto)
