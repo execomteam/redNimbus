@@ -20,5 +20,7 @@ namespace UserService.DatabaseModel
         public string Password { get; set; }
 
         public string PhoneNumber { get; set; }
+
+        public Byte ActiveAccount { get; set; }
     }
 }

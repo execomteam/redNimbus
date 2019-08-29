@@ -115,7 +115,12 @@ namespace RedNimbus.UserService.Services
 
             if (userDatabaseUtils.CheckIfAlreadyRegistered(user.Email))
             {
-                var registeredUser = userDatabaseUtils.getUserByEmail(user.Email);
+                var registeredUser = userDatabaseUtils.GetUserByEmail(user.Email);
+
+                if(registeredUser == null)
+                {
+                    return new AuthenticationError("Account has been deactivated", ErrorCode.AccountDeactivated);
+                }
                 if (registeredUser.Password == HashHelper.ComputeHash(user.Password))
                 {
                     return registeredUser;
@@ -165,7 +170,7 @@ namespace RedNimbus.UserService.Services
                 return new NotFoundError("Requested user data not found", ErrorCode.UserNotRegistrated);
             }
 
-            User registeredUser = userDatabaseUtils.getUserByEmail(email);
+            User registeredUser = userDatabaseUtils.GetUserByEmail(email);
             registeredUser.Key = token;
 
             return registeredUser;

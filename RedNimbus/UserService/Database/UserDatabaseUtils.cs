@@ -24,12 +24,13 @@ namespace UserService.Database
         {
             UserDB userDB = new UserDB();
 
-            userDB.FirstName    = newUser.FirstName;
-            userDB.LastName     = newUser.LastName;
-            userDB.Password     = newUser.Password;
-            userDB.PhoneNumber  = newUser.PhoneNumber;
-            userDB.Email        = newUser.Email;
-            userDB.Id           = newUser.Id;
+            userDB.FirstName        = newUser.FirstName;
+            userDB.LastName         = newUser.LastName;
+            userDB.Password         = newUser.Password;
+            userDB.PhoneNumber      = newUser.PhoneNumber;
+            userDB.Email            = newUser.Email;
+            userDB.Id               = newUser.Id;
+            userDB.ActiveAccount    = 1;   
 
             using(context = new DatabaseContext())
             {
@@ -60,19 +61,25 @@ namespace UserService.Database
             }
         }
 
-        public User getUserByEmail(string email)
+        public User GetUserByEmail(string email)
         {
             UserDB user;
             using (context = new DatabaseContext())
             {
                user = context.Users.First(u => u.Email.Equals(email));
             }
-
-            User result = convertUserDBToUser(user);
-            return result;
+            if(user.ActiveAccount == 0)
+            {
+                return null;
+            }
+            else
+            {
+                User result = ConvertUserDBToUser(user);
+                return result;
+            }
         }
 
-        private User convertUserDBToUser(UserDB userdb)
+        private User ConvertUserDBToUser(UserDB userdb)
         {
             User user = new User
             {
@@ -85,7 +92,7 @@ namespace UserService.Database
             return user;
         }
 
-        private UserDB convertUserToUserDB(User user)
+        private UserDB ConvertUserToUserDB(User user)
         {
             UserDB userdb = new UserDB
             {
@@ -96,6 +103,16 @@ namespace UserService.Database
                 Password    = user.Password
             };
             return userdb;
+        }
+
+        public bool DeactivateUserAccount(String userEmail)
+        {
+            return true;  
+        }
+
+        public bool ActivateUserAccount(String userEmail)
+        {
+            return true;
         }
     }
 }
