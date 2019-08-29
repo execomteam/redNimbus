@@ -232,3 +232,4 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+/RedNimbus/UserService/DBConfig.json

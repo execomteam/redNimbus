@@ -19,6 +19,7 @@ using RedNimbus.UserService.Mappings;
 using RedNimbus.UserService.Services;
 using RedNimbus.UserService.Services.Interfaces;
 using RedNimbus.Either;
+using RedNimbus.UserService.Model;
 
 namespace UserService
 {
@@ -72,6 +73,7 @@ namespace UserService
             services.AddSingleton(tokenService);
 
             IUserService userService = new RedNimbus.UserService.Services.UserService();
+
             services.AddSingleton(userService);
         }
 
