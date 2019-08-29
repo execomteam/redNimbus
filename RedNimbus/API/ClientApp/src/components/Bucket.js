@@ -98,13 +98,15 @@ class MyVerticallyCenteredModal extends React.Component {
         this.createNewBucket = this.createNewBucket.bind(this);
     }
 
-    createNewBucket()
+    createNewBucket(data)
     {
         const options = {
             headers: { 'token': localStorage.getItem("token")}
         };
 
-        axios.post("http://localhost:65001/api/bucket/createBucket", options, {value: document.getElementById('newBucketName')}).then(
+        var x = document.getElementById("newBucketName").value;
+
+        axios.post("http://localhost:65001/api/bucket/createBucket", {Value: x}, options).then(
             (resp) => this.onSuccessHandler(resp),
             (resp) => this.onErrorHandler(resp)
         );
@@ -133,6 +135,7 @@ class MyVerticallyCenteredModal extends React.Component {
                         <input type="text"
                         className="form-control form-control-sm"
                                 id="newBucketName"
+                                name="newBucket"
                                 placeholder = "Enter name"
                                 required
                         />
