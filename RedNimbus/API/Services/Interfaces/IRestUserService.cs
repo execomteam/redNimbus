@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace RedNimbus.API.Services.Interfaces
 {
-    public interface ICommunicationService
+    public interface IRestUserService
     {
         Task<Either<IError, TSuccess>> Send<TRequest, TSuccess>(string path, TRequest data);
     }

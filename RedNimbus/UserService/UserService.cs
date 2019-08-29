@@ -146,37 +146,6 @@ namespace UserService
             SendErrorMessage("Invalid credentials.", RedNimbus.Either.Enums.ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
         }
 
-        private void SendErrorMessage(string messageText, RedNimbus.Either.Enums.ErrorCode errorCode, NetMQFrame idFrame)
-        {
-            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
-
-            errorMessage.Data.MessageText = messageText;
-            errorMessage.Data.ErrorCode = (int) errorCode;
-            errorMessage.Id = idFrame;
-
-            NetMQMessage msg = errorMessage.ToNetMQMessage();
-            SendMessage(msg);
-        }
-
-
-
-        private string GenerateToken()
-        {
-            string key = "VerySecureSecretKey";
-            string issuer = "RedNimbus";
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-
-            var token = new JwtSecurityToken(issuer,
-              issuer,
-              null,
-              expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-
         private void HandleGetUser(NetMQMessage message)
         {
             Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
@@ -186,7 +155,7 @@ namespace UserService
                 SendErrorMessage("Requested user data not found", RedNimbus.Either.Enums.ErrorCode.UserNotFound, tokenMessage.Id);
             }
 
-            if(tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
+            if (tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
             {
                 string email = tokenEmailPairs[tokenMessage.Data.Token];
                 if (!registeredUsers.ContainsKey(email))
@@ -206,6 +175,34 @@ namespace UserService
                 NetMQMessage msg = userMessage.ToNetMQMessage();
                 SendMessage(msg);
             }
+        }
+
+        private void SendErrorMessage(string messageText, RedNimbus.Either.Enums.ErrorCode errorCode, NetMQFrame idFrame)
+        {
+            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
+
+            errorMessage.Data.MessageText = messageText;
+            errorMessage.Data.ErrorCode = (int) errorCode;
+            errorMessage.Id = idFrame;
+
+            NetMQMessage msg = errorMessage.ToNetMQMessage();
+            SendMessage(msg);
+        }
+
+        private string GenerateToken()
+        {
+            string key = "VerySecureSecretKey";
+            string issuer = "RedNimbus";
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+
+            var token = new JwtSecurityToken(issuer,
+              issuer,
+              null,
+              expires: DateTime.Now.AddMinutes(120),
+              signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

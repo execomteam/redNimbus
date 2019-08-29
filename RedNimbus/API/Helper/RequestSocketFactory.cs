@@ -2,7 +2,7 @@
 using NetMQ;
 using NetMQ.Sockets;
 
-namespace RedNimbus.API.Services
+namespace RedNimbus.API.Helper
 {
     public static class RequestSocketFactory
     {

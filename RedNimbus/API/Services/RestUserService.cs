@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace RedNimbus.API.Services
 {
-    public class CommunicationService : ICommunicationService
+    public class RestUserService : IRestUserService
     {
         private readonly string _address;
 
-        public CommunicationService(string address)
+        public RestUserService(string address)
         {
             _address = address;
         }  

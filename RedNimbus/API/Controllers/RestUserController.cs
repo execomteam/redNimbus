@@ -12,9 +12,9 @@ namespace RedNimbus.API.Controllers
     [Route("api/user")]
     public class RestUserController : ControllerBase
     {
-        private readonly ICommunicationService _communicationService;
+        private readonly IRestUserService _communicationService;
 
-        public RestUserController(ICommunicationService communicationService)
+        public RestUserController(IRestUserService communicationService)
         {
             _communicationService = communicationService;
         }

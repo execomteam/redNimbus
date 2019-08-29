@@ -7,6 +7,7 @@ using RedNimbus.DTO;
 using RedNimbus.Domain;
 using NetMQ;
 using System;
+using RedNimbus.API.Helper;
 
 namespace RedNimbus.API.Services
 {
