@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace RedNimbus.BucketService.Services
@@ -18,7 +16,7 @@ namespace RedNimbus.BucketService.Services
                 string[] val = entry.Split('/');
                 returnValue.Add(val[val.Length-1]);
             }
-
+            returnValue.Add("*");
             foreach (string entry in Directory.GetFiles(path))
             {
                 string[] val = entry.Split('/');

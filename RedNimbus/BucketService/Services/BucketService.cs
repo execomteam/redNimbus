@@ -6,6 +6,8 @@ using RedNimbus.BucketService.Helper;
 using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.BucketService.Services;
+using RedNimbus.Messages;
+using Google.Protobuf;
 
 namespace RedNimbus.BucketService.Services
 {
@@ -27,94 +29,106 @@ namespace RedNimbus.BucketService.Services
 
         public void ListBucketContent(NetMQMessage message)
         {
-            string relativePath = MessageHelper.GetPath(message);
-            string userGuid = MessageHelper.GetStringGuid(message);
+            Message<BucketMessage> msg = new Message<BucketMessage>(message);
+
+            string relativePath = msg.Data.Path;
+            string userGuid = MessageHelper.Decode(msg.Data.Token) ;
             string absolutePath = _path + userGuid + relativePath;
 
             List<string> contentList = FileSystemService.ListContent(absolutePath);
 
-            MessageHelper.InsertContentList(message, contentList);
-            SendMessage(message);
+            msg.Data.ReturnItems.AddRange(contentList);
+            msg.Topic = "Response";
+            msg.Data.Successful = true;
+            SendMessage(msg.ToNetMQMessage());
         }
 
         public void CreateBucket(NetMQMessage message)
         {
-            string relativePath = MessageHelper.GetPath(message);
-            string userGuid = MessageHelper.GetStringGuid(message);
+            Message<BucketMessage> msg = new Message<BucketMessage>(message);
+            string relativePath = msg.Data.Path;
+            string userGuid = MessageHelper.Decode(msg.Data.Token);
             string absolutePath = _path + userGuid + relativePath;
 
             bool successfulCreate = FileSystemService.CreateBucket(absolutePath);
-
+            msg.Topic = "Response";
             if (successfulCreate)
             {
-                MessageHelper.SuccessfulMessage(message);
-                SendMessage(message);
+                msg.Data.Successful=true;
+                
+                SendMessage(msg.ToNetMQMessage());
             }
             else
             {
-                MessageHelper.UnsuccessfulMessage(message);
-                SendMessage(message);
+                msg.Data.Successful = true;
+                msg.Data.ErrorMessage = "Ugh";
+                SendMessage(msg.ToNetMQMessage());
             }
         }
 
         //Bucket must be empty for deleting
         public void DeleteBucket(NetMQMessage message)
         {
-            string relativePath = MessageHelper.GetPath(message);
-            string userGuid = MessageHelper.GetStringGuid(message);
+            Message<BucketMessage> msg = new Message<BucketMessage>(message);
+            string relativePath = msg.Data.Path;
+            string userGuid = MessageHelper.Decode(msg.Data.Token);
             string absolutePath = _path + userGuid + relativePath;
 
             bool successfulDelete = FileSystemService.DeleteBucket(absolutePath);
-
+            msg.Topic = "Response";
             if (successfulDelete)
             {
-                MessageHelper.SuccessfulMessage(message);
-                SendMessage(message);
+                msg.Data.Successful = true;
+
+                SendMessage(msg.ToNetMQMessage());
             }
             else
             {
-                MessageHelper.UnsuccessfulMessage(message);
-                SendMessage(message);
+                msg.Data.Successful = true;
+                msg.Data.ErrorMessage = "Ugh";
+                SendMessage(msg.ToNetMQMessage());
             }
         }
 
         public void PutFile(NetMQMessage message)
         {
-            string relativePath = MessageHelper.GetPath(message);
-            string userGuid = MessageHelper.GetStringGuid(message);
+            Message<BucketMessage> msg = new Message<BucketMessage>(message);
+            string relativePath = msg.Data.Path;
+            string userGuid = MessageHelper.Decode(msg.Data.Token);
             string absolutePath = _path + userGuid + relativePath;
-            byte[] fileAsByteArray = MessageHelper.GetFileAsByteArray(message);
+            byte[] fileAsByteArray = msg.Data.File.ToByteArray();
 
             FileSystemService.ByteArrayToFile(absolutePath, fileAsByteArray);
+            msg.Topic = "Response";
+            msg.Data.Successful = true;
 
-            MessageHelper.SuccessfulMessage(message);
-            SendMessage(message);
+            SendMessage(msg.ToNetMQMessage());
         }
 
         public void GetFile(NetMQMessage message)
         {
-            string relativePath = MessageHelper.GetPath(message);
-            string userGuid = MessageHelper.GetStringGuid(message);
+            Message<BucketMessage> msg = new Message<BucketMessage>(message);
+            string relativePath = msg.Data.Path;
+            string userGuid = MessageHelper.Decode(msg.Data.Token);
             string absolutePath = _path + userGuid + relativePath;
 
             byte[] fileAsByteArray = FileSystemService.FileToByteArray(absolutePath);
-
-            MessageHelper.PutFileAsByteArray(message, fileAsByteArray);
-
-            SendMessage(message);
+            msg.Topic = "Response";
+            msg.Data.File = ByteString.CopyFrom(fileAsByteArray);
+            SendMessage(msg.ToNetMQMessage());
         }
 
         public void DeleteFile(NetMQMessage message)
         {
-            string relativePath = MessageHelper.GetPath(message);
-            string userGuid = MessageHelper.GetStringGuid(message);
+            Message<BucketMessage> msg = new Message<BucketMessage>(message);
+            string relativePath = msg.Data.Path;
+            string userGuid = MessageHelper.Decode(msg.Data.Token); ;
             string absolutePath = _path + userGuid + relativePath;
 
             FileSystemService.DeleteFile(absolutePath);
-
-            MessageHelper.SuccessfulMessage(message);
-
-            SendMessage(message);
+            msg.Topic = "Response";
+            msg.Data.Successful = true;
+            SendMessage(msg.ToNetMQMessage());
         }
     }
 }
