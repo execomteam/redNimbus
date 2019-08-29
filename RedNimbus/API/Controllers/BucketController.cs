@@ -160,7 +160,7 @@ namespace API.Controllers
 
             if (Data.Successful)
             {
-                return AllOk();
+                return AllOk(bucketName);
             }
             return BadRequest();
         }
