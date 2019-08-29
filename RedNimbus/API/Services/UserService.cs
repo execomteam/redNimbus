@@ -1,10 +1,6 @@
 ﻿using RedNimbus.API.Services.Interfaces;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using RedNimbus.Messages;
 using RedNimbus.Communication;
 using RedNimbus.DTO;
@@ -18,6 +14,7 @@ namespace RedNimbus.API.Services
         {
 
         }
+
         public Either<IError, TSuccess> RegisterUser<TRequest, TSuccess>(CreateUserDto createUserDto)
         {
             Message<UserMessage> message = new Message<UserMessage>("RegisterUser");
@@ -42,6 +39,11 @@ namespace RedNimbus.API.Services
             // TODO: Convert response to result (type of Either)
 
             return result;
+        }
+
+        public Either<IError, TSuccess> AuthenticateUser<TRequest, TSuccess>(AuthenticateUserDto authenticateUserDto)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

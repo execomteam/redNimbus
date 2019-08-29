@@ -1,5 +1,4 @@
 ﻿using RedNimbus.API.Models;
-using RedNimbus.DTO.Interfaces;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 using System.Threading.Tasks;

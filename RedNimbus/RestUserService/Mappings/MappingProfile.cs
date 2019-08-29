@@ -2,7 +2,7 @@
 using RedNimbus.Domain;
 using RedNimbus.DTO;
 
-namespace RedNimbus.Either.Mappings
+namespace RedNimbus.RestUserService.Mappings
 {
     public class MappingProfile : Profile
     {

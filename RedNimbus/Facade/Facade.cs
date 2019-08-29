@@ -48,11 +48,12 @@ namespace RedNimbus.Facade
         {
             if (IsRunning)
             {
-                base.Stop();
-
                 try
                 {
+                    _routerSocket.Disconnect(_facadeAddress);
                     _routerSocket.Dispose();
+
+                    base.Stop();
                 }
                 finally
                 {

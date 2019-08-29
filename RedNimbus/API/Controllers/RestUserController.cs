@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RedNimbus.API.Models;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.DTO;
 using RedNimbus.Either;
@@ -8,14 +9,14 @@ using RedNimbus.Either.Errors;
 namespace RedNimbus.API.Controllers
 {
     [ApiController]
-    [Route("api/v2/user")]
-    public class UserController : ControllerBase
+    [Route("api/user")]
+    public class RestUserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly ICommunicationService _communicationService;
 
-        public UserController(IUserService userService)
+        public RestUserController(ICommunicationService communicationService)
         {
-            _userService = userService;
+            _communicationService = communicationService;
         }
 
         #region IActionResult
@@ -55,23 +56,31 @@ namespace RedNimbus.API.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
-            return _userService.RegisterUser<CreateUserDto, Empty>(createUserDto)
+            return _communicationService.Send<CreateUserDto, Empty>("api/user", createUserDto)
+                 .Result
                  .Map(() => AllOk())
                  .Reduce(BadRequestErrorHandler, x => x is FormatError)
                  .Reduce(InternalServisErrorHandler);
-
         }
 
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthenticateUserDto userLoginDTO)
         {
-            return _userService.AuthenticateUser<AuthenticateUserDto, UserDto>(userLoginDTO)
+            return _communicationService.Send<AuthenticateUserDto, UserDto>("api/user/authenticate", userLoginDTO)
+                .Result
                 .Map(x => AllOk(x))
                 .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
                 .Reduce(InternalServisErrorHandler);
         }
-        
 
-        // TODO: GET
+        [HttpPost("get")]
+        public IActionResult GetUser([FromBody]KeyDto keyData)
+        {
+            return _communicationService.Send<KeyDto, UserDto>("api/user/get", keyData)
+                .Result
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+        }
     }
 }

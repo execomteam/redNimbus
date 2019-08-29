@@ -1,18 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NetMQ;
-using NetMQ.Sockets;
-using RedNimbus.API.Models;
-using RedNimbus.API.Services.Interfaces;
-using RedNimbus.DTO.Interfaces;
+﻿using RedNimbus.API.Services.Interfaces;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using RedNimbus.Messages;
-using RedNimbus.Communication;
-using System.Text;
 
 namespace RedNimbus.API.Services
 {
@@ -20,7 +12,8 @@ namespace RedNimbus.API.Services
     {
         private readonly string _address;
 
-        public CommunicationService(string address) {
+        public CommunicationService(string address)
+        {
             _address = address;
         }  
 
