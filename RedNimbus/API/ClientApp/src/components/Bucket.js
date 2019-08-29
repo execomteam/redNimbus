@@ -1,6 +1,7 @@
 ﻿import React from 'react';
-import './css/Bucket.css'
 import axios from 'axios';
+import FolderGroup from './FolderGroup'
+import FileGroup from './FileGroup'
 
 class Bucket extends React.Component
 {
@@ -8,7 +9,8 @@ class Bucket extends React.Component
         super(props);
 
         this.state = {
-            buckets = null
+            folders: ['Volvo', 'BMV'],
+            files: ['DilanDog.pdf', 'MarkMystery.txt']
         }
 
         const options = {
@@ -16,8 +18,8 @@ class Bucket extends React.Component
         };
 
         axios.get("http://localhost:65001/api/bucket", options).then(
-            (resp) => this.onSuccessHandler(response),
-            (resp) => this.onErrorHandler(response)
+            (resp) => this.onSuccessHandler(resp),
+            (resp) => this.onErrorHandler(resp)
         );
     }
 
@@ -26,8 +28,24 @@ class Bucket extends React.Component
     }
 
     onSuccessHandler(resp){
+        var tempFolders = [];
+        var tempFiles = [];
+        var flag = true;
+
+        for (var i = 0; i < resp.data.length; i++) {
+            if (resp.data[i] === '*') {
+              flag == false;
+              continue;
+            }
+            if(flag==true){
+                tempFolders.push(resp.data[i])
+            }else{
+                tempFiles.push(resp.data[i]);
+            }
+        }
         this.setState({
-            bucket: resp.data
+            folders: tempFolders,
+            files: tempFiles
         });
     }
 
@@ -48,57 +66,9 @@ class Bucket extends React.Component
                     </div>
                     <div className="col-md-10">   
                         <br />
-                        <div class="card-group">
-                            <div style={{ backgroundColor: 'red' }} class="card " style={{
-                                width: '100', height: '120px', display: 'inline-block', justifyContent: 'center',
-                                alignItems: 'center', marginLeft: '50px', marginRight: '50px', marginTop: '50px', marginBottom: '50px'}}>                               
-                                <img style={{ height: '100px', width: '100px' }} src="https://freeiconshop.com/wp-content/uploads/edd/folder-outline-filled.png" class="card-img-top" alt="..." />
-                                <div class="card-body">
-                                    <p style={{ textAlign: 'center' }} class="card-text">name</p>
-                                </div>
-                            </div>
-                            
-                            <div style={{ backgroundColor: 'red' }} class="card " style={{
-                                width: '100', height: '120px', display: 'inline-block', justifyContent: 'center',
-                                alignItems: 'center', marginLeft: '50px', marginRight: '50px', marginTop: '50px', marginBottom: '50px'}}>
-                                <img style={{ height: '100px', width: '100px' }} src="https://freeiconshop.com/wp-content/uploads/edd/folder-outline-filled.png" class="card-img-top" alt="..." />
-                                <div class="card-body">
-                                    <p style={{ textAlign: 'center' }} class="card-text">name</p>
-                                </div>
-                            </div>
-
-                            <div style={{ backgroundColor: 'red' }} class="card " style={{
-                                width: '100', height: '120px', display: 'inline-block', justifyContent: 'center',
-                                alignItems: 'center', marginLeft: '50px', marginRight: '50px', marginTop: '50px', marginBottom: '50px'}}>
-                                <img style={{ height: '100px', width: '100px' }} src="https://freeiconshop.com/wp-content/uploads/edd/folder-outline-filled.png" class="card-img-top" alt="..." />
-                                <div class="card-body">
-                                    <p style={{ textAlign: 'center' }} class="card-text">name</p>
-                                </div>
-                            </div>
-                        </div>
-
+                        <FolderGroup content={this.state.folders}/>
                         <hr/>
-
-                        <div class="card-group">
-                            <div style={{ backgroundColor: 'red' }} class="card " style={{
-                                width: '100', height: '120px', display: 'inline-block', justifyContent: 'center',
-                                alignItems: 'center', marginLeft: '50px', marginRight: '50px', marginTop: '50px', marginBottom: '50px'}}>
-                                <img style={{ height: '100px', width: '100px' }} src="https://cdn2.iconfinder.com/data/icons/55-files-and-documents/512/Icon_17-512.png" class="card-img-top" alt="..." />
-                                <div class="card-body">
-                                    <p style={{ textAlign: 'center' }} class="card-text">name</p>
-                                </div>
-                            </div>
-                            <div style={{ backgroundColor: 'red' }} class="card " style={{
-                                width: '100', height: '120px', display: 'inline-block', justifyContent: 'center',
-                                alignItems: 'center', marginLeft: '50px', marginRight: '50px', marginTop: '50px', marginBottom: '50px'}}>
-
-                                <img style={{ height: '100px', width: '100px' }} src="https://cdn2.iconfinder.com/data/icons/55-files-and-documents/512/Icon_17-512.png" class="card-img-top" alt="..." />
-                                <div class="card-body">
-                                    <p style={{ textAlign: 'center' }} class="card-text">name</p>
-                                </div>
-                            </div>
-                            
-                        </div>
+                        <FileGroup content={this.state.files}/>
                     </div>
                 </div>
             </div>

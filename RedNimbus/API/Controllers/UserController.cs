@@ -66,7 +66,7 @@ namespace RedNimbus.API.Controllers
                 .Result
                 .Map(x => AllOk(x))
                 .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
-                .Reduce(InternalServisErrorHandler);
+                .Reduce(InternalServisErrorHandler);            
         }
 
         [HttpGet]
