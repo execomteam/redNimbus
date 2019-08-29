@@ -24,12 +24,13 @@ namespace RedNimbus.Messages {
     static ErrorMessageReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChJFcnJvck1lc3NhZ2UucHJvdG8SElJlZE5pbWJ1cy5NZXNzYWdlcyIfCgxF",
-            "cnJvck1lc3NhZ2USDwoHTWVzc2FnZRgBIAEoCWIGcHJvdG8z"));
+            "ChJFcnJvck1lc3NhZ2UucHJvdG8SElJlZE5pbWJ1cy5NZXNzYWdlcyI2CgxF",
+            "cnJvck1lc3NhZ2USEwoLTWVzc2FnZVRleHQYASABKAkSEQoJRXJyb3JDb2Rl",
+            "GAIgASgFYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.ErrorMessage), global::RedNimbus.Messages.ErrorMessage.Parser, new[]{ "Message" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.ErrorMessage), global::RedNimbus.Messages.ErrorMessage.Parser, new[]{ "MessageText", "ErrorCode" }, null, null, null, null)
           }));
     }
     #endregion
@@ -61,7 +62,8 @@ namespace RedNimbus.Messages {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public ErrorMessage(ErrorMessage other) : this() {
-      message_ = other.message_;
+      messageText_ = other.messageText_;
+      errorCode_ = other.errorCode_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -70,14 +72,25 @@ namespace RedNimbus.Messages {
       return new ErrorMessage(this);
     }
 
-    /// <summary>Field number for the "Message" field.</summary>
-    public const int MessageFieldNumber = 1;
-    private string message_ = "";
+    /// <summary>Field number for the "MessageText" field.</summary>
+    public const int MessageTextFieldNumber = 1;
+    private string messageText_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Message {
-      get { return message_; }
+    public string MessageText {
+      get { return messageText_; }
       set {
-        message_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        messageText_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "ErrorCode" field.</summary>
+    public const int ErrorCodeFieldNumber = 2;
+    private int errorCode_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int ErrorCode {
+      get { return errorCode_; }
+      set {
+        errorCode_ = value;
       }
     }
 
@@ -94,14 +107,16 @@ namespace RedNimbus.Messages {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Message != other.Message) return false;
+      if (MessageText != other.MessageText) return false;
+      if (ErrorCode != other.ErrorCode) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (Message.Length != 0) hash ^= Message.GetHashCode();
+      if (MessageText.Length != 0) hash ^= MessageText.GetHashCode();
+      if (ErrorCode != 0) hash ^= ErrorCode.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -115,9 +130,13 @@ namespace RedNimbus.Messages {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Message.Length != 0) {
+      if (MessageText.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteString(Message);
+        output.WriteString(MessageText);
+      }
+      if (ErrorCode != 0) {
+        output.WriteRawTag(16);
+        output.WriteInt32(ErrorCode);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -127,8 +146,11 @@ namespace RedNimbus.Messages {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (Message.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
+      if (MessageText.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(MessageText);
+      }
+      if (ErrorCode != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ErrorCode);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -141,8 +163,11 @@ namespace RedNimbus.Messages {
       if (other == null) {
         return;
       }
-      if (other.Message.Length != 0) {
-        Message = other.Message;
+      if (other.MessageText.Length != 0) {
+        MessageText = other.MessageText;
+      }
+      if (other.ErrorCode != 0) {
+        ErrorCode = other.ErrorCode;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -156,7 +181,11 @@ namespace RedNimbus.Messages {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            Message = input.ReadString();
+            MessageText = input.ReadString();
+            break;
+          }
+          case 16: {
+            ErrorCode = input.ReadInt32();
             break;
           }
         }

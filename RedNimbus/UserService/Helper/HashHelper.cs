@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace RedNimbus.RestUserService.Helper
+namespace RedNimbus.UserService.Helper
 {
     public static class HashHelper
     {

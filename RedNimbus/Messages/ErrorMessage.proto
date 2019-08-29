@@ -2,5 +2,6 @@
 package RedNimbus.Messages;
 
 message ErrorMessage {
-	string Message = 1;
+	string MessageText = 1;
+	int32 ErrorCode = 2;
 }

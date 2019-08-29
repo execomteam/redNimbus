@@ -76,11 +76,8 @@ namespace RedNimbus.API.Controllers
             //   .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
             //   .Reduce(InternalServisErrorHandler);
 
-            // TODO
-
             return null;
         }
-        
 
         // TODO: GET
     }

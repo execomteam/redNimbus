@@ -6,6 +6,7 @@ using RedNimbus.Communication;
 using RedNimbus.DTO;
 using RedNimbus.Domain;
 using NetMQ;
+using System;
 
 namespace RedNimbus.API.Services
 {
@@ -38,26 +39,39 @@ namespace RedNimbus.API.Services
             string responseTopic = response.First.ConvertToString();
 
 
-
-            // TODO: Convert response to result (type of Either)
-
             if (responseTopic.Equals("Response"))
             {
                 Message<UserMessage> successMessage = new Message<UserMessage>(response);
 
-                // TODO: Ne vracati user objekat
-
                 return new Right<IError, User>(user);
             }
 
-            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>(response);
-            return new Left<IError, User>(new FormatError(errorMessage.Data.Message, Either.Enums.ErrorCode.EmailAlreadyUsed));
-            
+            return new Left<IError, User>(GetError(response));
         }
 
-        public Either<IError, TSuccess> AuthenticateUser<TRequest, TSuccess>(AuthenticateUserDto authenticateUserDto)
+
+        private IError GetError(NetMQMessage response)
         {
-            throw new System.NotImplementedException();
+            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>(response);
+
+            RedNimbus.Either.Enums.ErrorCode errorCode = (RedNimbus.Either.Enums.ErrorCode)Enum.ToObject(typeof(RedNimbus.Either.Enums.ErrorCode), errorMessage.Data.ErrorCode);
+
+            switch (errorCode)
+            {
+                case RedNimbus.Either.Enums.ErrorCode.FirstNameNullEmptyOrWhiteSpace:
+                case RedNimbus.Either.Enums.ErrorCode.LastNameNullEmptyOrWhiteSpace:
+                case RedNimbus.Either.Enums.ErrorCode.EmailWrongFormat:
+                case RedNimbus.Either.Enums.ErrorCode.PasswordWrongFormat:
+                case RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed:
+                    return new FormatError(errorMessage.Data.MessageText, errorCode);
+                default:
+                    return new InternalServisError(errorMessage.Data.MessageText, errorCode);
+            }
+        }
+
+        public Either<IError, User> Authenticate(User user)
+        {
+            throw new NotImplementedException();
         }
     }
 }
