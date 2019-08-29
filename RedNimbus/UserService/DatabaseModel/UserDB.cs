@@ -21,6 +21,6 @@ namespace UserService.DatabaseModel
 
         public string PhoneNumber { get; set; }
 
-        public Byte ActiveAccount { get; set; }
+        public bool ActiveAccount { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RedNimbus.DTO.Enums;
+using RedNimbus.Either.Errors;
 using RedNimbus.UserService.Model;
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ using UserService.DatabaseModel;
 
 namespace UserService.Database
 {
-    public class UserDatabaseUtils
+    public class UserRepository
     {
         private DatabaseContext context;
 
@@ -18,12 +20,12 @@ namespace UserService.Database
         /// Throws: DbUpdateException if user with given email exists
         /// </summary>
         /// <param name="newUser"></param>
-        public void RegisterUser(User newUser)
+        public void SaveUser(User newUser)
         {
             UserDB userDB = ConvertUserToUserDB(newUser);
 
             userDB.Id               = newUser.Id;
-            userDB.ActiveAccount    = 1;   
+            userDB.ActiveAccount    = true;   
 
             using(context = new DatabaseContext())
             {
@@ -38,19 +40,11 @@ namespace UserService.Database
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public bool CheckIfAlreadyRegistered(string email)
+        public bool CheckIfExists(string email)
         {
             using(context = new DatabaseContext())
             {
-                try
-                {
-                    UserDB user = context.Users.First(u => u.Email.Equals(email));
-                    return true;
-                }
-                catch (InvalidOperationException)
-                {
-                    return false;
-                }
+                return context.Users.FirstOrDefault(u => u.Email == email && u.ActiveAccount) != null;
             }
         }
 
@@ -65,7 +59,7 @@ namespace UserService.Database
                     return null;
                 }
             }
-            if(user.ActiveAccount == 0)
+            if(!user.ActiveAccount)
             {
                 return null;
             }

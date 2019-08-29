@@ -19,10 +19,10 @@ namespace RedNimbus.UserService.Services
 {
     public class UserService : IUserService
     {
-        private UserDatabaseUtils userDatabaseUtils;
+        private UserRepository userDatabaseUtils;
         public UserService()
         {
-            userDatabaseUtils = new UserDatabaseUtils();
+            userDatabaseUtils = new UserRepository();
         }
         private static readonly Dictionary<string, string>  tokenEmailPairs = new Dictionary<string, string>();
 
@@ -86,7 +86,7 @@ namespace RedNimbus.UserService.Services
 
             try
             {
-                userDatabaseUtils.RegisterUser(user);
+                userDatabaseUtils.SaveUser(user);
             }
             catch (DbUpdateException)
             {
@@ -113,7 +113,7 @@ namespace RedNimbus.UserService.Services
             }
 
 
-            if (userDatabaseUtils.CheckIfAlreadyRegistered(user.Email))
+            if (userDatabaseUtils.CheckIfExists(user.Email))
             {
                 var registeredUser = userDatabaseUtils.GetUserByEmail(user.Email);
 
@@ -165,7 +165,7 @@ namespace RedNimbus.UserService.Services
             }
 
             string email = tokenEmailPairs[token];
-            if (!userDatabaseUtils.CheckIfAlreadyRegistered(email))
+            if (!userDatabaseUtils.CheckIfExists(email))
             {
                 return new NotFoundError("Requested user data not found", ErrorCode.UserNotRegistrated);
             }
