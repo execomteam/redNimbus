@@ -3,6 +3,16 @@ import CreateNewBucket from './CreateNewBucket'
 import {Button } from "react-bootstrap";
 
 class SideNav extends React.Component{
+    /*
+    <ul className="nav flex-column">
+                    <li className="nav-item">
+                        <a style={{hidden: true}} className="nav-link active" href="/bucket"></a>
+                    </li>
+                    <li className="nav-item">
+                        <a style={{hidden: true}} className="nav-link" href="#"></a>
+                    </li>
+                </ul>
+    */
     render(){
         return (
             <div>
@@ -12,14 +22,7 @@ class SideNav extends React.Component{
                         onHide={this.props.setModalShow}
                 />
 
-                <ul className="nav flex-column">
-                    <li className="nav-item">
-                        <a className="nav-link active" href="/bucket">My Buckets</a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link" href="#">Shared with me</a>
-                    </li>
-                </ul>
+                
             </div>
         );
     }
