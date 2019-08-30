@@ -33,7 +33,7 @@ class Bucket extends React.Component
     
 
     onErrorHandler(response){
-        alert("pokriti slucaj");
+        alert("Error response: Uncovered case");
     }
 
     onSuccessHandler(resp){
@@ -60,7 +60,6 @@ class Bucket extends React.Component
 
 
     addNewBucket(bucket){
-        alert("aaaaa");
         this.setState(prevState => ({
             folders: [...prevState.folders, bucket.value]
         }));
