@@ -14,15 +14,18 @@ using MySql.Data.MySqlClient;
 using RedNimbus.Either.Mappings;
 using UserService.DatabaseModel;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace RedNimbus.UserService.Services
 {
     public class UserService : IUserService
     {
+        private IMapper _mapper;
         private UserRepository userDatabaseUtils;
-        public UserService()
+        public UserService(IMapper mapper)
         {
-            userDatabaseUtils = new UserRepository();
+            this._mapper = mapper;
+            userDatabaseUtils = new UserRepository(mapper);
         }
         private static readonly Dictionary<string, string>  tokenEmailPairs = new Dictionary<string, string>();
 
