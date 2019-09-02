@@ -1,0 +1,11 @@
+﻿syntax = "proto3";
+package RedNimbus.Messages;
+
+message BucketMessage{
+	bool successful = 1;
+	string errorMessage = 2;
+	string token = 3;
+	string path = 4;
+	repeated string returnItems = 5;
+	bytes file = 6;
+}
