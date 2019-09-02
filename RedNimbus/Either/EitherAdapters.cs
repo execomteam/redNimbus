@@ -68,6 +68,10 @@ namespace RedNimbus.Either
                 {
                     return func(left);
                 }
+                else
+                {
+                    return left;
+                }
             }
 
             return (Right<TLeft, TRight>)either;

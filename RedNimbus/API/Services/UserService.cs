@@ -26,9 +26,6 @@ namespace RedNimbus.API.Services
             message.Data.LastName = user.LastName;
             message.Data.Email = user.Email;
             message.Data.Password = user.Password;
-            //message.Data.PhoneNumber = user.PhoneNumber;
-
-            // TODO: Fix message constructor
 
             NetMQMessage temp = message.ToNetMQMessage();
             NetMQFrame topicFrame = temp.Pop();
@@ -56,8 +53,6 @@ namespace RedNimbus.API.Services
 
             message.Data.Email = user.Email;
             message.Data.Password = user.Password;
-
-            // TODO: Fix message constructor
 
             NetMQMessage temp = message.ToNetMQMessage();
             NetMQFrame topicFrame = temp.Pop();
@@ -111,8 +106,6 @@ namespace RedNimbus.API.Services
             Message<TokenMessage> message = new Message<TokenMessage>("GetUser");
 
             message.Data.Token = token;
-
-            // TODO: Fix message constructor
 
             NetMQMessage temp = message.ToNetMQMessage();
             NetMQFrame topicFrame = temp.Pop();

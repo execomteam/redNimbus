@@ -9,6 +9,7 @@ using RedNimbus.Communication;
 using RedNimbus.Domain;
 using RedNimbus.Messages;
 using RedNimbus.UserService.Helper;
+using UserService.Helper;
 
 namespace UserService
 {
@@ -24,59 +25,50 @@ namespace UserService
             Subscribe("GetUser", HandleGetUser);
         }
 
-        #region Validation functions
-        private bool IsFirstNameValid(string firstName)
+        private bool Validate(Message<UserMessage> userMessage)
         {
-            return Regex.IsMatch(firstName, @"^[a-z A-Z]+$");
+            bool isValid = false;
+
+            if (!Validation.IsFirstNameValid(userMessage.Data.FirstName))
+            {
+                SendErrorMessage("First Name is empty.", RedNimbus.Either.Enums.ErrorCode.FirstNameNullEmptyOrWhiteSpace, userMessage.Id);
+                isValid = false;
+                return isValid;
+            }
+
+            if (!Validation.IsLastNameValid(userMessage.Data.LastName))
+            {
+                SendErrorMessage("Last Name is empty.", RedNimbus.Either.Enums.ErrorCode.LastNameNullEmptyOrWhiteSpace, userMessage.Id);
+                isValid = false;
+                return isValid;
+            }
+
+            if (!Validation.IsEmailValid(userMessage.Data.Email))
+            {
+                SendErrorMessage("Invalid email format.", RedNimbus.Either.Enums.ErrorCode.EmailWrongFormat, userMessage.Id);
+                isValid = false;
+                return isValid;
+            }
+
+            if (!Validation.IsPasswordValid(userMessage.Data.Password))
+            {
+                SendErrorMessage("Password does not satisfy requirements.", RedNimbus.Either.Enums.ErrorCode.PasswordWrongFormat, userMessage.Id);
+                isValid = false;
+                return isValid;
+            }
+
+            isValid = true;
+
+            return isValid;
         }
-
-        private bool IsLastNameValid(string lastName)
-        {
-            return Regex.IsMatch(lastName, @"^[a-z A-Z]+$");
-        }
-
-        private bool IsEmailValid(string email)
-        {
-            return RegexUtilities.IsValidEmail(email);
-        }
-
-        private bool IsPasswordValid(string password)
-        {
-            return Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,24}$") && !String.IsNullOrWhiteSpace(password);
-        }
-
-        private bool IsPhoneValid(string phoneNumber)
-        {
-            if (!String.IsNullOrWhiteSpace(phoneNumber))
-                return Regex.IsMatch(phoneNumber, @"^[0-9()-]+$");
-
-            return true;
-        }
-
-        # endregion
 
         private void HandleRegisterUser(NetMQMessage message)
         {
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
 
-            if (!IsFirstNameValid(userMessage.Data.FirstName))
+            if(!Validate(userMessage))
             {
-                SendErrorMessage("First Name is empty.", RedNimbus.Either.Enums.ErrorCode.FirstNameNullEmptyOrWhiteSpace, userMessage.Id);
-            }
-
-            if (!IsLastNameValid(userMessage.Data.LastName))
-            {
-                SendErrorMessage("Last Name is empty.", RedNimbus.Either.Enums.ErrorCode.LastNameNullEmptyOrWhiteSpace, userMessage.Id);
-            }
-
-            if (!IsEmailValid(userMessage.Data.Email))
-            {
-                SendErrorMessage("Invalid email format.", RedNimbus.Either.Enums.ErrorCode.EmailWrongFormat, userMessage.Id);
-            }
-
-            if (!IsPasswordValid(userMessage.Data.Password))
-            {
-                SendErrorMessage("Password does not satisfy requirements.", RedNimbus.Either.Enums.ErrorCode.PasswordWrongFormat, userMessage.Id);
+                return;
             }
 
             User user = new User
@@ -112,12 +104,12 @@ namespace UserService
         {
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
 
-            if (!IsEmailValid(userMessage.Data.Email))
+            if (!Validation.IsEmailValid(userMessage.Data.Email))
             {
                 SendErrorMessage("Invalid email format.", RedNimbus.Either.Enums.ErrorCode.EmailWrongFormat, userMessage.Id);
             }
 
-            if (!IsPasswordValid(userMessage.Data.Password))
+            if (!Validation.IsPasswordValid(userMessage.Data.Password))
             {
                 SendErrorMessage("Password does not satisfy requirements.", RedNimbus.Either.Enums.ErrorCode.PasswordWrongFormat, userMessage.Id);
             }

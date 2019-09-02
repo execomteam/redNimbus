@@ -15,7 +15,7 @@ namespace RedNimbus.API.Helper
             requestSocket.SendMultipartMessage(requestMessage);
 
             NetMQMessage responseMessage = null;
-            TimeSpan timeSpan = new TimeSpan(0, 0, 15);
+            TimeSpan timeSpan = new TimeSpan(10, 0, 15);
             requestSocket.TryReceiveMultipartMessage(timeSpan, ref responseMessage);
 
             requestSocket.Disconnect(_facadeAddress);
