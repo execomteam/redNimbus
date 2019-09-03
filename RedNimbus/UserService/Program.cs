@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UserService
+namespace RedNimbus.UserService
 {
     class Program
     {

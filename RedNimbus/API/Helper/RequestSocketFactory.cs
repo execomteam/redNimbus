@@ -10,18 +10,19 @@ namespace RedNimbus.API.Helper
 
         public static NetMQMessage SendRequest(NetMQMessage requestMessage)
         {
-            RequestSocket requestSocket = new RequestSocket();
-            requestSocket.Connect(_facadeAddress);
-            requestSocket.SendMultipartMessage(requestMessage);
+            using (var requestSocket = new RequestSocket(_facadeAddress))
+            {
+                requestSocket.SendMultipartMessage(requestMessage);
 
-            NetMQMessage responseMessage = null;
-            TimeSpan timeSpan = new TimeSpan(10, 0, 15);
-            requestSocket.TryReceiveMultipartMessage(timeSpan, ref responseMessage);
+                NetMQMessage responseMessage = null;
+                TimeSpan timeSpan = new TimeSpan(0, 0, 15);
+                requestSocket.TryReceiveMultipartMessage(timeSpan, ref responseMessage);
 
-            requestSocket.Disconnect(_facadeAddress);
-            requestSocket.Dispose();
+                requestSocket.Disconnect(_facadeAddress);
+                requestSocket.Dispose();
 
-            return responseMessage;
+                return responseMessage;
+            }
         }
     }
 }

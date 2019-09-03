@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace UserService.Helper
+namespace RedNimbus.UserService.Helper
 {
     public static class Validation
     {
@@ -30,10 +30,7 @@ namespace UserService.Helper
 
         public static bool IsPhoneValid(string phoneNumber)
         {
-            if (!String.IsNullOrWhiteSpace(phoneNumber))
-                return Regex.IsMatch(phoneNumber, @"^[0-9()-]+$");
-
-            return true;
+            return Regex.IsMatch(phoneNumber, @"^[0-9()-]+$");
         }
     }
 }

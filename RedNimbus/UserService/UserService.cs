@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
-using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.Domain;
 using RedNimbus.Messages;
 using RedNimbus.UserService.Helper;
-using UserService.Helper;
+using NetMQ;
+using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
-namespace UserService
+namespace RedNimbus.UserService
 {
     public class UserService : BaseService
     {
@@ -27,39 +26,31 @@ namespace UserService
 
         private bool Validate(Message<UserMessage> userMessage)
         {
-            bool isValid = false;
-
             if (!Validation.IsFirstNameValid(userMessage.Data.FirstName))
             {
-                SendErrorMessage("First Name is empty.", RedNimbus.Either.Enums.ErrorCode.FirstNameNullEmptyOrWhiteSpace, userMessage.Id);
-                isValid = false;
-                return isValid;
+                SendErrorMessage("First Name is empty.", ErrorCode.FirstNameNullEmptyOrWhiteSpace, userMessage.Id);
+                return false;
             }
 
             if (!Validation.IsLastNameValid(userMessage.Data.LastName))
             {
-                SendErrorMessage("Last Name is empty.", RedNimbus.Either.Enums.ErrorCode.LastNameNullEmptyOrWhiteSpace, userMessage.Id);
-                isValid = false;
-                return isValid;
+                SendErrorMessage("Last Name is empty.", ErrorCode.LastNameNullEmptyOrWhiteSpace, userMessage.Id);
+                return false;
             }
 
             if (!Validation.IsEmailValid(userMessage.Data.Email))
             {
-                SendErrorMessage("Invalid email format.", RedNimbus.Either.Enums.ErrorCode.EmailWrongFormat, userMessage.Id);
-                isValid = false;
-                return isValid;
+                SendErrorMessage("Invalid email format.", ErrorCode.EmailWrongFormat, userMessage.Id);
+                return false;
             }
 
             if (!Validation.IsPasswordValid(userMessage.Data.Password))
             {
-                SendErrorMessage("Password does not satisfy requirements.", RedNimbus.Either.Enums.ErrorCode.PasswordWrongFormat, userMessage.Id);
-                isValid = false;
-                return isValid;
+                SendErrorMessage("Password does not satisfy requirements.", ErrorCode.PasswordWrongFormat, userMessage.Id);
+                return false;
             }
 
-            isValid = true;
-
-            return isValid;
+            return true;
         }
 
         private void HandleRegisterUser(NetMQMessage message)
@@ -92,11 +83,11 @@ namespace UserService
             }
             catch (ArgumentException)
             {
-                SendErrorMessage("Email already exists.", RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed, userMessage.Id);
+                SendErrorMessage("Email already exists.", ErrorCode.EmailAlreadyUsed, userMessage.Id);
             }
             catch (Exception)
             {
-                SendErrorMessage("Internal server error.", RedNimbus.Either.Enums.ErrorCode.InternalServerError, userMessage.Id);
+                SendErrorMessage("Internal server error.", ErrorCode.InternalServerError, userMessage.Id);
             }
         }
 
@@ -106,12 +97,12 @@ namespace UserService
 
             if (!Validation.IsEmailValid(userMessage.Data.Email))
             {
-                SendErrorMessage("Invalid email format.", RedNimbus.Either.Enums.ErrorCode.EmailWrongFormat, userMessage.Id);
+                SendErrorMessage("Invalid email format.", ErrorCode.EmailWrongFormat, userMessage.Id);
             }
 
             if (!Validation.IsPasswordValid(userMessage.Data.Password))
             {
-                SendErrorMessage("Password does not satisfy requirements.", RedNimbus.Either.Enums.ErrorCode.PasswordWrongFormat, userMessage.Id);
+                SendErrorMessage("Password does not satisfy requirements.", ErrorCode.PasswordWrongFormat, userMessage.Id);
             }
 
             if (registeredUsers.ContainsKey(userMessage.Data.Email))
@@ -135,7 +126,7 @@ namespace UserService
 
             }
 
-            SendErrorMessage("Invalid credentials.", RedNimbus.Either.Enums.ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
+            SendErrorMessage("Invalid credentials.", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
         }
 
         private void HandleGetUser(NetMQMessage message)
@@ -144,7 +135,7 @@ namespace UserService
 
             if (tokenMessage.Data.Token == null || !tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
             {
-                SendErrorMessage("Requested user data not found", RedNimbus.Either.Enums.ErrorCode.UserNotFound, tokenMessage.Id);
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
             }
 
             if (tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
@@ -152,7 +143,7 @@ namespace UserService
                 string email = tokenEmailPairs[tokenMessage.Data.Token];
                 if (!registeredUsers.ContainsKey(email))
                 {
-                    SendErrorMessage("Requested user data not found", RedNimbus.Either.Enums.ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                    SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
                 }
 
                 User registeredUser = registeredUsers[email];
@@ -169,7 +160,7 @@ namespace UserService
             }
         }
 
-        private void SendErrorMessage(string messageText, RedNimbus.Either.Enums.ErrorCode errorCode, NetMQFrame idFrame)
+        private void SendErrorMessage(string messageText, ErrorCode errorCode, NetMQFrame idFrame)
         {
             Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
 

@@ -8,16 +8,12 @@ using RedNimbus.Domain;
 using NetMQ;
 using System;
 using RedNimbus.API.Helper;
+using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
 namespace RedNimbus.API.Services
 {
     public class UserService : IUserService
     {
-        public UserService()
-        {
-
-        }
-
         public Either<IError, User> RegisterUser(User user)
         {
             Message<UserMessage> message = new Message<UserMessage>("RegisterUser");
@@ -80,21 +76,21 @@ namespace RedNimbus.API.Services
         {
             Message<ErrorMessage> errorMessage = new Message<ErrorMessage>(response);
 
-            RedNimbus.Either.Enums.ErrorCode errorCode = (RedNimbus.Either.Enums.ErrorCode)Enum.ToObject(typeof(RedNimbus.Either.Enums.ErrorCode), errorMessage.Data.ErrorCode);
+            ErrorCode errorCode = (ErrorCode)Enum.ToObject(typeof(ErrorCode), errorMessage.Data.ErrorCode);
 
             switch (errorCode)
             {
-                case RedNimbus.Either.Enums.ErrorCode.FirstNameNullEmptyOrWhiteSpace:
-                case RedNimbus.Either.Enums.ErrorCode.LastNameNullEmptyOrWhiteSpace:
-                case RedNimbus.Either.Enums.ErrorCode.EmailWrongFormat:
-                case RedNimbus.Either.Enums.ErrorCode.PasswordWrongFormat:
-                case RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed:
-                case RedNimbus.Either.Enums.ErrorCode.PasswordsDoNotMatch:
+                case ErrorCode.FirstNameNullEmptyOrWhiteSpace:
+                case ErrorCode.LastNameNullEmptyOrWhiteSpace:
+                case ErrorCode.EmailWrongFormat:
+                case ErrorCode.PasswordWrongFormat:
+                case ErrorCode.EmailAlreadyUsed:
+                case ErrorCode.PasswordsDoNotMatch:
                     return new FormatError(errorMessage.Data.MessageText, errorCode);
-                case RedNimbus.Either.Enums.ErrorCode.IncorrectEmailOrPassword:
+                case ErrorCode.IncorrectEmailOrPassword:
                     return new AuthenticationError(errorMessage.Data.MessageText, errorCode);
-                case RedNimbus.Either.Enums.ErrorCode.UserNotFound:
-                case RedNimbus.Either.Enums.ErrorCode.UserNotRegistrated:
+                case ErrorCode.UserNotFound:
+                case ErrorCode.UserNotRegistrated:
                     return new NotFoundError(errorMessage.Data.MessageText, errorCode);
                 default:
                     return new InternalServisError(errorMessage.Data.MessageText, errorCode);
