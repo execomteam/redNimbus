@@ -9,14 +9,22 @@ using RedNimbus.Either.Errors;
 using RedNimbus.Either;
 using RedNimbus.DTO;
 using RedNimbus.DTO.Enums;
+using UserService.Database;
+using MySql.Data.MySqlClient;
+using RedNimbus.Either.Mappings;
+using UserService.DatabaseModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace RedNimbus.UserService.Services
 {
     public class UserService : IUserService
     {
-        private static readonly Dictionary<string, User> registeredUsers = new Dictionary<string, User>();
-        private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
-        public UserService() {}
+        private UserRepository userDatabaseUtils;
+        public UserService()
+        {
+            userDatabaseUtils = new UserRepository();
+        }
+        private static readonly Dictionary<string, string>  tokenEmailPairs = new Dictionary<string, string>();
 
         #region Validation functions
 
@@ -78,9 +86,9 @@ namespace RedNimbus.UserService.Services
 
             try
             {
-                registeredUsers.Add(user.Email, user);
+                userDatabaseUtils.SaveUser(user);
             }
-            catch (ArgumentException)
+            catch (DbUpdateException)
             {
                 return new Left<IError, User>(new FormatError("Email already exist", ErrorCode.EmailAlreadyUsed) );
             }
@@ -89,7 +97,7 @@ namespace RedNimbus.UserService.Services
                 return new Left<IError, User>(new InternalServisError("ServiceError", ErrorCode.InternalServerError));
             }
 
-            return new Right<IError, User>(registeredUsers[user.Email]);
+            return new Right<IError, User>(user);
         }
 
         public Either<IError, User> Authenticate(User user)
@@ -104,9 +112,15 @@ namespace RedNimbus.UserService.Services
                 return new AuthenticationError("Password field empty!", ErrorCode.IncorrectEmailOrPassword);
             }
 
-            if (registeredUsers.ContainsKey(user.Email))
+
+            if (userDatabaseUtils.CheckIfExists(user.Email))
             {
-                var registeredUser = registeredUsers[user.Email];
+                var registeredUser = userDatabaseUtils.GetUserByEmail(user.Email);
+
+                if(registeredUser == null)
+                {
+                    return new AuthenticationError("Account has been deactivated", ErrorCode.AccountDeactivated);
+                }
                 if (registeredUser.Password == HashHelper.ComputeHash(user.Password))
                 {
                     return registeredUser;
@@ -151,12 +165,12 @@ namespace RedNimbus.UserService.Services
             }
 
             string email = tokenEmailPairs[token];
-            if (!registeredUsers.ContainsKey(email))
+            if (!userDatabaseUtils.CheckIfExists(email))
             {
                 return new NotFoundError("Requested user data not found", ErrorCode.UserNotRegistrated);
             }
 
-            User registeredUser = registeredUsers[email];
+            User registeredUser = userDatabaseUtils.GetUserByEmail(email);
             registeredUser.Key = token;
 
             return registeredUser;

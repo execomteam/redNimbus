@@ -18,6 +18,7 @@ namespace RedNimbus.DTO.Enums
         IncorrectEmailOrPassword,
         UserNotFound,
         UserNotRegistrated,
-        MappingError
+        MappingError,
+        AccountDeactivated
     }
 }
