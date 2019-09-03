@@ -1,0 +1,6 @@
+{
+  "server":"localhost",
+  "database":"rednimbususerdb",
+  "user":"root",
+  "password":"root"
+}

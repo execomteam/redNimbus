@@ -1,7 +1,4 @@
-﻿using RedNimbus.UserService.Helper;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.Text.RegularExpressions;
 
 namespace RedNimbus.UserService.Helper

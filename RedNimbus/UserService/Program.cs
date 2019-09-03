@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper;
+using UserService.Mapping;
 
 namespace RedNimbus.UserService
 {
@@ -6,7 +7,13 @@ namespace RedNimbus.UserService
     {
         static void Main(string[] args)
         {
-            UserService userService = new UserService();
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            UserService userService = new UserService(mapper);
             userService.Start();
         }
     }

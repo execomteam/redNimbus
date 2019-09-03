@@ -2,26 +2,29 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
+using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.Domain;
 using RedNimbus.Messages;
 using RedNimbus.UserService.Helper;
-using NetMQ;
+using UserService.Database;
 using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
 namespace RedNimbus.UserService
 {
     public class UserService : BaseService
     {
-        private static readonly Dictionary<string, User> registeredUsers = new Dictionary<string, User>();
         private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
+        private UserRepository _userRepository;
 
-        public UserService() : base()
+        public UserService(IMapper mapper) : base()
         {
             Subscribe("RegisterUser", HandleRegisterUser);
             Subscribe("AuthenticateUser", HandleAuthenticateUser);
             Subscribe("GetUser", HandleGetUser);
+            _userRepository = new UserRepository(mapper);
         }
 
         private bool Validate(Message<UserMessage> userMessage)
@@ -74,7 +77,8 @@ namespace RedNimbus.UserService
 
             try
             {
-                registeredUsers.Add(user.Email, user);
+                //registeredUsers.Add(user.Email, user);
+                this._userRepository.SaveUser(user);
 
                 userMessage.Topic = "Response";
 
@@ -105,9 +109,12 @@ namespace RedNimbus.UserService
                 SendErrorMessage("Password does not satisfy requirements.", ErrorCode.PasswordWrongFormat, userMessage.Id);
             }
 
-            if (registeredUsers.ContainsKey(userMessage.Data.Email))
-            {
-                var registeredUser = registeredUsers[userMessage.Data.Email];
+            var email = userMessage.Data.Email;
+            //if (registeredUsers.ContainsKey(userMessage.Data.Email))
+            if (_userRepository.CheckIfExists(email))
+                {
+                //var registeredUser = registeredUsers[userMessage.Data.Email];
+                var registeredUser = _userRepository.GetUserByEmail(userMessage.Data.Email);
                 if (registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
                 {
                     Message<TokenMessage> tokenMessage = new Message<TokenMessage>("Response");
@@ -141,12 +148,12 @@ namespace RedNimbus.UserService
             if (tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
             {
                 string email = tokenEmailPairs[tokenMessage.Data.Token];
-                if (!registeredUsers.ContainsKey(email))
+                if (!_userRepository.CheckIfExists(email))
                 {
                     SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
                 }
 
-                User registeredUser = registeredUsers[email];
+                User registeredUser = _userRepository.GetUserByEmail(email);
                 registeredUser.Key = tokenMessage.Data.Token;
 
                 Message<UserMessage> userMessage = new Message<UserMessage>("Response");
