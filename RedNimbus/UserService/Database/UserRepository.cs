@@ -15,6 +15,12 @@ namespace UserService.Database
     public class UserRepository
     {
         private DatabaseContext context;
+        private IMapper _mapper;
+
+        public UserRepository(IMapper mapper)
+        {
+            this._mapper = mapper;
+        }
 
 
         /// <summary>
@@ -74,28 +80,12 @@ namespace UserService.Database
 
         private User ConvertUserDBToUser(UserDB userdb)
         {
-            // TODO [enisnerbajin][29/08/2019]: Use automapper
-            return new User
-            {
-                FirstName   = userdb.FirstName,
-                LastName    = userdb.LastName,
-                Email       = userdb.Email,
-                PhoneNumber = userdb.PhoneNumber,
-                Password    = userdb.Password
-            };
+            return _mapper.Map<User>(userdb);
         }
 
         private UserDB ConvertUserToUserDB(User user)
         {
-            // TODO [enisnerbajin][29/08/2019]: Use automapper
-            return new UserDB
-            {
-                FirstName   = user.FirstName,
-                LastName    = user.LastName,
-                Email       = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                Password    = user.Password
-            };
+            return _mapper.Map<UserDB>(user);
         }
     }
 }

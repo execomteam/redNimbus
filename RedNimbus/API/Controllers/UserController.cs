@@ -19,8 +19,6 @@ namespace RedNimbus.API.Controllers
             _communicationService = communicationService;
         }
 
-        #region IActionResult
-
         private IActionResult AllOk()
         {
             return Ok(new Empty());
@@ -33,14 +31,13 @@ namespace RedNimbus.API.Controllers
 
         private IActionResult BadRequestErrorHandler(IError error)
         {
-            return BadRequest(error.Message);
+            return BadRequest(error);
         }
 
         private IActionResult InternalServisErrorHandler(IError error)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, error);
         }
-
         private IActionResult NotFoundErrorHandler(IError error)
         {
             return NotFound(error.Message);
@@ -48,33 +45,20 @@ namespace RedNimbus.API.Controllers
 
         private IActionResult AuthenticationErrorHandler(IError error)
         {
-            return StatusCode(StatusCodes.Status406NotAcceptable, error.Message);
+            return StatusCode(StatusCodes.Status406NotAcceptable, error);
         }
-
-        #endregion
 
         [HttpPost]
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
+            // var response = _communicationService.Send<CreateUserDto, Response<Empty>>("api/user", createUserDto).Result;
             return _communicationService.Send<CreateUserDto, Empty>("api/user", createUserDto)
                  .Result
                  .Map(() => AllOk())
                  .Reduce(BadRequestErrorHandler, x => x is FormatError)
                  .Reduce(InternalServisErrorHandler);
         }
-        /*
-        [HttpPost]
-        public IActionResult RegisterUser([FromBody]CreateUserDto createUserDto)
-        {
-            string topic = "RegisterUser";
 
-            // - Dodeliti topic
-            // - Konvertovati DTO u nas protobuf message
-            // - Od toga napraviti NetMQMessage
-            // - Poslati preko socket factory zahtev
-            // - kad stigne response uraditi nesto
-        }
-        */
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
         {
@@ -82,13 +66,13 @@ namespace RedNimbus.API.Controllers
                 .Result
                 .Map(x => AllOk(x))
                 .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
-                .Reduce(InternalServisErrorHandler);
+                .Reduce(InternalServisErrorHandler);            
         }
 
-        [HttpPost("get")]
-        public IActionResult GetUser([FromBody]KeyDto keyData)
+        [HttpGet]
+        public IActionResult Get()
         {
-            return _communicationService.Send<KeyDto, UserDto>("api/user/get", keyData)
+            return _communicationService.Get<UserDto>("api/user", Request.Headers["token"])
                 .Result
                 .Map(x => AllOk(x))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)

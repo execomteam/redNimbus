@@ -1,59 +1,28 @@
 import React from 'react'
-import { BrowserRouter as Router, Route, Link , withRouter} from "react-router-dom";
+import {Route, withRouter, Switch } from "react-router-dom";
 import LoginForm from './LoginForm'
 import RegistrationForm from './RegistrationForm'
 import Home from './Home'
 import SignOut from './SignOut'
-import './css/NavBar.css'
+import Bucket from './Bucket'
 
-class NavBar extends React.Component {
+class Routes extends React.Component {
+    
     constructor(props){
         super(props);
     }
 
-    render() {
-        
-        if(this.props.state.isLoggedIn)
-            return (
-                <div>
-                    <Router>
-                        <div>
-                            <nav>
-                                <ul>
-                                    <li id="home"><Link to="/">Home</Link></li>
-                                    <li id="signout"><Link to="/signout">Sign Out</Link></li>
-                                </ul>
-                            </nav>
-
-                            <Route exact path="/" render={(props) => <Home user={this.props.state}/>} />
-                            <Route path="/signout" render={(props) => <SignOut signOut={this.props.signOut} />} />
-                        </div>
-                    </Router>
-                </div>
+    render(){
+            return (<Switch>
+                <Route exact path="/" render={(props) => <Home user={this.props.user} />} />
+                <Route path="/bucket" render={(props) => <Bucket />} />
+                <Route path="/signout" render={(props) => <SignOut signOut={this.props.signOut} />} />
+                <Route path="/login" render={(props) => <LoginForm changeState={this.props.changeState} />} />
+                <Route path="/register" render={(props) => <RegistrationForm />} />
+            </Switch>
             );
-
-        return (
-            <div>
-                <Router>
-                    <div>
-                        <nav>
-                            <ul>
-                                <li id="home"><Link to="/">Home</Link></li>
-                                <li id="register"><Link to="/register">Sign Up</Link></li>
-                                <li id="login"><Link to="/login">Sign In</Link></li>
-
-                            </ul>
-                        </nav>
-
-                        <Route exact path="/" render={(props) => <Home user={this.props.state}/>} />
-                        <Route path="/login" render={(props) => <LoginForm changeState={this.props.changeState} />} />
-                        <Route path="/register" render={(props) => <RegistrationForm />} />
-                    </div>
-                </Router>
-            </div>
-        );
-    }
+        }
   }
 
-  export default withRouter(NavBar);
+  export default withRouter(Routes);
 

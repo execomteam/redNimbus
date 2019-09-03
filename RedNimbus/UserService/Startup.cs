@@ -72,7 +72,7 @@ namespace UserService
             ITokenService tokenService = new TokenService(jwtConfig);
             services.AddSingleton(tokenService);
 
-            IUserService userService = new RedNimbus.UserService.Services.UserService();
+            IUserService userService = new RedNimbus.UserService.Services.UserService(mapper);
 
             services.AddSingleton(userService);
         }

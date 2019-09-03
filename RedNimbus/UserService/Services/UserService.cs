@@ -14,15 +14,18 @@ using MySql.Data.MySqlClient;
 using RedNimbus.Either.Mappings;
 using UserService.DatabaseModel;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace RedNimbus.UserService.Services
 {
     public class UserService : IUserService
     {
+        private IMapper _mapper;
         private UserRepository userDatabaseUtils;
-        public UserService()
+        public UserService(IMapper mapper)
         {
-            userDatabaseUtils = new UserRepository();
+            this._mapper = mapper;
+            userDatabaseUtils = new UserRepository(mapper);
         }
         private static readonly Dictionary<string, string>  tokenEmailPairs = new Dictionary<string, string>();
 
@@ -77,7 +80,7 @@ namespace RedNimbus.UserService.Services
 
             if (!IsPasswordValid(user))
             {
-                return new Left<IError, User>(new FormatError("Password format is unacceptable!", ErrorCode.PasswordWrongFormat));
+                return new Left<IError, User>(new FormatError("Password must have at least 8 characters, one uppercase letter, one lowcase letter, one number and one special character!", ErrorCode.PasswordWrongFormat));
             }
 
             user.Id = Guid.NewGuid();

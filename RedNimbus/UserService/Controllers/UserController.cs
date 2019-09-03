@@ -92,10 +92,10 @@ namespace RedNimbus.UserService.Controllers
 
         //greskaaaaa get ne post
 
-        [HttpPost("get")]
-        public IActionResult GetUser([FromBody]KeyDto keyData)
+        [HttpGet]
+        public IActionResult Get()
         {
-            return _userService.GetUserByToken(keyData.Key)
+            return _userService.GetUserByToken(Request.Headers["token"])
                 .Map(_mapper.Map<UserDto>)
                 .Map((either) => AllOk(either))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
