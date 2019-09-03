@@ -1,15 +1,12 @@
 ﻿using NUnit.Framework;
 using System;
+using RedNimbus.Either;
 
 namespace Either.Test
 {
     [TestFixture]
-    public class Class1
+    public class EitherTest
     {
-        [Test]
-        public void Test1()
-        {
-            Assert.That(1 == 1);
-        }
+        
     }
 }
