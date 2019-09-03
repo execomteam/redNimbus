@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using RedNimbus.Domain;
 using RedNimbus.DTO;
+using UserService.DatabaseModel;
 
-namespace RedNimbus.Either.Mappings
+namespace RedNimbus.RestUserService.Mappings
 {
     public class MappingProfile : Profile
     {
@@ -16,6 +17,8 @@ namespace RedNimbus.Either.Mappings
             CreateMap<AuthenticateUserDto, User>();
             CreateMap<UserDto, KeyDto>();
             CreateMap<KeyDto, UserDto>();
+            CreateMap<User, UserDB>();
+            CreateMap<UserDB, User>();
         }
     }
 }

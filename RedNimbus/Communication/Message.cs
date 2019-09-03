@@ -30,6 +30,15 @@ namespace RedNimbus.Communication
         /// <summary>
         /// Create a new Message instance.
         /// </summary>
+        /// <param name="topic">String representation of the topic for the message.</param>
+        public Message(string topic)
+        {
+            Topic = topic;
+        }
+
+        /// <summary>
+        /// Create a new Message instance.
+        /// </summary>
         /// <param name="message">Instance of NetMQMessage class.</param>
         public Message(NetMQMessage message)
         {

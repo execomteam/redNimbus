@@ -1,0 +1,6 @@
+﻿syntax = "proto3";
+package RedNimbus.Messages;
+
+message TokenMessage {
+	string Token = 1;
+}
