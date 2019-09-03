@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using RedNimbus.DTO.Enums;
+using RedNimbus.Either.Enums;
 using RedNimbus.Either.Errors;
 using System;
 

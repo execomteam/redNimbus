@@ -1,8 +1,4 @@
-﻿using RedNimbus.DTO.Enums;
-using RedNimbus.Either.Errors;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using RedNimbus.Either.Enums;
 
 namespace RedNimbus.Either.Errors
 {
@@ -10,6 +6,7 @@ namespace RedNimbus.Either.Errors
     {
         private string _message;
         private ErrorCode _code;
+
         public FormatError(string message, ErrorCode code)
         {
             _message = message;

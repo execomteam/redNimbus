@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RedNimbus.DTO
+﻿namespace RedNimbus.DTO
 {
     public class KeyDto
     {
