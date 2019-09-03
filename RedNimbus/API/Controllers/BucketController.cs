@@ -61,8 +61,10 @@ namespace API.Controllers
             netMqMsg.Append("bucket/listBucketContent");
 
             //Initializating message 
-            BucketMessage msg = new BucketMessage();
-            msg.Path = "/";
+            BucketMessage msg = new BucketMessage {
+                Path = "/"
+            };
+            
             //msg.Token = Request.Headers["token"];
 
             //From BucketMessage to NetMqMessage
@@ -99,10 +101,11 @@ namespace API.Controllers
             netMqMsg.Append("bucket/listBucketContent");
 
             //Initializating message 
-            BucketMessage msg = new BucketMessage();
-            msg.Path = "/" + id;
-            //msg.Token = Request.Headers["token"];
-
+            BucketMessage msg = new BucketMessage {
+                Path = "/" + id,
+                Token = Request.Headers["token"]
+            };
+            
             //From BucketMessage to NetMqMessage
             MemoryStream stream = new MemoryStream();
             msg.WriteTo(stream);
@@ -122,8 +125,7 @@ namespace API.Controllers
 
             if (Data.Successful)
             {
-                List<string>  toReturn = new List<string>(Data.ReturnItems);
-                return AllOk(toReturn);
+                return AllOk(new List<string>(Data.ReturnItems));
             }
             return BadRequest();
         }
@@ -137,9 +139,10 @@ namespace API.Controllers
             netMqMsg.Append("bucket/createBucket");
 
             //Initializating message 
-            BucketMessage msg = new BucketMessage();
-            msg.Path = "/" + bucketName.Value;
-            //msg.Token = Request.Headers["token"];
+            BucketMessage msg = new BucketMessage {
+                Path = "/" + bucketName.Value,
+                Token = Request.Headers["token"]
+            };
 
             //From BucketMessage to NetMqMessage
             MemoryStream stream = new MemoryStream();

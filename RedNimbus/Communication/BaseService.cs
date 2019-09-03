@@ -13,11 +13,14 @@ namespace RedNimbus.Communication
         private const string _publisherAddress = "tcp://127.0.0.1:8081";
         private const string _dealerAddress = "tcp://127.0.0.1:8080";
 
+        protected const string _returnTopic = "Response";
+
         private SubscriberSocket _subscriberSocket;
         private DealerSocket _dealerSocket;
         private NetMQPoller _poller;
 
         private IDictionary<string, Action<NetMQMessage>> _topicsToActions;
+
 
         /// <summary>
         /// Use this NetMQPoller instance to observe sockets.
