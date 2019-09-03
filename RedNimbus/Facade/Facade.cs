@@ -10,8 +10,7 @@ namespace RedNimbus.Facade
 {
     public class Facade : BaseService
     {
-        // TODO: Set address
-        private const string _facadeAddress = "";
+        private const string _facadeAddress = "tcp://*:8000";
 
         private RouterSocket _routerSocket;
 
@@ -22,6 +21,9 @@ namespace RedNimbus.Facade
         {
             _routerSocket = new RouterSocket();
 
+            Subscribe("Response", SendResponse);
+            Subscribe("Error", SendResponse);
+
             Poller.Add(_routerSocket);
         }
 
@@ -30,13 +32,13 @@ namespace RedNimbus.Facade
         /// </summary>
         new public void Start()
         {
-            if(IsStopped)
+            if (IsStopped)
             {
-                base.Start();
-
                 _routerSocket.Bind(_facadeAddress);
 
                 _routerSocket.ReceiveReady += ReceiveRequestEventHandler;
+
+                base.Start();
             }
         }
 
@@ -47,11 +49,12 @@ namespace RedNimbus.Facade
         {
             if (IsRunning)
             {
-                base.Stop();
-
                 try
                 {
+                    _routerSocket.Disconnect(_facadeAddress);
                     _routerSocket.Dispose();
+
+                    base.Stop();
                 }
                 finally
                 {
@@ -69,13 +72,16 @@ namespace RedNimbus.Facade
         /// <returns>The transformed message.</returns>
         public NetMQMessage ToDealerMessage(NetMQMessage message)
         {
-            NetMQFrame idFrame = message.Pop();
-            NetMQFrame topicFrame = message.Pop();
+            NetMQFrame idFrame = message[0];
+            NetMQFrame topicFrame = message[2];
+            NetMQFrame dataFrame = message[3];
 
-            message.Push(idFrame);
-            message.Push(topicFrame);
+            NetMQMessage dealerMessage = new NetMQMessage();
+            dealerMessage.Append(topicFrame);
+            dealerMessage.Append(idFrame);
+            dealerMessage.Append(dataFrame);
 
-            return message;
+            return dealerMessage;
         }
 
         /// <summary>
@@ -86,13 +92,19 @@ namespace RedNimbus.Facade
         /// <returns>The transformed message.</returns>
         public NetMQMessage ToRouterMessage(NetMQMessage message)
         {
-            NetMQFrame topicFrame = message.Pop();
-            NetMQFrame idFrame = message.Pop();
+            NetMQMessage routerMessage = new NetMQMessage();
 
-            message.Push(topicFrame);
-            message.Push(idFrame);
-            
-            return message;
+            NetMQFrame topicFrame = message[0];
+            NetMQFrame idFrame = message[1];
+            NetMQFrame dataFrame = message[2];
+
+            routerMessage.Append(idFrame);
+            routerMessage.AppendEmptyFrame();
+            routerMessage.Append(topicFrame);
+            routerMessage.AppendEmptyFrame();
+            routerMessage.Append(dataFrame);
+
+            return routerMessage;
         }
 
         /// <summary>
@@ -113,10 +125,10 @@ namespace RedNimbus.Facade
 
 
         public void SendResponse(NetMQMessage message)
-        {   
-            // TODO: SUBSCRIBE TO RESPONSE EVENT
-
+        {
             _routerSocket.SendMultipartMessage(ToRouterMessage(message));
         }
+
+       
     }
 }

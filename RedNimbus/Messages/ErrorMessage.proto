@@ -1,0 +1,7 @@
+﻿syntax = "proto3";
+package RedNimbus.Messages;
+
+message ErrorMessage {
+	string MessageText = 1;
+	int32 ErrorCode = 2;
+}

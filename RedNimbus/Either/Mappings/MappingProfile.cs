@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using RedNimbus.UserService.Model;
+using RedNimbus.Domain;
 using RedNimbus.DTO;
 
 namespace RedNimbus.Either.Mappings
@@ -12,8 +12,8 @@ namespace RedNimbus.Either.Mappings
             CreateMap<UserDto, User>();
             CreateMap<User, CreateUserDto>();
             CreateMap<CreateUserDto, User>();
-            CreateMap<User, AuthorizeUserDto>();
-            CreateMap<AuthorizeUserDto, User>();
+            CreateMap<User, AuthenticateUserDto>();
+            CreateMap<AuthenticateUserDto, User>();
             CreateMap<UserDto, KeyDto>();
             CreateMap<KeyDto, UserDto>();
         }

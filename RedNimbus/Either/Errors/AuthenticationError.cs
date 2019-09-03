@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using RedNimbus.DTO.Enums;
+using RedNimbus.Either.Enums;
 
 namespace RedNimbus.Either.Errors
 {

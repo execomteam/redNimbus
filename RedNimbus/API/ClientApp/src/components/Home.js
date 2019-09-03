@@ -3,6 +3,10 @@ import { withRouter } from "react-router-dom";
 import './css/Home.css'
 
 class Home extends React.Component {
+    
+    constructor(props){
+        super(props);
+    }
 
     render(){
         if (this.props.user.isLoggedIn) {

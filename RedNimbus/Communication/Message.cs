@@ -18,9 +18,9 @@ namespace RedNimbus.Communication
         public string Topic { get; set; }
 
         /// <summary>
-        /// Represents the unique identifer of the request connection.
+        /// Represents the NetMQFrame that contains the unique identifer of the request connection.
         /// </summary>
-        public Guid Id { get; set; }
+        public NetMQFrame Id { get; set; }
 
         /// <summary>
         /// Represents the payload of the message.
@@ -30,13 +30,21 @@ namespace RedNimbus.Communication
         /// <summary>
         /// Create a new Message instance.
         /// </summary>
+        /// <param name="topic">String representation of the topic for the message.</param>
+        public Message(string topic)
+        {
+            Topic = topic;
+        }
+
+        /// <summary>
+        /// Create a new Message instance.
+        /// </summary>
         /// <param name="message">Instance of NetMQMessage class.</param>
         public Message(NetMQMessage message)
         {
-            // TODO: Check if this should be wrapped with try/catch
+            Topic = message.Pop().ConvertToString();
 
-            Topic = message.Pop().ConvertToString();            // TODO: Define topic string format
-            Id = new Guid(message.Pop().ToByteArray());
+            Id = message.Pop();
 
             NetMQFrame data = message.Pop();
             Data.MergeFrom(data.ToByteArray());
@@ -52,10 +60,7 @@ namespace RedNimbus.Communication
 
             message.Append(Topic);
 
-            if (Id == Guid.Empty)
-                message.AppendEmptyFrame();
-            else
-                message.Append(new NetMQFrame(Id.ToByteArray()));
+            message.Append(Id);
 
             MemoryStream stream = new MemoryStream();
             Data.WriteTo(stream);
