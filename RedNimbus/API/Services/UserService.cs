@@ -16,13 +16,17 @@ namespace RedNimbus.API.Services
     {
         public Either<IError, User> RegisterUser(User user)
         {
-            Message<UserMessage> message = new Message<UserMessage>("RegisterUser");
-
-            message.Data.FirstName = user.FirstName;
-            message.Data.LastName = user.LastName;
-            message.Data.Email = user.Email;
-            message.Data.Password = user.Password;
-
+            Message<UserMessage> message = new Message<UserMessage>("RegisterUser")
+            {
+                Data = new UserMessage()
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Password = user.Password
+                }
+            };
+           
             NetMQMessage temp = message.ToNetMQMessage();
             NetMQFrame topicFrame = temp.Pop();
             NetMQFrame emptyFrame = temp.Pop();
