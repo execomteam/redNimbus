@@ -1,4 +1,4 @@
-﻿using RedNimbus.DTO.Enums;
+﻿using RedNimbus.Either.Enums;
 
 namespace RedNimbus.Either.Errors
 {

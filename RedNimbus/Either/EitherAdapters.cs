@@ -52,10 +52,8 @@ namespace RedNimbus.Either
         {
             if (either is Left<TLeft, TRight> left)
             {
-                if (when(left))
-                {
-                    return func(left);
-                }
+
+                return when(left) ?  func(left) : either;
             }
 
             return (Right<TLeft, TRight>)either;

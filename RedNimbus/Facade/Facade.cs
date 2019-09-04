@@ -22,6 +22,7 @@ namespace RedNimbus.Facade
             _routerSocket = new RouterSocket();
 
             Subscribe("Response", SendResponse);
+            Subscribe("Error", SendResponse);
 
             Poller.Add(_routerSocket);
         }
@@ -48,11 +49,12 @@ namespace RedNimbus.Facade
         {
             if (IsRunning)
             {
-                base.Stop();
-
                 try
                 {
+                    _routerSocket.Disconnect(_facadeAddress);
                     _routerSocket.Dispose();
+
+                    base.Stop();
                 }
                 finally
                 {
@@ -92,10 +94,13 @@ namespace RedNimbus.Facade
         {
             NetMQMessage routerMessage = new NetMQMessage();
 
+            NetMQFrame topicFrame = message[0];
             NetMQFrame idFrame = message[1];
             NetMQFrame dataFrame = message[2];
 
             routerMessage.Append(idFrame);
+            routerMessage.AppendEmptyFrame();
+            routerMessage.Append(topicFrame);
             routerMessage.AppendEmptyFrame();
             routerMessage.Append(dataFrame);
 
