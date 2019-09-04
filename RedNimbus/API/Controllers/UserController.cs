@@ -42,10 +42,10 @@ namespace RedNimbus.API.Controllers
                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
                .Reduce(InternalServisErrorHandler);
 
-        [HttpPost("get")]
-        public IActionResult Get([FromBody]KeyDto keyDto)
+        [HttpGet]
+        public IActionResult Get()
         {
-            return _userService.GetUserByToken(keyDto.Key)
+            return _userService.GetUserByToken(Request.Headers["token"])
                 .Map(_mapper.Map<UserDto>)
                 .Map(x => AllOk(x))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)

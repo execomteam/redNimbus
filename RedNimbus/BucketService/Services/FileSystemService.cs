@@ -7,40 +7,7 @@ namespace RedNimbus.BucketService.Services
 {
     public static class FileSystemService
     {
-        /*
-        public static bool CreateUser(string path)
-        {
-            try
-            {
-                string pathForZfs = path.TrimStart('/');
-                string cmd = "zfs create " + pathForZfs;
-                ShellHelper.Bash(cmd);
-                return true;
-            }
-            catch(Exception)
-            {
-                return false;
-            }
-        }
-
-        public static bool CreateBucket(string path)
-        {
-            try
-            {
-                string pathForZfs = path.TrimStart('/');
-                string cmd = "zfs create " + pathForZfs;
-                ShellHelper.Bash(cmd);
-                cmd = "zfs set quota=5G " + pathForZfs;
-                ShellHelper.Bash(cmd);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-        */
-
+        
         public static int NumberOfDirectories(string path)
         {
             return Directory.GetDirectories(path).Length;
@@ -63,7 +30,6 @@ namespace RedNimbus.BucketService.Services
             }
             catch (DirectoryNotFoundException)
             {
-                
                 return null;
             }
             return returnValue;
@@ -76,14 +42,15 @@ namespace RedNimbus.BucketService.Services
                 if (Directory.Exists(path))
                 {
                     int i = 1;
-                    path = path + "(" + i + ")";
+                    string path1 = path + "(" + i + ")";
                     
-                    while (Directory.Exists(path))
+                    while (Directory.Exists(path1))
                     {
                         i++;
-                        path = path + "(" + i + ")";
+                        path1 = path + "(" + i + ")";
                         
                     }
+                    path = path1;
                     
                 }
 
