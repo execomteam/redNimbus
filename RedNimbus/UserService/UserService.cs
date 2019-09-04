@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using AutoMapper;
-using GalaSoft.MvvmLight.Ioc;
 using Microsoft.IdentityModel.Tokens;
 using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.Domain;
-using RedNimbus.Either.Mappings;
 using RedNimbus.Messages;
 using RedNimbus.UserService.Helper;
 using UserService.Database;
@@ -81,7 +78,6 @@ namespace RedNimbus.UserService
 
             try
             {
-                //registeredUsers.Add(user.Email, user);
                 this._userRepository.SaveUser(user);
 
                 userMessage.Topic = "Response";
@@ -114,10 +110,8 @@ namespace RedNimbus.UserService
             }
 
             var email = userMessage.Data.Email;
-            //if (registeredUsers.ContainsKey(userMessage.Data.Email))
             if (_userRepository.CheckIfExists(email))
                 {
-                //var registeredUser = registeredUsers[userMessage.Data.Email];
                 var registeredUser = _userRepository.GetUserByEmail(userMessage.Data.Email);
                 if (registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
                 {
