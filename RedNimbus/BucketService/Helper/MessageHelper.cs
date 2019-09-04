@@ -19,5 +19,13 @@ namespace RedNimbus.BucketService.Helper
             return "Spisak";
         }
 
+        public static string GetNameFromPath(string path)
+        {
+            string[] val = path.Split('/');
+            string last = val[val.Length - 1];
+            string[] splitLast = last.Split('\\');
+            return splitLast[splitLast.Length - 1];
+        }
+
     }
 }

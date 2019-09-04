@@ -46,14 +46,6 @@ namespace RedNimbus.BucketService.Services
             return Directory.GetDirectories(path).Length;
         }
 
-        public static string GetNameFromPath(string path)
-        {
-            string[] val = path.Split('/');
-            string last = val[val.Length - 1];
-            string[] splitLast = last.Split('\\');
-            return splitLast[splitLast.Length - 1];
-        }
-
         public static List<string> ListContent(string path)
         {
             List<string> returnValue = new List<string>();
@@ -61,12 +53,12 @@ namespace RedNimbus.BucketService.Services
             {
                 foreach (string entry in Directory.GetDirectories(path))
                 {
-                    returnValue.Add(GetNameFromPath(entry));
+                    returnValue.Add(MessageHelper.GetNameFromPath(entry));
                 }
                 returnValue.Add("*");
                 foreach (string entry in Directory.GetFiles(path))
                 {
-                    returnValue.Add(GetNameFromPath(entry));
+                    returnValue.Add(MessageHelper.GetNameFromPath(entry));
                 }
             }
             catch (DirectoryNotFoundException)
@@ -84,15 +76,15 @@ namespace RedNimbus.BucketService.Services
                 if (Directory.Exists(path))
                 {
                     int i = 1;
-                    string path1 = path + "(" + i + ")";
+                    path = path + "(" + i + ")";
                     
-                    while (Directory.Exists(path1))
+                    while (Directory.Exists(path))
                     {
                         i++;
-                        path1 = path + "(" + i + ")";
+                        path = path + "(" + i + ")";
                         
                     }
-                    path = path1;
+                    
                 }
 
                 // Try to create the directory.
