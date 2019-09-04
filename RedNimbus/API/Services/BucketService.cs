@@ -91,7 +91,7 @@ namespace RedNimbus.API.Services
             return new Left<IError, List<string>>(GetError(response));
         }
 
-        public Either<IError, bool> CreateBucket(string token, StringDto bucketName)
+        public Either<IError, StringDto> CreateBucket(string token, StringDto bucketName)
         {
             Message<BucketMessage> message = new Message<BucketMessage>("bucket/createBucket")
             {
@@ -117,10 +117,10 @@ namespace RedNimbus.API.Services
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
 
-                return new Right<IError, bool>(true);
+                return new Right<IError, StringDto>(bucketName);
             }
 
-            return new Left<IError, bool>(GetError(response));
+            return new Left<IError, StringDto>(GetError(response));
 
         }
     }

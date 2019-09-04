@@ -10,7 +10,7 @@ using RedNimbus.Either.Mappings;
 namespace RedNimbus.API.Controllers
 {
     [ApiController]
-    [Route("api/v2/user")]
+    [Route("api/user")]
     [Produces("application/json")]
     public class UserController : BaseController
     {
