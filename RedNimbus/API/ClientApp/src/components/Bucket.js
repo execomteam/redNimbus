@@ -14,11 +14,14 @@ class Bucket extends React.Component
         this.state = {
             folders: [],
             files: [],
-            modalShow: false
+            deleteModalShow: false,
+            createModalShow: false
         }
         
         this.addNewBucket = this.addNewBucket.bind(this);
-        this.setModalShow = this.setModalShow.bind(this);
+        this.setCreateModalShow = this.setCreateModalShow.bind(this);
+        this.setDeleteModalShow = this.setDeleteModalShow.bind(this);
+        this.deletingBucket = this.deletingBucket.bind(this);
 
         const options = {
             headers: { 'token': localStorage.getItem("token")}
@@ -65,18 +68,33 @@ class Bucket extends React.Component
         }));
     }
 
-    setModalShow(value){
-        this.setState({
-            modalShow: value
-        });
+    deletingBucket(bucket) {
+        let arr = this.state.folders;
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] === bucket.value) {
+                arr.splice(i, 1);
+            }
+        }
+
+        this.setState({folders: arr});
     }
 
+    setCreateModalShow(value){
+        this.setState({
+            createModalShow: value
+        });
+    }
+    setDeleteModalShow(value) {
+        this.setState({
+            deleteModalShow: value
+        });
+    }
     render() {
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-md-2">
-                        <SideNav addNewBucket={this.addNewBucket} modalShow={this.state.modalShow} setModalShow={this.setModalShow} onClick={this.onClickeCreateNewBucket}/>
+                        <SideNav addNewBucket={this.addNewBucket} createModalShow={this.state.createModalShow} setCreateModalShow={this.setCreateModalShow} onClick={this.onClickeCreateNewBucket} deletingBucket={this.deletingBucket} deleteModalShow={this.state.deleteModalShow} setDeleteModalShow={this.setDeleteModalShow} onClick={this.onClickeDeleteBucket} />
                     </div>
                     <div className="col-md-10">   
                         <br />

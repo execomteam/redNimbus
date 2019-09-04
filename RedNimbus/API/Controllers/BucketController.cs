@@ -8,161 +8,56 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NetMQ;
 using NetMQ.Sockets;
+using RedNimbus.API.Controllers;
+using RedNimbus.API.Services;
 using RedNimbus.DTO;
 using RedNimbus.Either.Errors;
+using RedNimbus.Either;
 using RedNimbus.Messages;
 
-namespace API.Controllers
+namespace RedNimbus.API.Controllers
 {
     [ApiController]
     [Route("api/bucket")]
-    public class BucketController : ControllerBase
+    public class BucketController : BaseController
     {
-        #region IActionResult
-
-        private IActionResult AllOk()
+        private readonly BucketService _bucketService;
+        public BucketController(BucketService bucketService)
         {
-            return Ok(new Empty());
+            _bucketService = bucketService;
         }
-
-        private IActionResult AllOk(object obj)
-        {
-            return Ok(obj);
-        }
-
-        private IActionResult BadRequestErrorHandler(IError error)
-        {
-            return BadRequest(error.Message);
-        }
-
-        private IActionResult InternalServisErrorHandler(IError error)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
-        }
-
-        private IActionResult NotFoundErrorHandler(IError error)
-        {
-            return NotFound(error.Message);
-        }
-
-        private IActionResult AuthenticationErrorHandler(IError error)
-        {
-            return StatusCode(StatusCodes.Status406NotAcceptable, error.Message);
-        }
-
-        #endregion
 
         [HttpGet]
-        public IActionResult Get()
-        {
-            //Allocating variables
-            NetMQMessage netMqMsg = new NetMQMessage();
+        public IActionResult Get() =>
+            _bucketService.Get(Request.Headers["token"])
+                .Map((x) => AllOk(x))
+                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
 
-            netMqMsg.Append("bucket/listBucketContent");
-
-            //Initializating message 
-            BucketMessage msg = new BucketMessage();
-            msg.Path = "/";
-            //msg.Token = Request.Headers["token"];
-
-            //From BucketMessage to NetMqMessage
-            MemoryStream stream = new MemoryStream();
-            msg.WriteTo(stream);
-            NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
-            netMqMsg.Append(dataFrame);
-
-            using (var requestSocket = new RequestSocket("tcp://localhost:8000"))
-            {
-                requestSocket.SendMultipartMessage(netMqMsg);
-                netMqMsg = requestSocket.ReceiveMultipartMessage();
-            }
-
-            //From NetMqMessage to BucketMessage
-            NetMQFrame recivedData = netMqMsg.Pop();
-            BucketMessage Data = new BucketMessage();
-            Data.MergeFrom(recivedData.ToByteArray());
-
-            if (Data.Successful)
-            {
-                List<string>  toReturn = new List<string>(Data.ReturnItems);
-                return AllOk(toReturn);
-            }
-            return BadRequest();
-        }
+        
+        
         
         [HttpGet("{id}")]
-        public IActionResult ListBucketContent(string id)
-        {
-            //Allocating variables
-            NetMQMessage netMqMsg = new NetMQMessage();
-
-            netMqMsg.Append("bucket/listBucketContent");
-
-            //Initializating message 
-            BucketMessage msg = new BucketMessage();
-            msg.Path = "/" + id;
-            //msg.Token = Request.Headers["token"];
-
-            //From BucketMessage to NetMqMessage
-            MemoryStream stream = new MemoryStream();
-            msg.WriteTo(stream);
-            NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
-            netMqMsg.Append(dataFrame);
-
-            using (var requestSocket = new RequestSocket("tcp://localhost:8000"))
-            {
-                requestSocket.SendMultipartMessage(netMqMsg);
-                netMqMsg = requestSocket.ReceiveMultipartMessage();
-            }
-
-            //From NetMqMessage to BucketMessage
-            NetMQFrame recivedData = netMqMsg.Pop();
-            BucketMessage Data = new BucketMessage();
-            Data.MergeFrom(recivedData.ToByteArray());
-
-            if (Data.Successful)
-            {
-                List<string>  toReturn = new List<string>(Data.ReturnItems);
-                return AllOk(toReturn);
-            }
-            return BadRequest();
-        }
+        public IActionResult ListBucketContent(string id) => 
+            _bucketService.ListBucketContent(Request.Headers["token"], id)
+                .Map((x) => AllOk(x))
+                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
         
+
         [HttpPost("createBucket")]
-        public IActionResult CreateBucket([FromBody]StringDto bucketName)
-        {
-            //Allocating variables
-            NetMQMessage netMqMsg = new NetMQMessage();
+        public IActionResult CreateBucket([FromBody]StringDto bucketName) =>
+            _bucketService.CreateBucket(Request.Headers["token"], bucketName)
+                .Map((x) => AllOk(x))
+                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
 
-            netMqMsg.Append("bucket/createBucket");
+        [HttpPost("deleteBucket")]
+        public IActionResult DeleteBucket([FromBody]StringDto bucketName) =>
+            _bucketService.DeleteBucket(Request.Headers["token"], bucketName)
+                .Map((x) => AllOk(x))
+                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
 
-            //Initializating message 
-            BucketMessage msg = new BucketMessage();
-            msg.Path = "/" + bucketName.Value;
-            //msg.Token = Request.Headers["token"];
-
-            //From BucketMessage to NetMqMessage
-            MemoryStream stream = new MemoryStream();
-            msg.WriteTo(stream);
-            NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
-            netMqMsg.Append(dataFrame);
-
-            using (var requestSocket = new RequestSocket("tcp://localhost:8000"))
-            {
-                requestSocket.SendMultipartMessage(netMqMsg);
-                netMqMsg = requestSocket.ReceiveMultipartMessage();
-            }
-
-            //From NetMqMessage to BucketMessage
-            NetMQFrame recivedData = netMqMsg.Pop();
-            BucketMessage Data = new BucketMessage();
-            Data.MergeFrom(recivedData.ToByteArray());
-
-            if (Data.Successful)
-            {
-                return AllOk(bucketName);
-            }
-            return BadRequest();
-        }
     }
 }

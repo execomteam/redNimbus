@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RedNimbus.BucketService.Helper;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -6,7 +7,44 @@ namespace RedNimbus.BucketService.Services
 {
     public static class FileSystemService
     {
+        /*
+        public static bool CreateUser(string path)
+        {
+            try
+            {
+                string pathForZfs = path.TrimStart('/');
+                string cmd = "zfs create " + pathForZfs;
+                ShellHelper.Bash(cmd);
+                return true;
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+        }
 
+        public static bool CreateBucket(string path)
+        {
+            try
+            {
+                string pathForZfs = path.TrimStart('/');
+                string cmd = "zfs create " + pathForZfs;
+                ShellHelper.Bash(cmd);
+                cmd = "zfs set quota=5G " + pathForZfs;
+                ShellHelper.Bash(cmd);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        */
+
+        public static int NumberOfDirectories(string path)
+        {
+            return Directory.GetDirectories(path).Length;
+        }
 
         public static List<string> ListContent(string path)
         {
@@ -15,65 +53,92 @@ namespace RedNimbus.BucketService.Services
             {
                 foreach (string entry in Directory.GetDirectories(path))
                 {
-                    //TODO: Change this shit
-                    string[] val = entry.Split('/');
-                    string last = val[val.Length - 1];
-                    string[] splitLast = last.Split('\\');
-                    returnValue.Add(splitLast[splitLast.Length - 1]);
+                    returnValue.Add(MessageHelper.GetNameFromPath(entry));
                 }
                 returnValue.Add("*");
                 foreach (string entry in Directory.GetFiles(path))
                 {
-                    //TODO: Change this shit
-                    string[] val = entry.Split('/');
-                    string last = val[val.Length - 1];
-                    string[] splitLast = last.Split('\\');
-                    returnValue.Add(splitLast[splitLast.Length - 1]);
+                    returnValue.Add(MessageHelper.GetNameFromPath(entry));
                 }
             }
-            catch (Exception)
+            catch (DirectoryNotFoundException)
             {
+                
                 return null;
             }
-            finally { }
             return returnValue;
         }
 
-        public static bool CreateBucket(string path)
+        public static string CreateFolder(string path)
         {
             try
             {
                 if (Directory.Exists(path))
                 {
-                    return false;
+                    int i = 1;
+                    path = path + "(" + i + ")";
+                    
+                    while (Directory.Exists(path))
+                    {
+                        i++;
+                        path = path + "(" + i + ")";
+                        
+                    }
+                    
                 }
 
                 // Try to create the directory.
                 Directory.CreateDirectory(path);
-                return true;
+
+                return MessageHelper.GetNameFromPath(path);
             }
             catch (Exception)
             {
-                return false;
+                return null;
             }
-            finally { }
 
         }
 
-        public static bool DeleteBucket(string path)
+        public static bool DeleteFolder(string path)
         {
             try
             {
-                // Try to delete the directory.
-                Directory.Delete(path);
+                System.IO.Directory.Delete(path, true);
                 return true;
             }
-            catch (Exception)
+            catch (UnauthorizedAccessException)
             {
                 return false;
             }
-            finally { }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (PathTooLongException)
+            {
+                return false;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                return false;
+            }
 
+        }
+
+        public static bool CheckFolderEmpty(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentNullException("path");
+            }
+
+            var folder = new DirectoryInfo(path);
+            if (folder.Exists)
+            {
+                return folder.GetFileSystemInfos().Length == 0;
+            }
+
+            throw new DirectoryNotFoundException();
         }
 
         public static bool ByteArrayToFile(string path, byte[] fileAsByteArray)
@@ -87,7 +152,6 @@ namespace RedNimbus.BucketService.Services
             {
                 return false;
             }
-            finally { }
         }
 
         public static byte[] FileToByteArray(string path)
@@ -100,7 +164,6 @@ namespace RedNimbus.BucketService.Services
             {
                 return null;
             }
-            finally { }
         }
 
         public static bool DeleteFile(string path)
@@ -114,7 +177,6 @@ namespace RedNimbus.BucketService.Services
             {
                 return false;
             }
-            finally { }
         }
     }
 }

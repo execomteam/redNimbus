@@ -12,7 +12,7 @@ namespace RedNimbus.API.Controllers
     [ApiController]
     [Route("api/user")]
     [Produces("application/json")]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
         private readonly IEitherMapper _mapper;
@@ -23,48 +23,16 @@ namespace RedNimbus.API.Controllers
             _mapper = mapper;
         }
 
-        private IActionResult AllOk()
-        {
-            return Ok(new Empty());
-        }
-
-        private IActionResult AllOk(object obj)
-        {
-            return Ok(obj);
-        }
-
-        private IActionResult BadRequestErrorHandler(IError error)
-        {
-            return BadRequest(error);
-        }
-
-        private IActionResult InternalServisErrorHandler(IError error)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, error);
-        }
-        private IActionResult NotFoundErrorHandler(IError error)
-        {
-            return NotFound(error.Message);
-        }
-
-        private IActionResult AuthenticationErrorHandler(IError error)
-        {
-            return StatusCode(StatusCodes.Status406NotAcceptable, error);
-        }
-        private static bool EmailAlreadyUsed(IError err)
-        {
-            return err is FormatError formatError && formatError.Code == RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed;
-        }
-
         [HttpPost]
-        public IActionResult Post([FromBody]CreateUserDto createUserDto)
-        {
-
-            return _mapper.Map<User>(createUserDto)
+        public IActionResult Post([FromBody]CreateUserDto createUserDto) => _mapper.Map<User>(createUserDto)
                 .Map(_userService.RegisterUser)
                 .Map(() => AllOk())
                 .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed)
                 .Reduce(this.InternalServisErrorHandler);
+
+        private static bool EmailAlreadyUsed(IError err)
+        {
+            return err is FormatError formatError && formatError.Code == RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed;
         }
 
         [HttpPost("authenticate")]
@@ -73,11 +41,11 @@ namespace RedNimbus.API.Controllers
                .Map(x => AllOk(new KeyDto() { Key = x.Key }))
                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
                .Reduce(InternalServisErrorHandler);
-         
-        [HttpGet]
-        public IActionResult Get()
+
+        [HttpPost("get")]
+        public IActionResult Get([FromBody]KeyDto keyDto)
         {
-            return _userService.GetUserByToken(Request.Headers["token"])
+            return _userService.GetUserByToken(keyDto.Key)
                 .Map(_mapper.Map<UserDto>)
                 .Map(x => AllOk(x))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
