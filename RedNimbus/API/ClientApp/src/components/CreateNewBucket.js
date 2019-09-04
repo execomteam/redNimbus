@@ -24,6 +24,10 @@ class CreateNewBucket extends React.Component {
         );
     }
 
+    onErrorHandler(resp) {
+        alert(resp.response.data);
+    }
+
     onSuccessHandler(resp){
         this.props.addNewBucket(resp.data);
         this.props.onHide();
