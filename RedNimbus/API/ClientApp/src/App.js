@@ -29,7 +29,8 @@ export default class App extends React.Component{
                 headers: { 'token': token }
             };
             axios.get('http://localhost:65001/api/user', options).then(
-                (response) => { self.changeState(response) }
+                (response) => { self.changeState(response) },
+                (response) => { console.log(response)}
             );
         }
     }

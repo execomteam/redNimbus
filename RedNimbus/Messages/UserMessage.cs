@@ -24,14 +24,14 @@ namespace RedNimbus.Messages {
     static UserMessageReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChFVc2VyTWVzc2FnZS5wcm90bxISUmVkTmltYnVzLk1lc3NhZ2VzImgKC1Vz",
+            "ChFVc2VyTWVzc2FnZS5wcm90bxISUmVkTmltYnVzLk1lc3NhZ2VzIncKC1Vz",
             "ZXJNZXNzYWdlEhEKCUZpcnN0TmFtZRgBIAEoCRIQCghMYXN0TmFtZRgCIAEo",
             "CRINCgVFbWFpbBgDIAEoCRIQCghQYXNzd29yZBgEIAEoCRITCgtQaG9uZU51",
-            "bWJlchgFIAEoCWIGcHJvdG8z"));
+            "bWJlchgFIAEoCRINCgVUb2tlbhgGIAEoCWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.UserMessage), global::RedNimbus.Messages.UserMessage.Parser, new[]{ "FirstName", "LastName", "Email", "Password", "PhoneNumber" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.UserMessage), global::RedNimbus.Messages.UserMessage.Parser, new[]{ "FirstName", "LastName", "Email", "Password", "PhoneNumber", "Token" }, null, null, null, null)
           }));
     }
     #endregion
@@ -68,6 +68,7 @@ namespace RedNimbus.Messages {
       email_ = other.email_;
       password_ = other.password_;
       phoneNumber_ = other.phoneNumber_;
+      token_ = other.token_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -131,6 +132,17 @@ namespace RedNimbus.Messages {
       }
     }
 
+    /// <summary>Field number for the "Token" field.</summary>
+    public const int TokenFieldNumber = 6;
+    private string token_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Token {
+      get { return token_; }
+      set {
+        token_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as UserMessage);
@@ -149,6 +161,7 @@ namespace RedNimbus.Messages {
       if (Email != other.Email) return false;
       if (Password != other.Password) return false;
       if (PhoneNumber != other.PhoneNumber) return false;
+      if (Token != other.Token) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -160,6 +173,7 @@ namespace RedNimbus.Messages {
       if (Email.Length != 0) hash ^= Email.GetHashCode();
       if (Password.Length != 0) hash ^= Password.GetHashCode();
       if (PhoneNumber.Length != 0) hash ^= PhoneNumber.GetHashCode();
+      if (Token.Length != 0) hash ^= Token.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -193,6 +207,10 @@ namespace RedNimbus.Messages {
         output.WriteRawTag(42);
         output.WriteString(PhoneNumber);
       }
+      if (Token.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Token);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -215,6 +233,9 @@ namespace RedNimbus.Messages {
       }
       if (PhoneNumber.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(PhoneNumber);
+      }
+      if (Token.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -241,6 +262,9 @@ namespace RedNimbus.Messages {
       }
       if (other.PhoneNumber.Length != 0) {
         PhoneNumber = other.PhoneNumber;
+      }
+      if (other.Token.Length != 0) {
+        Token = other.Token;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -271,6 +295,10 @@ namespace RedNimbus.Messages {
           }
           case 42: {
             PhoneNumber = input.ReadString();
+            break;
+          }
+          case 50: {
+            Token = input.ReadString();
             break;
           }
         }

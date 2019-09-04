@@ -9,7 +9,7 @@ using RedNimbus.Either.Errors;
 namespace RedNimbus.API.Controllers
 {
     [ApiController]
-    [Route("api/user")]
+    [Route("api/restuser")]
     public class RestUserController : ControllerBase
     {
         private readonly IRestUserService _communicationService;

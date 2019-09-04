@@ -10,7 +10,7 @@ using RedNimbus.Either.Mappings;
 namespace RedNimbus.API.Controllers
 {
     [ApiController]
-    [Route("api/v2/user")]
+    [Route("api/user")]
     [Produces("application/json")]
     public class UserController : ControllerBase
     {
@@ -51,17 +51,20 @@ namespace RedNimbus.API.Controllers
         {
             return StatusCode(StatusCodes.Status406NotAcceptable, error);
         }
+        private static bool EmailAlreadyUsed(IError err)
+        {
+            return err is FormatError formatError && formatError.Code == RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed;
+        }
 
         [HttpPost]
-        public IActionResult Post([FromBody]CreateUserDto createUserDto) => _mapper.Map<User>(createUserDto)
+        public IActionResult Post([FromBody]CreateUserDto createUserDto)
+        {
+
+            return _mapper.Map<User>(createUserDto)
                 .Map(_userService.RegisterUser)
                 .Map(() => AllOk())
                 .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed)
                 .Reduce(this.InternalServisErrorHandler);
-
-        private static bool EmailAlreadyUsed(IError err)
-        {
-            return err is FormatError formatError && formatError.Code == RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed;
         }
 
         [HttpPost("authenticate")]
@@ -70,11 +73,11 @@ namespace RedNimbus.API.Controllers
                .Map(x => AllOk(new KeyDto() { Key = x.Key }))
                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
                .Reduce(InternalServisErrorHandler);
-
-        [HttpPost("get")]
-        public IActionResult Get([FromBody]KeyDto keyDto)
+         
+        [HttpGet]
+        public IActionResult Get()
         {
-            return _userService.GetUserByToken(keyDto.Key)
+            return _userService.GetUserByToken(Request.Headers["token"])
                 .Map(_mapper.Map<UserDto>)
                 .Map(x => AllOk(x))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)

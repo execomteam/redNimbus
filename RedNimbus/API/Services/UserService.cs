@@ -123,7 +123,8 @@ namespace RedNimbus.API.Services
                 User user = new User
                 {
                     FirstName = successMessage.Data.FirstName,
-                    LastName = successMessage.Data.LastName
+                    LastName = successMessage.Data.LastName,
+                    Key = successMessage.Data.Token
                 };
 
                 return new Right<IError, User>(user);

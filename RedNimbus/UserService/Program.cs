@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RedNimbus.TokenManager;
 using UserService.Mapping;
 
 namespace RedNimbus.UserService
@@ -13,7 +14,8 @@ namespace RedNimbus.UserService
             });
 
             IMapper mapper = mappingConfig.CreateMapper();
-            UserService userService = new UserService(mapper);
+            ITokenManager tokenManager = new TokenManager.TokenManager();
+            UserService userService = new UserService(mapper, tokenManager);
             userService.Start();
         }
     }

@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace RedNimbus.TokenManager
 {
-    public class TokenManager
+    public class TokenManager : ITokenManager
     {
         private string _secret = "p644qqY/bOVrqjOrWsVoX0plybUeYdDwyUyCpBfEUSe0nGGO8mpRWB4RVkgKFeIFhLH09wNrmg2e18fgRVvqrA==";
 
@@ -16,7 +16,7 @@ namespace RedNimbus.TokenManager
             SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
-                    new Claim(ClaimTypes.Name, id.ToString("B")) //Convert guid in following string format: "{x-x-x-x}"
+                    new Claim(ClaimTypes.Authentication, id.ToString("B")) //Convert guid in following string format: "{x-x-x-x}"
                     }),
                 Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
@@ -60,13 +60,13 @@ namespace RedNimbus.TokenManager
             }
         }
 
-        public string ValidateToken(string token)
+        public Guid ValidateToken(string token)
         {
             ClaimsPrincipal principal = GetPrincipal(token);
 
             if (principal == null)
             {
-                return null;
+                return Guid.Empty;
             }
 
             ClaimsIdentity identity;
@@ -76,12 +76,17 @@ namespace RedNimbus.TokenManager
             }
             catch (NullReferenceException)
             {
-                return null;
+                return Guid.Empty;
             }
 
+            
             Claim idClaim = identity.FindFirst(ClaimTypes.Authentication);
+            if(idClaim == null)
+            {
+                return Guid.Empty;
+            }
 
-            return idClaim.Value; //returns guid in string representation
+            return Guid.Parse(idClaim.Value); //returns guid in string representation
 
         }
     }

@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Either\Either.csproj" />
     <ProjectReference Include="..\Messages\Messages.csproj" />
+    <ProjectReference Include="..\TokenManager\TokenManager.csproj" />
   </ItemGroup>
 
   <ItemGroup>
