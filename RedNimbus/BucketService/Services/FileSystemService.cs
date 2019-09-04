@@ -76,15 +76,15 @@ namespace RedNimbus.BucketService.Services
                 if (Directory.Exists(path))
                 {
                     int i = 1;
-                    path = path + "(" + i + ")";
-                    
-                    while (Directory.Exists(path))
+                    string path1 = path + "(" + i + ")";
+
+                    while (Directory.Exists(path1))
                     {
                         i++;
-                        path = path + "(" + i + ")";
-                        
+                        path1 = path + "(" + i + ")";
+
                     }
-                    
+                    path = path1;
                 }
 
                 // Try to create the directory.
