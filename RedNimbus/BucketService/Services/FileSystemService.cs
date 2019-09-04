@@ -46,6 +46,14 @@ namespace RedNimbus.BucketService.Services
             return Directory.GetDirectories(path).Length;
         }
 
+        public static string GetNameFromPath(string path)
+        {
+            string[] val = path.Split('/');
+            string last = val[val.Length - 1];
+            string[] splitLast = last.Split('\\');
+            return splitLast[splitLast.Length - 1];
+        }
+
         public static List<string> ListContent(string path)
         {
             List<string> returnValue = new List<string>();
@@ -53,20 +61,12 @@ namespace RedNimbus.BucketService.Services
             {
                 foreach (string entry in Directory.GetDirectories(path))
                 {
-                    //TODO: Find better solution for this, later.
-                    string[] val = entry.Split('/');
-                    string last = val[val.Length - 1];
-                    string[] splitLast = last.Split('\\');
-                    returnValue.Add(splitLast[splitLast.Length - 1]);
+                    returnValue.Add(GetNameFromPath(entry));
                 }
                 returnValue.Add("*");
                 foreach (string entry in Directory.GetFiles(path))
                 {
-                    //TODO: Find better solution for this, later.
-                    string[] val = entry.Split('/');
-                    string last = val[val.Length - 1];
-                    string[] splitLast = last.Split('\\');
-                    returnValue.Add(splitLast[splitLast.Length - 1]);
+                    returnValue.Add(GetNameFromPath(entry));
                 }
             }
             catch (DirectoryNotFoundException)
@@ -77,7 +77,7 @@ namespace RedNimbus.BucketService.Services
             return returnValue;
         }
 
-        public static bool CreateFolder(string path)
+        public static string CreateFolder(string path)
         {
             try
             {
@@ -97,11 +97,12 @@ namespace RedNimbus.BucketService.Services
 
                 // Try to create the directory.
                 Directory.CreateDirectory(path);
-                return true;
+
+                return GetNameFromPath(path);
             }
             catch (Exception)
             {
-                return false;
+                return null;
             }
 
         }
