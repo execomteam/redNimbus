@@ -124,7 +124,7 @@ namespace RedNimbus.API.Services
 
         }
 
-        public Either<IError, bool> DeleteBucket(string token, StringDto bucketName)
+        public Either<IError, StringDto> DeleteBucket(string token, StringDto bucketName)
         {
             Message<BucketMessage> message = new Message<BucketMessage>("bucket/deleteBucket")
             {
@@ -150,10 +150,10 @@ namespace RedNimbus.API.Services
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
 
-                return new Right<IError, bool>(true);
+                return new Right<IError, StringDto>(bucketName);
             }
 
-            return new Left<IError, bool>(GetError(response));
+            return new Left<IError, StringDto>(GetError(response));
 
         }
     }
