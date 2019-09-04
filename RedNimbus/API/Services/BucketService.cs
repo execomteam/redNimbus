@@ -116,7 +116,7 @@ namespace RedNimbus.API.Services
             if (responseTopic.Equals("Response"))
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
-
+                bucketName.Value = successMessage.Data.ReturnItems[0];
                 return new Right<IError, StringDto>(bucketName);
             }
 

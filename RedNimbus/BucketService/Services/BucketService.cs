@@ -52,9 +52,12 @@ namespace RedNimbus.BucketService.Services
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
             string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
-
+            string bucketName = null;
             if (FileSystemService.NumberOfDirectories(HomePath(msg.Data.Token)) < 5)
-                msg.Data.Successful = FileSystemService.CreateFolder(absolutePath);
+            {
+                bucketName = FileSystemService.CreateFolder(absolutePath);
+                msg.Data.Successful = bucketName != null;
+            }
             else
             {
                 SendErrorMessage("Maximum number of buckets is 5", Either.Enums.ErrorCode.NumberOfBucketsExeeded, msg.Id);
@@ -64,6 +67,7 @@ namespace RedNimbus.BucketService.Services
             if (msg.Data.Successful)
             {
                 msg.Topic = _returnTopic;
+                msg.Data.ReturnItems.Add(bucketName);
                 SendMessage(msg.ToNetMQMessage());
             }
             else
@@ -98,7 +102,7 @@ namespace RedNimbus.BucketService.Services
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
             string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
 
-            msg.Data.Successful = FileSystemService.CreateFolder(absolutePath);
+            msg.Data.Successful = FileSystemService.CreateFolder(absolutePath) != null;
             msg.Topic = _returnTopic;
 
             if (msg.Data.Successful)
