@@ -12,7 +12,7 @@ using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
 namespace RedNimbus.API.Services
 {
-    public class UserService : IUserService
+    public class UserService : BaseService, IUserService
     {
         public Either<IError, User> RegisterUser(User user)
         {
@@ -76,30 +76,7 @@ namespace RedNimbus.API.Services
             return new Left<IError, KeyDto>(GetError(response));
         }
 
-        private IError GetError(NetMQMessage response)
-        {
-            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>(response);
-
-            ErrorCode errorCode = (ErrorCode)Enum.ToObject(typeof(ErrorCode), errorMessage.Data.ErrorCode);
-
-            switch (errorCode)
-            {
-                case ErrorCode.FirstNameNullEmptyOrWhiteSpace:
-                case ErrorCode.LastNameNullEmptyOrWhiteSpace:
-                case ErrorCode.EmailWrongFormat:
-                case ErrorCode.PasswordWrongFormat:
-                case ErrorCode.EmailAlreadyUsed:
-                case ErrorCode.PasswordsDoNotMatch:
-                    return new FormatError(errorMessage.Data.MessageText, errorCode);
-                case ErrorCode.IncorrectEmailOrPassword:
-                    return new AuthenticationError(errorMessage.Data.MessageText, errorCode);
-                case ErrorCode.UserNotFound:
-                case ErrorCode.UserNotRegistrated:
-                    return new NotFoundError(errorMessage.Data.MessageText, errorCode);
-                default:
-                    return new InternalServisError(errorMessage.Data.MessageText, errorCode);
-            }
-        }
+        
 
         public Either<IError, User> GetUserByToken(string token)
         {

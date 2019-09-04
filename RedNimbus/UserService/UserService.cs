@@ -167,18 +167,6 @@ namespace RedNimbus.UserService
             }
         }
 
-        private void SendErrorMessage(string messageText, ErrorCode errorCode, NetMQFrame idFrame)
-        {
-            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
-
-            errorMessage.Data.MessageText = messageText;
-            errorMessage.Data.ErrorCode = (int) errorCode;
-            errorMessage.Id = idFrame;
-
-            NetMQMessage msg = errorMessage.ToNetMQMessage();
-            SendMessage(msg);
-        }
-
         private string GenerateToken()
         {
             string key = "VerySecureSecretKey";
