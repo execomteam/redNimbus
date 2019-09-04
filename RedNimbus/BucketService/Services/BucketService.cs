@@ -43,16 +43,21 @@ namespace RedNimbus.BucketService.Services
             if (FileSystemService.NumberOfDirectories(HomePath(msg.Data.Token)) < 5)
                 msg.Data.Successful = FileSystemService.CreateFolder(absolutePath);
             else
-                msg.Data.Successful = false;
-
-            msg.Topic = _returnTopic;
-
-            if (!msg.Data.Successful)
             {
-                msg.Data.ErrorMessage = "Error";
+                SendErrorMessage("Maximum number of buckets is 5", Either.Enums.ErrorCode.NumberOfBucketsExeeded, msg.Id);
+                msg.Data.Successful = false;
             }
-
-            SendMessage(msg.ToNetMQMessage());
+            
+            if (msg.Data.Successful)
+            {
+                msg.Topic = _returnTopic;
+                SendMessage(msg.ToNetMQMessage());
+            }
+            else
+            {
+                SendErrorMessage("Create bucket error", Either.Enums.ErrorCode.CreateBucketError, msg.Id);
+            }
+                
         }
 
         public void ListBucketContent(NetMQMessage message)
@@ -67,14 +72,12 @@ namespace RedNimbus.BucketService.Services
             if (msg.Data.Successful)
             {
                 msg.Data.ReturnItems.AddRange(contentList);
-
+                SendMessage(msg.ToNetMQMessage());
             }
             else
             {
-                msg.Data.ErrorMessage = "Error";
+                SendErrorMessage("List bucket content error", Either.Enums.ErrorCode.ListBucketContentError, msg.Id);
             }
-            
-            SendMessage(msg.ToNetMQMessage());
         }
 
         public void CreateFolder(NetMQMessage message)
@@ -85,12 +88,14 @@ namespace RedNimbus.BucketService.Services
             msg.Data.Successful = FileSystemService.CreateFolder(absolutePath);
             msg.Topic = _returnTopic;
 
-            if (!msg.Data.Successful)
-            { 
-                msg.Data.ErrorMessage = "Error";
+            if (msg.Data.Successful)
+            {
+                SendMessage(msg.ToNetMQMessage());
             }
-
-            SendMessage(msg.ToNetMQMessage());
+            else
+            {
+                SendErrorMessage("Create folder error", Either.Enums.ErrorCode.CreateFolderError, msg.Id);
+            }
         }
 
         //Bucket must be empty for deleting
@@ -102,12 +107,14 @@ namespace RedNimbus.BucketService.Services
             msg.Data.Successful = FileSystemService.DeleteFolder(absolutePath);
             msg.Topic = _returnTopic; 
 
-            if (!msg.Data.Successful)
+            if (msg.Data.Successful)
             {
-                msg.Data.ErrorMessage = "Error";
+                SendMessage(msg.ToNetMQMessage());
             }
-            
-            SendMessage(msg.ToNetMQMessage());
+            else
+            {
+                SendErrorMessage("Delete folder error", Either.Enums.ErrorCode.DeleteFolderError, msg.Id);
+            }
         }
 
         public void PutFile(NetMQMessage message)
@@ -119,12 +126,14 @@ namespace RedNimbus.BucketService.Services
             msg.Data.Successful = FileSystemService.ByteArrayToFile(absolutePath, fileAsByteArray);
             msg.Topic = _returnTopic;
 
-            if (!msg.Data.Successful)
+            if (msg.Data.Successful)
             {
-                msg.Data.ErrorMessage = "Error";
+                SendMessage(msg.ToNetMQMessage());
             }
-
-            SendMessage(msg.ToNetMQMessage());
+            else
+            {
+                SendErrorMessage("Put file error", Either.Enums.ErrorCode.PutFileError, msg.Id);
+            }
         }
 
         public void GetFile(NetMQMessage message)
@@ -139,14 +148,12 @@ namespace RedNimbus.BucketService.Services
             {
                 msg.Data.Successful = true;
                 msg.Data.File = ByteString.CopyFrom(fileAsByteArray);
+                SendMessage(msg.ToNetMQMessage());
             }
             else
             {
-                msg.Data.Successful = false;
-                msg.Data.ErrorMessage = "Error";
+                SendErrorMessage("Get file error", Either.Enums.ErrorCode.GetFileError, msg.Id);
             }
-
-            SendMessage(msg.ToNetMQMessage());
         }
 
         public void DeleteFile(NetMQMessage message)
@@ -157,15 +164,17 @@ namespace RedNimbus.BucketService.Services
             msg.Data.Successful = FileSystemService.DeleteFile(absolutePath);
             msg.Topic = _returnTopic;
 
-            if (!msg.Data.Successful)
+            if (msg.Data.Successful)
             {
-                msg.Data.ErrorMessage = "Error";
+                SendMessage(msg.ToNetMQMessage());
             }
-            
-            SendMessage(msg.ToNetMQMessage());
+            else
+            {
+                SendErrorMessage("Delete file error", Either.Enums.ErrorCode.DeleteFileError, msg.Id);
+            }
         }
 
-        public string HomePath(string token)
+        private string HomePath(string token)
         {
             return _path + MessageHelper.Decode(token);
         }

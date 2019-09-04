@@ -9,4 +9,9 @@
     <PackageReference Include="NetMQ" Version="4.0.0.207" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Either\Either.csproj" />
+    <ProjectReference Include="..\Messages\Messages.csproj" />
+  </ItemGroup>
+
 </Project>

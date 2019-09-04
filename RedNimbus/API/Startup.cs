@@ -56,7 +56,7 @@ namespace RedNimbus.API
             // Dependency Injection of object that implements ICommunicationService interface
             services.AddSingleton(typeof(IRestUserService), new RestUserService("http://localhost:65000/"));
             services.AddSingleton(typeof(IUserService), new UserService());
-
+            services.AddSingleton(typeof(BucketService), new BucketService());
             services.AddEitherServiceMapper();
 
         }

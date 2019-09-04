@@ -10,7 +10,7 @@ namespace RedNimbus.API.Controllers
 {
     [ApiController]
     [Route("api/user")]
-    public class RestUserController : ControllerBase
+    public class RestUserController : BaseController
     {
         private readonly IRestUserService _communicationService;
 
@@ -18,40 +18,6 @@ namespace RedNimbus.API.Controllers
         {
             _communicationService = communicationService;
         }
-
-        #region IActionResult
-
-        private IActionResult AllOk()
-        {
-            return Ok(new Empty());
-        }
-
-        private IActionResult AllOk(object obj)
-        {
-            return Ok(obj);
-        }
-
-        private IActionResult BadRequestErrorHandler(IError error)
-        {
-            return BadRequest(error.Message);
-        }
-
-        private IActionResult InternalServisErrorHandler(IError error)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
-        }
-
-        private IActionResult NotFoundErrorHandler(IError error)
-        {
-            return NotFound(error.Message);
-        }
-
-        private IActionResult AuthenticationErrorHandler(IError error)
-        {
-            return StatusCode(StatusCodes.Status406NotAcceptable, error.Message);
-        }
-
-        #endregion
 
         [HttpPost]
         public IActionResult Post([FromBody]CreateUserDto createUserDto)

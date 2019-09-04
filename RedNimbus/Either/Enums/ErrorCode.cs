@@ -19,6 +19,14 @@ namespace RedNimbus.Either.Enums
         UserNotRegistrated,          
         MappingError,                   
         InternalServerError,            
-        AccountDeactivated
+        AccountDeactivated,
+        NumberOfBucketsExeeded,
+        ListBucketContentError,
+        CreateFolderError,
+        DeleteFolderError,
+        CreateBucketError,
+        PutFileError,
+        GetFileError,
+        DeleteFileError
     }
 }

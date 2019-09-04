@@ -69,8 +69,9 @@ namespace RedNimbus.BucketService.Services
                     returnValue.Add(splitLast[splitLast.Length - 1]);
                 }
             }
-            catch (Exception)
+            catch (DirectoryNotFoundException)
             {
+                
                 return null;
             }
             return returnValue;

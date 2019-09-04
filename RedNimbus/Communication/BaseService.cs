@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using NetMQ;
 using NetMQ.Sockets;
+using RedNimbus.Either;
+using RedNimbus.Messages;
 
 namespace RedNimbus.Communication
 {
@@ -136,6 +138,18 @@ namespace RedNimbus.Communication
         public void SendMessage(NetMQMessage message)
         {
             _dealerSocket.SendMultipartMessage(message);
+        }
+
+        protected void SendErrorMessage(string messageText, Either.Enums.ErrorCode errorCode, NetMQFrame idFrame)
+        {
+            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
+
+            errorMessage.Data.MessageText = messageText;
+            errorMessage.Data.ErrorCode = (int)errorCode;
+            errorMessage.Id = idFrame;
+
+            NetMQMessage msg = errorMessage.ToNetMQMessage();
+            SendMessage(msg);
         }
 
         /// <summary>
