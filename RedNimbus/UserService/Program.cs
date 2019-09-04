@@ -1,4 +1,9 @@
 ﻿using AutoMapper;
+using GalaSoft.MvvmLight.Ioc;
+using Org.BouncyCastle.Asn1.Ocsp;
+using RedNimbus.Domain;
+using UserService.Database;
+using UserService.Database.Model;
 using UserService.Mapping;
 
 namespace RedNimbus.UserService
@@ -7,13 +12,10 @@ namespace RedNimbus.UserService
     {
         static void Main(string[] args)
         {
-            var mappingConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new MappingProfile());
-            });
-
-            IMapper mapper = mappingConfig.CreateMapper();
-            UserService userService = new UserService(mapper);
+            SimpleIoc.Default.Register(() => new MapperConfiguration(mc =>{ mc.AddProfile(new MappingProfile()); }).CreateMapper());
+            SimpleIoc.Default.Register<IUserRepository, UserRepository>();
+            SimpleIoc.Default.Register<UserService>();
+            var userService = SimpleIoc.Default.GetInstance<UserService>();
             userService.Start();
         }
     }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using NetMQ;
 using RedNimbus.Communication;
@@ -17,15 +16,17 @@ namespace RedNimbus.UserService
     public class UserService : BaseService
     {
         private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
-        private UserRepository _userRepository;
-
-        public UserService(IMapper mapper) : base()
+        private IUserRepository _userRepository;
+       
+        public UserService(IUserRepository repository) : base()
         {
             Subscribe("RegisterUser", HandleRegisterUser);
             Subscribe("AuthenticateUser", HandleAuthenticateUser);
             Subscribe("GetUser", HandleGetUser);
-            _userRepository = new UserRepository(mapper);
+            _userRepository = repository;
         }
+
+
 
         private bool Validate(Message<UserMessage> userMessage)
         {
@@ -77,7 +78,6 @@ namespace RedNimbus.UserService
 
             try
             {
-                //registeredUsers.Add(user.Email, user);
                 this._userRepository.SaveUser(user);
 
                 userMessage.Topic = "Response";
@@ -110,10 +110,8 @@ namespace RedNimbus.UserService
             }
 
             var email = userMessage.Data.Email;
-            //if (registeredUsers.ContainsKey(userMessage.Data.Email))
             if (_userRepository.CheckIfExists(email))
                 {
-                //var registeredUser = registeredUsers[userMessage.Data.Email];
                 var registeredUser = _userRepository.GetUserByEmail(userMessage.Data.Email);
                 if (registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
                 {
