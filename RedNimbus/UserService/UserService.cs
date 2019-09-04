@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using AutoMapper;
+using GalaSoft.MvvmLight.Ioc;
 using Microsoft.IdentityModel.Tokens;
 using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.Domain;
+using RedNimbus.Either.Mappings;
 using RedNimbus.Messages;
 using RedNimbus.UserService.Helper;
 using UserService.Database;
@@ -17,15 +19,17 @@ namespace RedNimbus.UserService
     public class UserService : BaseService
     {
         private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
-        private UserRepository _userRepository;
-
-        public UserService(IMapper mapper) : base()
+        private IUserRepository _userRepository;
+       
+        public UserService(IUserRepository repository) : base()
         {
             Subscribe("RegisterUser", HandleRegisterUser);
             Subscribe("AuthenticateUser", HandleAuthenticateUser);
             Subscribe("GetUser", HandleGetUser);
-            _userRepository = new UserRepository(mapper);
+            _userRepository = repository;
         }
+
+
 
         private bool Validate(Message<UserMessage> userMessage)
         {

@@ -5,7 +5,7 @@ using UserService.Database.Model;
 
 namespace UserService.Database
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
         private DatabaseContext context;
         private IMapper _mapper;
