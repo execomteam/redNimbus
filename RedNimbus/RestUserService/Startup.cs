@@ -19,7 +19,6 @@ using RedNimbus.RestUserService.Mappings;
 using RedNimbus.RestUserService.Services;
 using RedNimbus.RestUserService.Services.Interfaces;
 using RedNimbus.Either;
-using RedNimbus.UserService.Model;
 
 namespace RedNimbus.RestUserService
 {
@@ -72,7 +71,7 @@ namespace RedNimbus.RestUserService
             ITokenService tokenService = new TokenService(jwtConfig);
             services.AddSingleton(tokenService);
 
-            IUserService userService = new RedNimbus.UserService.Services.UserService(mapper);
+            IUserService userService = new RedNimbus.RestUserService.Services.UserService(mapper);
 
             services.AddSingleton(userService);
         }

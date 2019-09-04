@@ -1,7 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using RedNimbus.Domain;
+using RedNimbus.Either.Errors;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using UserService.Database.Model;
+using System.Threading.Tasks;
+using UserService.DatabaseModel;
 
 namespace UserService.Database
 {
@@ -25,10 +30,10 @@ namespace UserService.Database
         {
             UserDB userDB = ConvertUserToUserDB(newUser);
 
-            userDB.Id = newUser.Id;
-            userDB.ActiveAccount = true;
+            userDB.Id               = newUser.Id;
+            userDB.ActiveAccount    = true;   
 
-            using (context = new DatabaseContext())
+            using(context = new DatabaseContext())
             {
                 context.Database.EnsureCreated();
                 context.Add(userDB);
@@ -43,7 +48,7 @@ namespace UserService.Database
         /// <returns></returns>
         public bool CheckIfExists(string email)
         {
-            using (context = new DatabaseContext())
+            using(context = new DatabaseContext())
             {
                 return context.Users.FirstOrDefault(u => u.Email == email && u.ActiveAccount) != null;
             }
@@ -55,12 +60,12 @@ namespace UserService.Database
             using (context = new DatabaseContext())
             {
                 user = context.Users.First(u => u.Email.Equals(email));
-                if (user == null)
+                if(user == null)
                 {
                     return null;
                 }
             }
-            if (!user.ActiveAccount)
+            if(!user.ActiveAccount)
             {
                 return null;
             }
