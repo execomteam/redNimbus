@@ -36,7 +36,8 @@ namespace RedNimbus.API.Controllers
         }
 
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto) => _mapper.Map<User>(authenticateUserDto)
+        public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto) =>
+            _mapper.Map<User>(authenticateUserDto)
                .Map(_userService.Authenticate)
                .Map(x => AllOk(new KeyDto() { Key = x.Key }))
                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
