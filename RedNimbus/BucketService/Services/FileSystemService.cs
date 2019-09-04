@@ -90,7 +90,7 @@ namespace RedNimbus.BucketService.Services
                 // Try to create the directory.
                 Directory.CreateDirectory(path);
 
-                return GetNameFromPath(path);
+                return MessageHelper.GetNameFromPath(path);
             }
             catch (Exception)
             {
