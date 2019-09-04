@@ -1,6 +1,5 @@
 import React from 'react';
 import CreateNewBucket from './CreateNewBucket'
-import DeleteBucket from './DeleteBucket'
 import {Button } from "react-bootstrap";
 
 class SideNav extends React.Component{
@@ -16,7 +15,7 @@ class SideNav extends React.Component{
     */
     render(){
         return (
-            <div>
+
                 <div>
                     <CreateNewBucket
                         addNewBucket={this.props.addNewBucket}
@@ -25,18 +24,7 @@ class SideNav extends React.Component{
                     />
 
 
-                </div>
-                <div>
-                    <DeleteBucket
-                        deletingBucket={this.props.deletingBucket}
-                        show={this.props.deleteModalShow}
-                        onHide={this.props.setDeleteModalShow}
-                    />
-
-
-                </div>
             </div>
-            
         );
     }
 }

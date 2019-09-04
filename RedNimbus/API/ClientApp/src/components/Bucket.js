@@ -14,13 +14,11 @@ class Bucket extends React.Component
         this.state = {
             folders: [],
             files: [],
-            deleteModalShow: false,
             createModalShow: false
         }
         
         this.addNewBucket = this.addNewBucket.bind(this);
         this.setCreateModalShow = this.setCreateModalShow.bind(this);
-        this.setDeleteModalShow = this.setDeleteModalShow.bind(this);
         this.deletingBucket = this.deletingBucket.bind(this);
 
         const options = {
@@ -94,11 +92,11 @@ class Bucket extends React.Component
             <div className="container">
                 <div className="row">
                     <div className="col-md-2">
-                        <SideNav addNewBucket={this.addNewBucket} createModalShow={this.state.createModalShow} setCreateModalShow={this.setCreateModalShow} onClick={this.onClickeCreateNewBucket} deletingBucket={this.deletingBucket} deleteModalShow={this.state.deleteModalShow} setDeleteModalShow={this.setDeleteModalShow} onClick={this.onClickeDeleteBucket} />
+                        <SideNav addNewBucket={this.addNewBucket} createModalShow={this.state.createModalShow} setCreateModalShow={this.setCreateModalShow} onClick={this.onClickeCreateNewBucket} />
                     </div>
                     <div className="col-md-10">   
                         <br />
-                        <FolderGroup content={this.state.folders}/>
+                        <FolderGroup deletingBucket={this.deletingBucket} content={this.state.folders}/>
                         <hr/>
                         <FileGroup content={this.state.files}/>
                     </div>
