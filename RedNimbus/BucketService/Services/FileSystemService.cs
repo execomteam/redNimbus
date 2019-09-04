@@ -101,24 +101,22 @@ namespace RedNimbus.BucketService.Services
         {
             try
             {
-                bool successful = true;
-                foreach (string entry in Directory.GetFiles(path))
-                {
-                    successful &= DeleteFile(entry);
-                }
-                foreach (string entry in Directory.GetDirectories(path))
-                {
-                    successful &= DeleteFolder(entry);
-                }
-                // Try to delete the directory.
-                if (CheckFolderEmpty(path))
-                {
-                    Directory.Delete(path);
-                    return successful;
-                }
+                System.IO.Directory.Delete(path, true);
+                return true;
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return false;
             }
-            catch (Exception)
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (PathTooLongException)
+            {
+                return false;
+            }
+            catch (DirectoryNotFoundException)
             {
                 return false;
             }

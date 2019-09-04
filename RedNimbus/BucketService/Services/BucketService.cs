@@ -32,7 +32,20 @@ namespace RedNimbus.BucketService.Services
 
         public void DeleteBucket(NetMQMessage message)
         {
+            Message<BucketMessage> msg = new Message<BucketMessage>(message);
+            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
 
+            msg.Data.Successful = FileSystemService.DeleteFolder(absolutePath);
+            msg.Topic = _returnTopic;
+
+            if (msg.Data.Successful)
+            {
+                SendMessage(msg.ToNetMQMessage());
+            }
+            else
+            {
+                SendErrorMessage("Delete bucket error", Either.Enums.ErrorCode.DeleteFolderError, msg.Id);
+            }
         }
 
         public void CreateBucket(NetMQMessage message)

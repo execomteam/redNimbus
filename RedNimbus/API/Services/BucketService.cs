@@ -123,5 +123,38 @@ namespace RedNimbus.API.Services
             return new Left<IError, bool>(GetError(response));
 
         }
+
+        public Either<IError, bool> DeleteBucket(string token, StringDto bucketName)
+        {
+            Message<BucketMessage> message = new Message<BucketMessage>("bucket/deleteBucket")
+            {
+                Data = new BucketMessage()
+                {
+                    Token = token,
+                    Path = "/" + bucketName.Value
+                }
+            };
+
+
+            NetMQMessage temp = message.ToNetMQMessage();
+            NetMQFrame topicFrame = temp.Pop();
+            NetMQFrame emptyFrame = temp.Pop();
+            temp.Push(topicFrame);
+
+            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+
+            string responseTopic = response.First.ConvertToString();
+
+
+            if (responseTopic.Equals("Response"))
+            {
+                Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
+
+                return new Right<IError, bool>(true);
+            }
+
+            return new Left<IError, bool>(GetError(response));
+
+        }
     }
 }

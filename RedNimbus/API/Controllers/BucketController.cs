@@ -51,6 +51,13 @@ namespace RedNimbus.API.Controllers
                 .Map((x) => AllOk(x))
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
-        
+
+        [HttpPost("deleteBucket")]
+        public IActionResult DeleteBucket([FromBody]StringDto bucketName) =>
+            _bucketService.DeleteBucket(Request.Headers["token"], bucketName)
+                .Map((x) => AllOk(x))
+                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+
     }
 }
