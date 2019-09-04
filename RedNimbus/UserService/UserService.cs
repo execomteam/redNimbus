@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using NetMQ;
 using RedNimbus.Communication;
@@ -18,17 +17,20 @@ namespace RedNimbus.UserService
     public class UserService : BaseService
     {
         private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
-        private UserRepository _userRepository;
+        private IUserRepository _userRepository;
         private ITokenManager _tokenManager;
 
-        public UserService(IMapper mapper, ITokenManager tokenManager) : base()
+        public UserService(IUserRepository repository, ITokenManager tokenManager) : base()
         {
             Subscribe("RegisterUser", HandleRegisterUser);
             Subscribe("AuthenticateUser", HandleAuthenticateUser);
             Subscribe("GetUser", HandleGetUser);
-            _userRepository = new UserRepository(mapper);
+            
             _tokenManager = tokenManager;
+            _userRepository = repository;
         }
+
+
 
         private bool Validate(Message<UserMessage> userMessage)
         {
@@ -80,7 +82,6 @@ namespace RedNimbus.UserService
 
             try
             {
-                //registeredUsers.Add(user.Email, user);
                 this._userRepository.SaveUser(user);
 
                 userMessage.Topic = "Response";
@@ -113,10 +114,8 @@ namespace RedNimbus.UserService
             }
 
             var email = userMessage.Data.Email;
-            //if (registeredUsers.ContainsKey(userMessage.Data.Email))
             if (_userRepository.CheckIfExists(email))
                 {
-                //var registeredUser = registeredUsers[userMessage.Data.Email];
                 var registeredUser = _userRepository.GetUserByEmail(userMessage.Data.Email);
                 if (registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
                 {
@@ -140,36 +139,7 @@ namespace RedNimbus.UserService
             SendErrorMessage("Invalid credentials.", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
         }
 
-        /*private void HandleGetUser(NetMQMessage message)
-        {
-            Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
-
-            if (tokenMessage.Data.Token == null || !tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
-            {
-                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
-            }
-
-            if (tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
-            {
-                string email = tokenEmailPairs[tokenMessage.Data.Token];
-                if (!_userRepository.CheckIfExists(email))
-                {
-                    SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
-                }
-
-                User registeredUser = _userRepository.GetUserByEmail(email);
-                registeredUser.Key = tokenMessage.Data.Token;
-
-                Message<UserMessage> userMessage = new Message<UserMessage>("Response");
-
-                userMessage.Id = tokenMessage.Id;
-                userMessage.Data.FirstName = registeredUser.FirstName;
-                userMessage.Data.LastName = registeredUser.LastName;
-
-                NetMQMessage msg = userMessage.ToNetMQMessage();
-                SendMessage(msg);
-            }
-        }*/
+        
 
         private void HandleGetUser(NetMQMessage message)
         {
