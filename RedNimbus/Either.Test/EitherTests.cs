@@ -11,34 +11,63 @@ namespace Either.Test
         public Either<Error, Euros> rightEuros = new Right<Error, Euros>(new Euros { Amount = 100 });
 
         public Either<Error, Dollars> leftDollars = new Left<Error, Dollars>(new Error() { Code = Code.Minus });
+        public Either<Error, Euros> LeftEuros = new Left<Error, Euros>(new Error() { Code = Code.Minus });
 
-        //Map adaptert 1
+        #region map_adapter_1
+
         [Test]
-        public void When_EitherMap1AdapterCalled_Expect_RightValue()
+        public void When_EitherMapAdapter1Called_Expect_RightValue()
         {
-            double restMoney = (Right<Error, double>)rightDollars.Map(Pay10dollars);           
-            Assert.That( restMoney == 30);
+            var restMoney = rightDollars.Map(Pay10dollars);           
+            Assert.That( restMoney is Right<Error, double>);
         }
 
         [Test]
-        public void When_EitherMap1AdaptersCalled_Expect_LeftValue()
+        public void When_EitherMapAdapter1Called_Expect_LeftValue()
         {
-            Error error = (Left<Error, double>)leftDollars.Map(Pay10dollars);
-            Assert.That(error.Code == Code.Minus);
-
+            var error = leftDollars.Map(Pay10dollars);
+            Assert.That(error is Left<Error, double> e && ((Error)e).Code == Code.Minus);
         }
 
-        //Map adapter 2
+        #endregion
+
+
+        #region map_adapter_2
+
         [Test]
-        public void WhenEitherMap2AdapterCalled_Expect_RightValue()
+        public void When_EitherMapAdapter2Called_Expect_RightValue()
         {
-            Dollars exchanged = (Right<Error, Dollars>)rightEuros.Map(ExchangeEuroToDollars);
-            Assert.That(exchanged.Amount == 80);
+            Either<Error, Dollars> exchanged = rightEuros.Map(ExchangeEuroToDollars);
+            Assert.That(exchanged is Right<Error, Dollars> e && ((Dollars)e).Amount == 80);
         }
 
+        [Test]
+        public void When_EItherMapAdapter2Called_Expect_LeftValue()
+        {
+            Either<Error, Dollars> error = LeftEuros.Map(ExchangeEuroToDollars);
+            Assert.That(error is Left<Error, Dollars> e && ((Error)e).Code == Code.Minus);
+        }
+
+        #endregion
+
+        #region map_adapter_3
         
+        [Test]
+        public void When_EitherMapAdapter3Called_Expect_RightValue()
+        {
+            bool isThatStatementTrue = (Right<Error,bool>)rightDollars.Map(IWillBuyYouAPresent);
+            Assert.That(isThatStatementTrue);
+            
+        }
+        
+        [Test]
+        public void When_EitherMapAdapter3Called_Expect_LeftValue()
+        {
+            Error isThatStatementTrue = (Left<Error, bool>)leftDollars.Map(IWillBuyYouAPresent);
+            Assert.That(isThatStatementTrue.Code == Code.Minus);
+        }
 
-
+        #endregion
 
         private double Pay10dollars(Dollars money)
         {
@@ -48,6 +77,11 @@ namespace Either.Test
         private Either<Error, Dollars> ExchangeEuroToDollars(Euros euros)
         {
             return new Right<Error, Dollars>(new Dollars() { Amount = euros.Amount * 0.8 });
+        }
+
+        private bool IWillBuyYouAPresent()
+        {
+            return true;
         }
 
     }
