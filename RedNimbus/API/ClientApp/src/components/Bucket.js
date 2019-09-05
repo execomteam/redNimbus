@@ -14,12 +14,17 @@ class Bucket extends React.Component
         this.state = {
             folders: [],
             files: [],
-            createModalShow: false
+            createModalShow: false,
+            uploadModalShow: false,
+            path: "/"
         }
         
         this.addNewBucket = this.addNewBucket.bind(this);
         this.setCreateModalShow = this.setCreateModalShow.bind(this);
         this.deletingBucket = this.deletingBucket.bind(this);
+
+        this.setUploadModalShow = this.setUploadModalShow.bind(this);
+        this.uploadFile = this.uploadFile.bind(this);
 
         const options = {
             headers: { 'token': localStorage.getItem("token")}
@@ -77,6 +82,12 @@ class Bucket extends React.Component
         this.setState({folders: arr});
     }
 
+    uploadFile(file) {
+        this.setState(prevState => ({
+            files: [...prevState.files, file.value]
+        }));
+    }
+
     setCreateModalShow(value){
         this.setState({
             createModalShow: value
@@ -87,12 +98,29 @@ class Bucket extends React.Component
             deleteModalShow: value
         });
     }
+
+    setUploadModalShow(value) {
+        this.setState({
+            uploadModalShow: value
+        });
+    }
+
     render() {
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-md-2">
-                        <SideNav addNewBucket={this.addNewBucket} createModalShow={this.state.createModalShow} setCreateModalShow={this.setCreateModalShow} onClick={this.onClickeCreateNewBucket} />
+                        <SideNav
+                            path={this.state.path}
+
+                            uploadFile={this.uploadFile}
+                            uploadModalShow={this.state.uploadModalShow}
+                            setUploadModalShow={this.setUploadModalShow}
+                           
+                            addNewBucket={this.addNewBucket}
+                            createModalShow={this.state.createModalShow}
+                            setCreateModalShow={this.setCreateModalShow}
+                             />
                     </div>
                     <div className="col-md-10">   
                         <br />
