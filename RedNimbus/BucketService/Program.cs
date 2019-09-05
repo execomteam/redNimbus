@@ -8,8 +8,18 @@ namespace RedNimbus.BucketService
     {
         static void Main(string[] args)
         {
-            Services.BucketService bucketService = new Services.BucketService(ConfigHelper.LoadConfig(), new TokenManager.TokenManager());
-            bucketService.Start();
+            try
+            {
+                Services.BucketService bucketService = new Services.BucketService(ConfigHelper.LoadConfig(), new TokenManager.TokenManager());
+                bucketService.Start();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("press any button");
+                Console.ReadLine();
+                return;
+            }          
         }
     }
 }
