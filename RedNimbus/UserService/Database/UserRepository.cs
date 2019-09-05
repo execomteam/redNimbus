@@ -26,7 +26,6 @@ namespace UserService.Database
         {
             UserDB userDB = ConvertUserToUserDB(newUser);
 
-            //userDB.Id = newUser.Id;
             userDB.ActiveAccount = true;
 
             using (context = new DatabaseContext())
@@ -58,12 +57,7 @@ namespace UserService.Database
                 user = context.Users.First(u => u.Email.Equals(email));
             }
 
-            if (user == null)
-            {
-                return null;
-            }
-
-            if (!user.ActiveAccount)
+            if (user == null || !user.ActiveAccount)
             {
                 return null;
             }
@@ -81,11 +75,7 @@ namespace UserService.Database
                 userDb = context.Users.First(u => u.Id.Equals(guid));
             }
 
-            if (userDb == null)
-            {
-                return null;
-            }
-            if (!userDb.ActiveAccount)
+            if (userDb == null || !userDb.ActiveAccount)
             {
                 return null;
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NetMQ;
 using RedNimbus.Communication;
@@ -89,7 +90,7 @@ namespace RedNimbus.UserService
                 NetMQMessage msg = userMessage.ToNetMQMessage();
                 SendMessage(msg);
             }
-            catch (ArgumentException)
+            catch (DbUpdateException)
             {
                 SendErrorMessage("Email already exists.", ErrorCode.EmailAlreadyUsed, userMessage.Id);
             }
@@ -139,7 +140,7 @@ namespace RedNimbus.UserService
             SendErrorMessage("Invalid credentials.", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
         }
 
-        
+
 
         private void HandleGetUser(NetMQMessage message)
         {
@@ -159,18 +160,22 @@ namespace RedNimbus.UserService
             }
 
             User registeredUser = _userRepository.GetUserById(id);
-            if(registeredUser == null)
+            if (registeredUser == null)
             {
                 SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
                 return;
             }
 
-            Message<UserMessage> userMessage = new Message<UserMessage>("Response");
-
-            userMessage.Id = tokenMessage.Id;
-            userMessage.Data.FirstName = registeredUser.FirstName;
-            userMessage.Data.LastName = registeredUser.LastName;
-            userMessage.Data.Token = tokenMessage.Data.Token;
+            Message<UserMessage> userMessage = new Message<UserMessage>("Response")
+            {
+                Id = tokenMessage.Id,
+                Data = new UserMessage
+                {
+                    FirstName = registeredUser.FirstName,
+                    LastName = registeredUser.LastName,
+                    Token = tokenMessage.Data.Token
+                }
+            };
 
             NetMQMessage msg = userMessage.ToNetMQMessage();
             SendMessage(msg);
@@ -178,11 +183,15 @@ namespace RedNimbus.UserService
 
         private void SendErrorMessage(string messageText, ErrorCode errorCode, NetMQFrame idFrame)
         {
-            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
-
-            errorMessage.Data.MessageText = messageText;
-            errorMessage.Data.ErrorCode = (int) errorCode;
-            errorMessage.Id = idFrame;
+            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error")
+            {
+                Data = new ErrorMessage
+                {
+                    MessageText = messageText,
+                    ErrorCode = (int)errorCode
+                },
+                Id = idFrame
+            };
 
             NetMQMessage msg = errorMessage.ToNetMQMessage();
             SendMessage(msg);
