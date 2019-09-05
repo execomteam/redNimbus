@@ -11,5 +11,6 @@ namespace UserService.Database
         void SaveUser(User u);
         bool CheckIfExists(String email);
         User GetUserByEmail(String email);
+        User GetUserById(Guid id);
     }
 }

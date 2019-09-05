@@ -7,6 +7,7 @@ using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.Domain;
 using RedNimbus.Messages;
+using RedNimbus.TokenManager;
 using RedNimbus.UserService.Helper;
 using UserService.Database;
 using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
@@ -17,12 +18,15 @@ namespace RedNimbus.UserService
     {
         private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
         private IUserRepository _userRepository;
-       
-        public UserService(IUserRepository repository) : base()
+        private ITokenManager _tokenManager;
+
+        public UserService(IUserRepository repository, ITokenManager tokenManager) : base()
         {
             Subscribe("RegisterUser", HandleRegisterUser);
             Subscribe("AuthenticateUser", HandleAuthenticateUser);
             Subscribe("GetUser", HandleGetUser);
+            
+            _tokenManager = tokenManager;
             _userRepository = repository;
         }
 
@@ -118,7 +122,8 @@ namespace RedNimbus.UserService
                     Message<TokenMessage> tokenMessage = new Message<TokenMessage>("Response");
 
                     tokenMessage.Id = userMessage.Id;
-                    tokenMessage.Data.Token = GenerateToken();
+                    tokenMessage.Data.Token = _tokenManager.GenerateToken(registeredUser.Id);
+
 
                     if (!tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
                     {
@@ -127,58 +132,60 @@ namespace RedNimbus.UserService
 
                     NetMQMessage msg = tokenMessage.ToNetMQMessage();
                     SendMessage(msg);
+                    return;
                 }
-
             }
 
             SendErrorMessage("Invalid credentials.", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
         }
 
+        
+
         private void HandleGetUser(NetMQMessage message)
         {
             Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
 
-            if (tokenMessage.Data.Token == null || !tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
+            if (tokenMessage.Data.Token == null)
             {
                 SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
             }
 
-            if (tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
+            Guid id = _tokenManager.ValidateToken(tokenMessage.Data.Token);
+            if (id.Equals(Guid.Empty))
             {
-                string email = tokenEmailPairs[tokenMessage.Data.Token];
-                if (!_userRepository.CheckIfExists(email))
-                {
-                    SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
-                }
-
-                User registeredUser = _userRepository.GetUserByEmail(email);
-                registeredUser.Key = tokenMessage.Data.Token;
-
-                Message<UserMessage> userMessage = new Message<UserMessage>("Response");
-
-                userMessage.Id = tokenMessage.Id;
-                userMessage.Data.FirstName = registeredUser.FirstName;
-                userMessage.Data.LastName = registeredUser.LastName;
-
-                NetMQMessage msg = userMessage.ToNetMQMessage();
-                SendMessage(msg);
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
             }
+
+            User registeredUser = _userRepository.GetUserById(id);
+            if(registeredUser == null)
+            {
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                return;
+            }
+
+            Message<UserMessage> userMessage = new Message<UserMessage>("Response");
+
+            userMessage.Id = tokenMessage.Id;
+            userMessage.Data.FirstName = registeredUser.FirstName;
+            userMessage.Data.LastName = registeredUser.LastName;
+            userMessage.Data.Token = tokenMessage.Data.Token;
+
+            NetMQMessage msg = userMessage.ToNetMQMessage();
+            SendMessage(msg);
         }
 
-        private string GenerateToken()
+        private void SendErrorMessage(string messageText, ErrorCode errorCode, NetMQFrame idFrame)
         {
-            string key = "VerySecureSecretKey";
-            string issuer = "RedNimbus";
+            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+            errorMessage.Data.MessageText = messageText;
+            errorMessage.Data.ErrorCode = (int) errorCode;
+            errorMessage.Id = idFrame;
 
-            var token = new JwtSecurityToken(issuer,
-              issuer,
-              null,
-              expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            NetMQMessage msg = errorMessage.ToNetMQMessage();
+            SendMessage(msg);
         }
     }
 }

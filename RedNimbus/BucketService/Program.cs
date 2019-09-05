@@ -8,7 +8,7 @@ namespace RedNimbus.BucketService
     {
         static void Main(string[] args)
         {
-            Services.BucketService bucketService = new Services.BucketService("C:/Users/praksa/Desktop/");
+            Services.BucketService bucketService = new Services.BucketService("C:/Users/praksa/Desktop/Spisak/",  new TokenManager.TokenManager());
             bucketService.Start();
         }
     }

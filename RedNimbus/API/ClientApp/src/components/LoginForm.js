@@ -22,7 +22,7 @@ class LoginForm extends React.Component {
 
     handleResponse(resp) {
         let self = this;
-        localStorage.setItem('token', resp.data.key);
+        localStorage.setItem('token', resp.data.key)
 
         const options = {
             headers: { 'token': resp.data.key}

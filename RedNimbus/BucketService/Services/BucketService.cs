@@ -8,17 +8,20 @@ using RedNimbus.Communication;
 using RedNimbus.BucketService.Services;
 using RedNimbus.Messages;
 using Google.Protobuf;
+using RedNimbus.TokenManager;
+using System.IO;
 
 namespace RedNimbus.BucketService.Services
 {
     public class BucketService : BaseService
     {
         private string _path;
-        
+        private ITokenManager _tokenManager;
 
-        public BucketService(string path) : base()
+        public BucketService(string path, ITokenManager manager) : base()
         {
             _path = path;
+            _tokenManager = manager;
 
             Subscribe("bucket/createBucket", CreateBucket);
             Subscribe("bucket/deleteBucket", DeleteBucket);
@@ -33,9 +36,22 @@ namespace RedNimbus.BucketService.Services
         public void DeleteBucket(NetMQMessage message)
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
-            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
+            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
 
-            msg.Data.Successful = FileSystemService.DeleteFolder(absolutePath);
+
+            if (absolutePath == null)
+            {
+                msg.Data.Successful = false;
+            }
+            else
+            {
+                if (!Directory.Exists(HomePath(msg.Data.Token)))
+                {
+                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
+                }
+                msg.Data.Successful = FileSystemService.DeleteFolder(absolutePath);
+            }
+
             msg.Topic = _returnTopic;
 
             if (msg.Data.Successful)
@@ -51,19 +67,33 @@ namespace RedNimbus.BucketService.Services
         public void CreateBucket(NetMQMessage message)
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
-            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
+            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
             string bucketName = null;
-            if (FileSystemService.NumberOfDirectories(HomePath(msg.Data.Token)) < 5)
+            
+            if (absolutePath == null)
             {
-                bucketName = FileSystemService.CreateFolder(absolutePath);
-                msg.Data.Successful = bucketName != null;
+                msg.Data.Successful = false;
             }
             else
             {
-                SendErrorMessage("Maximum number of buckets is 5", Either.Enums.ErrorCode.NumberOfBucketsExeeded, msg.Id);
-                msg.Data.Successful = false;
+                if (!Directory.Exists(HomePath(msg.Data.Token)))
+                {
+                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
+                }
+
+                if (FileSystemService.NumberOfDirectories(HomePath(msg.Data.Token)) < 5)
+                {
+                    bucketName = FileSystemService.CreateFolder(absolutePath);
+                    msg.Data.Successful = bucketName != null;
+                }
+                else
+                {
+                    SendErrorMessage("Maximum number of buckets is 5", Either.Enums.ErrorCode.NumberOfBucketsExeeded, msg.Id);
+                    return;
+                }
+                
             }
-            
+
             if (msg.Data.Successful)
             {
                 msg.Topic = _returnTopic;
@@ -80,9 +110,21 @@ namespace RedNimbus.BucketService.Services
         public void ListBucketContent(NetMQMessage message)
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
-            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
-
-            List<string> contentList = FileSystemService.ListContent(absolutePath);
+            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
+            List<string> contentList;
+            if (absolutePath == null)
+            {
+                contentList = null;
+            }
+            else
+            {
+                if (!Directory.Exists(HomePath(msg.Data.Token)))
+                {
+                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
+                }
+                contentList = FileSystemService.ListContent(absolutePath);
+            }
+            
             msg.Data.Successful = (contentList != null);
             msg.Topic = _returnTopic;
 
@@ -100,9 +142,21 @@ namespace RedNimbus.BucketService.Services
         public void CreateFolder(NetMQMessage message)
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
-            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
+            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
 
-            msg.Data.Successful = FileSystemService.CreateFolder(absolutePath) != null;
+            if (absolutePath == null)
+            {
+                msg.Data.Successful = false;
+            }
+            else
+            {
+                if (!Directory.Exists(HomePath(msg.Data.Token)))
+                {
+                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
+                }
+                msg.Data.Successful = FileSystemService.CreateFolder(absolutePath) != null;
+            }
+
             msg.Topic = _returnTopic;
 
             if (msg.Data.Successful)
@@ -119,7 +173,20 @@ namespace RedNimbus.BucketService.Services
         public void DeleteFolder(NetMQMessage message)
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
-            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
+            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
+
+            if (absolutePath == null)
+            {
+                msg.Data.Successful = false;
+            }
+            else
+            {
+                if (!Directory.Exists(HomePath(msg.Data.Token)))
+                {
+                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
+                }
+                msg.Data.Successful = FileSystemService.DeleteFolder(absolutePath);
+            }
 
             msg.Data.Successful = FileSystemService.DeleteFolder(absolutePath);
             msg.Topic = _returnTopic; 
@@ -137,10 +204,22 @@ namespace RedNimbus.BucketService.Services
         public void PutFile(NetMQMessage message)
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
-            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
+            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
             byte[] fileAsByteArray = msg.Data.File.ToByteArray();
 
-            msg.Data.Successful = FileSystemService.ByteArrayToFile(absolutePath, fileAsByteArray);
+            if (absolutePath == null)
+            {
+                msg.Data.Successful = false;
+            }
+            else
+            {
+                if (!Directory.Exists(HomePath(msg.Data.Token)))
+                {
+                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
+                }
+                msg.Data.Successful = FileSystemService.ByteArrayToFile(absolutePath, fileAsByteArray);
+            }
+
             msg.Topic = _returnTopic;
 
             if (msg.Data.Successful)
@@ -156,9 +235,22 @@ namespace RedNimbus.BucketService.Services
         public void GetFile(NetMQMessage message)
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
-            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
+            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
+            byte[] fileAsByteArray;
 
-            byte[] fileAsByteArray = FileSystemService.FileToByteArray(absolutePath);
+            if (absolutePath == null)
+            {
+                fileAsByteArray = null;
+            }
+            else
+            {
+                if (!Directory.Exists(HomePath(msg.Data.Token)))
+                {
+                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
+                }
+                fileAsByteArray = FileSystemService.FileToByteArray(absolutePath);
+            }
+
             msg.Topic = _returnTopic;
 
             if (fileAsByteArray != null)
@@ -176,9 +268,21 @@ namespace RedNimbus.BucketService.Services
         public void DeleteFile(NetMQMessage message)
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
-            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg);
+            string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
 
-            msg.Data.Successful = FileSystemService.DeleteFile(absolutePath);
+            if (absolutePath == null)
+            {
+                msg.Data.Successful = false;
+            }
+            else
+            {
+                if (!Directory.Exists(HomePath(msg.Data.Token)))
+                {
+                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
+                }
+                msg.Data.Successful = FileSystemService.DeleteFile(absolutePath);
+            }
+            
             msg.Topic = _returnTopic;
 
             if (msg.Data.Successful)
@@ -193,7 +297,8 @@ namespace RedNimbus.BucketService.Services
 
         private string HomePath(string token)
         {
-            return _path + MessageHelper.Decode(token);
+            Guid guid = _tokenManager.ValidateToken(token);
+            return _path + guid.ToString("B");
         }
     }
 }
