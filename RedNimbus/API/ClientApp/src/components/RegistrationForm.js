@@ -64,40 +64,40 @@ class RegistrationForm extends React.Component{
                 self.setState({
                     errorPassword: 'Passwords do not match'
                 });
-                return;
+                
             }
             if (self.state.password == null || self.state.password.trim() === '') {
                 self.setState({
                     errorPassword: 'Passwords can not be empty',
                 });
-                return;
+                
 
             }
             if (self.state.repeatedPassword == null || self.state.repeatedPassword.trim() === '') {
                 self.setState({
                     errorRepeatedPassword: 'Passwords can not be empty',
                 });
-                return;
+                
             }
             if (self.state.firstName == null || self.state.firstName.trim() === '') //check null empty or whitespace
             {
                 self.setState({
                     errorFirstName: 'Firstname can not be empty'
                 });
-                return;
+                
             }
             if (self.state.lastName == null || self.state.lastName.trim() === '')
             {
                 self.setState({
                     errorLastName: 'Lastname can not be empty'
                 });
-                return;
+                
             }
             if (self.state.email == null || self.state.email.trim() === '') {
                 self.setState({
                     errorEmail: 'Email must be in following format: example@provier.domain'
                 });
-                return;
+                
             } else {
                 var parts = self.state.email.split('@');
                 if (parts.length == 2) {
