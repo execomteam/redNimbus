@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NetMQ;
 using RedNimbus.Communication;
@@ -89,7 +90,7 @@ namespace RedNimbus.UserService
                 NetMQMessage msg = userMessage.ToNetMQMessage();
                 SendMessage(msg);
             }
-            catch (ArgumentException)
+            catch (DbUpdateException)
             {
                 SendErrorMessage("Email already exists.", ErrorCode.EmailAlreadyUsed, userMessage.Id);
             }

@@ -10,12 +10,18 @@ namespace RedNimbus.BucketService.Helper
     {
         public static string LoadConfig()
         {
-            Item item; 
-
-            using (StreamReader r = new StreamReader("bucketConfig.json"))
+            Item item;
+            try
             {
-                string json = r.ReadToEnd();
-                item = JsonConvert.DeserializeObject<Item>(json);
+                using (StreamReader r = new StreamReader("bucketConfig.json"))
+                {
+                    string json = r.ReadToEnd();
+                    item = JsonConvert.DeserializeObject<Item>(json);
+                }
+            }
+            catch
+            {
+                throw new FileNotFoundException("Can't find Bucket configuration file!");
             }
 
             return item.Path;

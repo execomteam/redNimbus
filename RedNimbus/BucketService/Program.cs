@@ -9,7 +9,6 @@ namespace RedNimbus.BucketService
         static void Main(string[] args)
         {
             Services.BucketService bucketService = new Services.BucketService(ConfigHelper.LoadConfig(), new TokenManager.TokenManager());
-            //("C:/Users/praksa/Desktop/Spisak/",  new TokenManager.TokenManager());
             bucketService.Start();
         }
     }
