@@ -24,7 +24,7 @@ namespace RedNimbus.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody]CreateUserDto createUserDto) => _mapper.Map<User>(createUserDto)
+        public IActionResult Post([FromBody]CreateUserDto createUserDto) =>  _mapper.Map<User>(createUserDto)
                 .Map(_userService.RegisterUser)
                 .Map(() => AllOk())
                 .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed)

@@ -106,12 +106,12 @@ namespace RedNimbus.UserService
 
             if (!Validation.IsEmailValid(userMessage.Data.Email))
             {
-                SendErrorMessage("Invalid email format.", ErrorCode.EmailWrongFormat, userMessage.Id);
+                SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
             }
 
             if (!Validation.IsPasswordValid(userMessage.Data.Password))
             {
-                SendErrorMessage("Password does not satisfy requirements.", ErrorCode.PasswordWrongFormat, userMessage.Id);
+                SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
             }
 
             var email = userMessage.Data.Email;
@@ -137,7 +137,7 @@ namespace RedNimbus.UserService
                 }
             }
 
-            SendErrorMessage("Invalid credentials.", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
+            SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
         }
 
 

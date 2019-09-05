@@ -23,22 +23,22 @@ namespace RedNimbus.API.Controllers
 
         protected IActionResult BadRequestErrorHandler(IError error)
         {
-            return BadRequest(error.Message);
+            return BadRequest(error);
         }
 
         protected IActionResult InternalServisErrorHandler(IError error)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, error);
         }
 
         protected IActionResult NotFoundErrorHandler(IError error)
         {
-            return NotFound(error.Message);
+            return NotFound(error);
         }
 
         protected IActionResult AuthenticationErrorHandler(IError error)
         {
-            return StatusCode(StatusCodes.Status406NotAcceptable, error.Message);
+            return StatusCode(StatusCodes.Status406NotAcceptable, error);
         }
 
     }
