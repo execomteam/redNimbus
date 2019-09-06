@@ -62,7 +62,8 @@ class RegistrationForm extends React.Component{
             var isError = false;
             if (self.state.password !== self.state.repeatedPassword) {
                 self.setState({
-                    errorPassword: 'Passwords do not match'
+                    errorPassword: 'Passwords do not match',
+                    errorRepeatedPassword: 'Passwords do not match'
                 });
                 
             }
