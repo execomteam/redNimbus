@@ -143,7 +143,7 @@ namespace RedNimbus.BucketService.Services
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
             string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
-
+            string folderName = null;
             if (absolutePath == null)
             {
                 msg.Data.Successful = false;
@@ -154,13 +154,16 @@ namespace RedNimbus.BucketService.Services
                 {
                     FileSystemService.CreateFolder(HomePath(msg.Data.Token));
                 }
-                msg.Data.Successful = FileSystemService.CreateFolder(absolutePath) != null;
+                folderName = FileSystemService.CreateFolder(absolutePath);
+                msg.Data.Successful = folderName != null;
             }
 
             msg.Topic = _returnTopic;
 
             if (msg.Data.Successful)
             {
+                msg.Topic = _returnTopic;
+                msg.Data.ReturnItems.Add(folderName);
                 SendMessage(msg.ToNetMQMessage());
             }
             else

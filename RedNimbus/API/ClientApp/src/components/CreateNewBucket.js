@@ -17,8 +17,9 @@ class CreateNewBucket extends React.Component {
         };
 
         var bucketName = document.getElementById("newBucketName").value;
+        var pth = this.props.path;
 
-        axios.post("http://localhost:65001/api/bucket/createBucket", {Value: bucketName}, options).then(
+        axios.post("http://localhost:65001/api/bucket/createBucket", {Path: pth, Value: bucketName}, options).then(
             (resp) => this.onSuccessHandler(resp),
             (resp) => this.onErrorHandler(resp)
         );

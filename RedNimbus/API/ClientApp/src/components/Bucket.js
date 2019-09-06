@@ -15,22 +15,32 @@ class Bucket extends React.Component
             folders: [],
             files: [],
             createModalShow: false,
-            uploadModalShow: false,
-            path: "/"
+            uploadModalShow: false
         }
         
         this.addNewBucket = this.addNewBucket.bind(this);
         this.setCreateModalShow = this.setCreateModalShow.bind(this);
         this.deletingBucket = this.deletingBucket.bind(this);
+        this.deletingFile = this.deletingFile.bind(this);
 
         this.setUploadModalShow = this.setUploadModalShow.bind(this);
         this.uploadFile = this.uploadFile.bind(this);
 
+        this.changePath = this.changePath.bind(this);
+        this.enterFolder = this.enterFolder.bind(this);
+
         const options = {
             headers: { 'token': localStorage.getItem("token")}
         };
-
-        axios.get("http://localhost:65001/api/bucket", options).then(
+        
+        
+        let path
+        if (typeof this.props.path === 'undefined')
+            path = "http://localhost:65001/api/bucket";
+        else
+            path = "http://localhost:65001/api/bucket" + this.props.path;
+        
+        axios.get(path, options).then(
             (resp) => this.onSuccessHandler(resp),
             (resp) => this.onErrorHandler(resp)
         );
@@ -82,6 +92,17 @@ class Bucket extends React.Component
         this.setState({folders: arr});
     }
 
+    deletingFile(file) {
+        let arr = this.state.files;
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] === file.value) {
+                arr.splice(i, 1);
+            }
+        }
+
+        this.setState({ files: arr });
+    }
+
     uploadFile(file) {
         this.setState(prevState => ({
             files: [...prevState.files, file.value]
@@ -105,13 +126,46 @@ class Bucket extends React.Component
         });
     }
 
+    changePath(newPath) {
+        const options = {
+            headers: { 'token': localStorage.getItem("token") }
+        };
+
+
+        this.props.changePath(newPath);
+        let path = "http://localhost:65001/api/bucket/post";
+        
+        axios.post(path, { Path: newPath }, options).then(
+            (resp) => this.onSuccessHandler(resp),
+            (resp) => this.onErrorHandler(resp)
+        );
+    }
+
+    enterFolder(folderName) {
+        const options = {
+            headers: { 'token': localStorage.getItem("token") }
+        };
+        let helpPath = this.props.path;
+        if (helpPath.slice(-1) === "/") {
+            let newPath = this.props.path + folderName + "/";
+            this.props.changePath(newPath);
+            let path = "http://localhost:65001/api/bucket/post";
+            axios.post(path, { Path: newPath }, options).then(
+                (resp) => this.onSuccessHandler(resp),
+                (resp) => this.onErrorHandler(resp)
+            );
+        }
+    }
+
     render() {
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-md-2">
                         <SideNav
-                            path={this.state.path}
+                            path={this.props.path}
+
+                            changePath={this.changePath}
 
                             uploadFile={this.uploadFile}
                             uploadModalShow={this.state.uploadModalShow}
@@ -124,9 +178,9 @@ class Bucket extends React.Component
                     </div>
                     <div className="col-md-10">   
                         <br />
-                        <FolderGroup deletingBucket={this.deletingBucket} content={this.state.folders}/>
+                        <FolderGroup deletingBucket={this.deletingBucket} content={this.state.folders} enterFolder={this.enterFolder} path={this.props.path}/>
                         <hr/>
-                        <FileGroup content={this.state.files}/>
+                        <FileGroup deletingFile={this.deletingFile} content={this.state.files} path={this.props.path}/>
                     </div>
                 </div>
             </div>

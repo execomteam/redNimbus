@@ -5,43 +5,44 @@ import axios from 'axios';
 class UploadFile extends React.Component {
     constructor(props) {
         super(props);
-        this.handleFile = this.handleFile.bind(this);
+        this.state = {
+            file: null
+        }
+        this.onFormSubmit = this.onFormSubmit.bind(this);
+        this.onChange = this.onChange.bind(this);
+        this.onSuccessHandler = this.onSuccessHandler.bind(this);
+        this.onErrorHandler = this.onErrorHandler.bind(this);
     }
-    state = {
-        file: null
-    }
-
-    handleFile(e) {
-
-        e.preventDefault();
-
-        let file = e.target.files[0];
-
-    }
-
-    handleUpload(e) {
-        let file = this.state.file;
-
-        var reader = new FileReader();
-        reader.fileName = this.state.file.name;
-
-        reader.onload = function (readerEvt) {
-            console.log(readerEvt.target.fileName);
-        };
-
-        const formData = { file: e.target.result };
-
-        reader.readAsBinaryString(file);
-
+    
+    onFormSubmit(e) {
+        e.preventDefault(); 
         const options = {
-            headers: { 'token': localStorage.getItem("token") }
+            headers: {
+                'token': localStorage.getItem("token")                                             
+            }
         };
-        let self = this;
-        axios.post("http://localhost:65001/api/bucket/uploadFile", { Value: this.state.file.name, Path: self.props.path, data: formData }, options).then(
-            (resp) => this.onSuccessHandler(resp),
-            (resp) => this.onErrorHandler(resp)
-        );
+
+        let fileReader = new FileReader();
+
+        fileReader.onload = (event) => {
+            axios.post("http://localhost:65001/api/bucket/uploadFile", { "File": event.target.result, "Path": this.props.path, "Value": this.state.file.name}, options).then(
+                (resp) => this.onSuccessHandler(resp),
+                (resp) => this.onErrorHandler(resp)
+            );
+
+        }
+
+        fileReader.readAsDataURL(this.state.file);
+        
+
     }
+
+    onChange(e) {
+        e.preventDefault();
+        this.setState({ file: e.target.files[0] })
+    }
+
+
 
     onErrorHandler(resp) {
         alert(resp.response.data);
@@ -55,7 +56,7 @@ class UploadFile extends React.Component {
     render() {
         return (
             <div>
-                <Button variant="primary" onClick={() => this.props.onHide(true)}>
+                <Button onClick={() => this.props.onHide(true)}>
                     Upload File
                 </Button>
                 <Modal
@@ -70,14 +71,14 @@ class UploadFile extends React.Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <form id="upload">
+                        <form id="upload" onSubmit={this.onFormSubmit}>
                             <div>
                                 <label>Select File</label>
-                                <input type="file" name="file" onChange={(e) => this.handleFile(e)} />
+                                <input type="file" name="file" id="file" onChange={this.onChange} />
                             </div>
 
                         <br />
-                            <button type="button" onClick={(e) => this.handleUpload(e)}>Upload</button>
+                            <Button type="submit">Upload</Button>
                             <Button onClick={() => this.props.onHide(false)}>Close</Button>
                         </form>
                     </Modal.Body>

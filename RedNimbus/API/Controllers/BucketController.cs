@@ -14,6 +14,7 @@ using RedNimbus.DTO;
 using RedNimbus.Either.Errors;
 using RedNimbus.Either;
 using RedNimbus.Messages;
+using DTO;
 
 namespace RedNimbus.API.Controllers
 {
@@ -34,12 +35,9 @@ namespace RedNimbus.API.Controllers
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
 
-        
-        
-        
-        [HttpGet("{id}")]
-        public IActionResult ListBucketContent(string id) => 
-            _bucketService.ListBucketContent(Request.Headers["token"], id)
+        [HttpPost("post")]
+        public IActionResult ListBucketContent([FromBody]StringDto val) => 
+            _bucketService.ListBucketContent(Request.Headers["token"], val.Path)
                 .Map((x) => AllOk(x))
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
@@ -58,6 +56,26 @@ namespace RedNimbus.API.Controllers
                 .Map((x) => AllOk(x))
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
+        
+        [HttpPost("uploadFile")]
+        public IActionResult DeleteBucket([FromBody]UploadFileDto uploadFile) =>
+            _bucketService.UploadFile(Request.Headers["token"], uploadFile)
+                .Map((x) => AllOk(x))
+                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
 
+        [HttpPost("deleteFile")]
+        public IActionResult DeleteFile([FromBody]StringDto fileName) =>
+            _bucketService.DeleteFile(Request.Headers["token"], fileName)
+                .Map((x) => AllOk(x))
+                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+
+        [HttpPost("downloadFile")]
+        public IActionResult DownloadFile([FromBody]StringDto fileName) =>
+            _bucketService.DeleteFile(Request.Headers["token"], fileName)
+                .Map((x) => AllOk(x))
+                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
     }
 }
