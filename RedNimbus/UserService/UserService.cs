@@ -58,6 +58,11 @@ namespace RedNimbus.UserService
                 SendErrorMessage("Password does not satisfy requirements.", ErrorCode.PasswordWrongFormat, userMessage.Id);
                 return false;
             }
+            if (!String.IsNullOrWhiteSpace(userMessage.Data.PhoneNumber) && !Validation.IsPhoneValid(userMessage.Data.PhoneNumber))
+            {
+                SendErrorMessage("Phone number wrong format", ErrorCode.PhoneNumberWrongFormat, userMessage.Id);
+                return false;
+            }
 
             return true;
         }

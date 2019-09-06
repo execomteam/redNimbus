@@ -27,6 +27,7 @@ namespace RedNimbus.Either.Enums
         CreateBucketError,
         PutFileError,
         GetFileError,
-        DeleteFileError
+        DeleteFileError,
+        PhoneNumberWrongFormat
     }
 }

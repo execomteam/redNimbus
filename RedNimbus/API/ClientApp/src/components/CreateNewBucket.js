@@ -17,6 +17,11 @@ class CreateNewBucket extends React.Component {
         };
 
         var bucketName = document.getElementById("newBucketName").value;
+        var format = /[ <>:"\\\/|?*]/;
+        if (format.test(bucketName)) {
+            alert('Name contain unacceptable characters');
+            return;
+        }
 
         axios.post("http://localhost:65001/api/bucket/createBucket", {Value: bucketName}, options).then(
             (resp) => this.onSuccessHandler(resp),
