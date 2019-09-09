@@ -15,14 +15,15 @@ class SideNav extends React.Component{
     */
     render(){
         return (
-            <div>
-                <CreateNewBucket
-                        addNewBucket = {this.props.addNewBucket}
-                        show={this.props.modalShow}
-                        onHide={this.props.setModalShow}
-                />
 
-                
+                <div>
+                    <CreateNewBucket
+                        addNewBucket={this.props.addNewBucket}
+                        show={this.props.createModalShow}
+                        onHide={this.props.setCreateModalShow}
+                    />
+
+
             </div>
         );
     }

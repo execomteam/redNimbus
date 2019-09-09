@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using NetMQ;
 using NetMQ.Sockets;
+using RedNimbus.Either;
+using RedNimbus.Messages;
 
 namespace RedNimbus.Communication
 {
@@ -13,11 +15,14 @@ namespace RedNimbus.Communication
         private const string _publisherAddress = "tcp://127.0.0.1:8081";
         private const string _dealerAddress = "tcp://127.0.0.1:8080";
 
+        protected const string _returnTopic = "Response";
+
         private SubscriberSocket _subscriberSocket;
         private DealerSocket _dealerSocket;
         private NetMQPoller _poller;
 
         private IDictionary<string, Action<NetMQMessage>> _topicsToActions;
+
 
         /// <summary>
         /// Use this NetMQPoller instance to observe sockets.
@@ -133,6 +138,18 @@ namespace RedNimbus.Communication
         public void SendMessage(NetMQMessage message)
         {
             _dealerSocket.SendMultipartMessage(message);
+        }
+
+        protected void SendErrorMessage(string messageText, Either.Enums.ErrorCode errorCode, NetMQFrame idFrame)
+        {
+            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error");
+
+            errorMessage.Data.MessageText = messageText;
+            errorMessage.Data.ErrorCode = (int)errorCode;
+            errorMessage.Id = idFrame;
+
+            NetMQMessage msg = errorMessage.ToNetMQMessage();
+            SendMessage(msg);
         }
 
         /// <summary>

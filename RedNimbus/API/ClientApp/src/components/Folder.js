@@ -1,6 +1,37 @@
 ﻿import React from 'react';
+import { Button } from "react-bootstrap";
+import axios from 'axios';
 
 class Folder extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.deleteBucket = this.deleteBucket.bind(this);
+    }
+
+    deleteBucket(event) {
+        event.preventDefault();
+
+        const options = {
+            headers: { 'token': localStorage.getItem("token") }
+        };
+
+        var bucketName = this.props.name;
+
+        axios.post("http://localhost:65001/api/bucket/deleteBucket", { Value: bucketName }, options).then(
+            (resp) => this.onSuccessHandler(resp),
+            (resp) => this.onErrorHandler(resp)
+        );
+    }
+
+    onErrorHandler(resp) {
+        alert(resp.response.data);
+    }
+
+    onSuccessHandler(resp) {
+        this.props.deletingBucket(resp.data);
+    }
+
     render() {
 
         return (
@@ -11,6 +42,12 @@ class Folder extends React.Component {
                 <img style={{ height: '100px', width: '100px' }} src="https://freeiconshop.com/wp-content/uploads/edd/folder-outline-filled.png" className="card-img-top" alt="..." />
                 <div className="card-body">
                     <p style={{ textAlign: 'center' }} className="card-text">{this.props.name}</p>
+                    <div>
+                        <center>
+                            <button onClick={this.deleteBucket}>Delete
+                            </button>
+                        </center>
+                    </div>
                 </div>
             </div>
         );

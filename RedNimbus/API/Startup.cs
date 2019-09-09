@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RedNimbus.API.Services;
 using RedNimbus.API.Services.Interfaces;
+using RedNimbus.Either;
+using RedNimbus.Either.Mappings;
 
 namespace RedNimbus.API
 {
@@ -39,9 +42,22 @@ namespace RedNimbus.API
                 configuration.RootPath = "ClientApp/build";
             });
 
+            // Auto Mapper Configuration
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
 
-            //Dependency Injection of object that implements ICommunicationService interface
-            services.AddSingleton(typeof(ICommunicationService), new CommunicationService("http://localhost:65000/"));
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
+
+
+            // Dependency Injection of object that implements ICommunicationService interface
+            services.AddSingleton(typeof(IRestUserService), new RestUserService("http://localhost:65000/"));
+            services.AddSingleton(typeof(IUserService), new UserService());
+            services.AddSingleton(typeof(BucketService), new BucketService());
+            services.AddEitherServiceMapper();
 
         }
 

@@ -1,24 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using GalaSoft.MvvmLight.Ioc;
+using Org.BouncyCastle.Asn1.Ocsp;
+using RedNimbus.Domain;
+using RedNimbus.TokenManager;
+using UserService.Database;
+using UserService.Database.Model;
+using UserService.Mapping;
 
-namespace UserService
+namespace RedNimbus.UserService
 {
-    public class Program
+    class Program
     {
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
-        }
+            SimpleIoc.Default.Register(() => new MapperConfiguration(mc =>{ mc.AddProfile(new MappingProfile()); }).CreateMapper());
+            SimpleIoc.Default.Register<IUserRepository, UserRepository>();
+            SimpleIoc.Default.Register<ITokenManager, TokenManager.TokenManager>();
+            SimpleIoc.Default.Register<UserService>();
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+            var userService = SimpleIoc.Default.GetInstance<UserService>();
+
+            userService.Start();
+        }
     }
 }

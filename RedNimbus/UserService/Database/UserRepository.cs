@@ -1,18 +1,12 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using RedNimbus.DTO.Enums;
-using RedNimbus.Either.Errors;
-using RedNimbus.UserService.Mappings;
-using RedNimbus.UserService.Model;
+using RedNimbus.Domain;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using UserService.DatabaseModel;
+using UserService.Database.Model;
 
 namespace UserService.Database
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
         private DatabaseContext context;
         private IMapper _mapper;
@@ -32,10 +26,9 @@ namespace UserService.Database
         {
             UserDB userDB = ConvertUserToUserDB(newUser);
 
-            userDB.Id               = newUser.Id;
-            userDB.ActiveAccount    = true;   
+            userDB.ActiveAccount = true;
 
-            using(context = new DatabaseContext())
+            using (context = new DatabaseContext())
             {
                 context.Database.EnsureCreated();
                 context.Add(userDB);
@@ -50,7 +43,7 @@ namespace UserService.Database
         /// <returns></returns>
         public bool CheckIfExists(string email)
         {
-            using(context = new DatabaseContext())
+            using (context = new DatabaseContext())
             {
                 return context.Users.FirstOrDefault(u => u.Email == email && u.ActiveAccount) != null;
             }
@@ -62,20 +55,32 @@ namespace UserService.Database
             using (context = new DatabaseContext())
             {
                 user = context.Users.First(u => u.Email.Equals(email));
-                if(user == null)
-                {
-                    return null;
-                }
             }
-            if(!user.ActiveAccount)
+
+            if (user == null || !user.ActiveAccount)
             {
                 return null;
             }
-            else
+
+            return ConvertUserDBToUser(user); 
+            
+        }
+
+        public User GetUserById(Guid guid)
+        {
+            UserDB userDb;
+
+            using (context = new DatabaseContext())
             {
-                User result = ConvertUserDBToUser(user);
-                return result;
+                userDb = context.Users.First(u => u.Id.Equals(guid));
             }
+
+            if (userDb == null || !userDb.ActiveAccount)
+            {
+                return null;
+            }
+
+            return ConvertUserDBToUser(userDb);
         }
 
         private User ConvertUserDBToUser(UserDB userdb)

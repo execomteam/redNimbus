@@ -1,79 +1,53 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RedNimbus.API.Models;
 using RedNimbus.API.Services.Interfaces;
+using RedNimbus.Domain;
 using RedNimbus.DTO;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
+using RedNimbus.Either.Mappings;
 
 namespace RedNimbus.API.Controllers
 {
     [ApiController]
     [Route("api/user")]
-    public class UserController : ControllerBase
+    [Produces("application/json")]
+    public class UserController : BaseController
     {
-        private readonly ICommunicationService _communicationService;
+        private readonly IUserService _userService;
+        private readonly IEitherMapper _mapper;
 
-        public UserController(ICommunicationService communicationService)
+        public UserController(IUserService userService, IEitherMapper mapper)
         {
-            _communicationService = communicationService;
-        }
-
-        private IActionResult AllOk()
-        {
-            return Ok(new Empty());
-        }
-
-        private IActionResult AllOk(object obj)
-        {
-            return Ok(obj);
-        }
-
-        private IActionResult BadRequestErrorHandler(IError error)
-        {
-            return BadRequest(error);
-        }
-
-        private IActionResult InternalServisErrorHandler(IError error)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, error);
-        }
-        private IActionResult NotFoundErrorHandler(IError error)
-        {
-            return NotFound(error.Message);
-        }
-
-        private IActionResult AuthenticationErrorHandler(IError error)
-        {
-            return StatusCode(StatusCodes.Status406NotAcceptable, error);
+            _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody]CreateUserDto createUserDto)
+        public IActionResult Post([FromBody]CreateUserDto createUserDto) =>  _mapper.Map<User>(createUserDto)
+                .Map(_userService.RegisterUser)
+                .Map(() => AllOk())
+                .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed)
+                .Reduce(this.InternalServisErrorHandler);
+
+        private static bool EmailAlreadyUsed(IError err)
         {
-            // var response = _communicationService.Send<CreateUserDto, Response<Empty>>("api/user", createUserDto).Result;
-            return _communicationService.Send<CreateUserDto, Empty>("api/user", createUserDto)
-                 .Result
-                 .Map(() => AllOk())
-                 .Reduce(BadRequestErrorHandler, x => x is FormatError)
-                 .Reduce(InternalServisErrorHandler);
+            return err is FormatError formatError && formatError.Code == RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed;
         }
 
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthorizeUserDto userLoginDTO)
-        {
-            return _communicationService.Send<AuthorizeUserDto, UserDto>("api/user/authenticate", userLoginDTO)
-                .Result
-                .Map(x => AllOk(x))
-                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
-                .Reduce(InternalServisErrorHandler);            
-        }
+        public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto) =>
+            _mapper.Map<User>(authenticateUserDto)
+               .Map(_userService.Authenticate)
+               .Map(x => AllOk(new KeyDto() { Key = x.Key }))
+               .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
+               .Reduce(InternalServisErrorHandler);
 
         [HttpGet]
         public IActionResult Get()
         {
-            return _communicationService.Get<UserDto>("api/user", Request.Headers["token"])
-                .Result
+            return _userService.GetUserByToken(Request.Headers["token"])
+                .Map(_mapper.Map<UserDto>)
                 .Map(x => AllOk(x))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);

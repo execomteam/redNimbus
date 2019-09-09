@@ -4,9 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using UserService.DatabaseModel;
+using UserService.Database.Model;
 
 namespace UserService.Database
 {
@@ -20,10 +18,10 @@ namespace UserService.Database
             {
                 string json = r.ReadToEnd();
                 var values = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
-                var server      = values["server"];
-                var database    = values["database"];
-                var user        = values["user"];
-                var password    = values["password"];
+                var server = values["server"];
+                var database = values["database"];
+                var user = values["user"];
+                var password = values["password"];
                 optionsBuilder.UseMySQL("server=" + server + ";database=" + database + ";user=" + user + ";password=" + password);
             }
         }
