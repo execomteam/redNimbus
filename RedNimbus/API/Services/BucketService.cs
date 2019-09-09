@@ -270,7 +270,7 @@ namespace RedNimbus.API.Services
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
                 byte[] data = successMessage.Data.File.ToByteArray();
                 string base64Str = Convert.ToBase64String(data);
-                fileName.Value = Translate(fileName.Value) + ";base64," + base64Str;
+                fileName.Value = Translate(fileName.Value)+ ";base64," + base64Str;
                 return new Right<IError, StringDto>(fileName);
             }
 
@@ -282,7 +282,7 @@ namespace RedNimbus.API.Services
         {
             string extension = Path.GetExtension(name);
 
-            return "data:application/x-msdownload";
+            return "data:text/plain";
         }
 
     }

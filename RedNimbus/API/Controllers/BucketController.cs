@@ -58,7 +58,7 @@ namespace RedNimbus.API.Controllers
                 .Reduce(InternalServisErrorHandler);
         
         [HttpPost("uploadFile")]
-        public IActionResult DeleteBucket([FromBody]UploadFileDto uploadFile) =>
+        public IActionResult UploadFile([FromBody]UploadFileDto uploadFile) =>
             _bucketService.UploadFile(Request.Headers["token"], uploadFile)
                 .Map((x) => AllOk(x))
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
@@ -73,7 +73,7 @@ namespace RedNimbus.API.Controllers
 
         [HttpPost("downloadFile")]
         public IActionResult DownloadFile([FromBody]StringDto fileName) =>
-            _bucketService.DeleteFile(Request.Headers["token"], fileName)
+            _bucketService.DownloadFile(Request.Headers["token"], fileName)
                 .Map((x) => AllOk(x))
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);

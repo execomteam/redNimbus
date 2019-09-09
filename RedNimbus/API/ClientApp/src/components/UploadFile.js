@@ -39,7 +39,13 @@ class UploadFile extends React.Component {
 
     onChange(e) {
         e.preventDefault();
-        this.setState({ file: e.target.files[0] })
+        let file_size = e.target.files[0].size;
+        if (file_size > 350000000) {
+            alert("File size limit is 350MB. Choose another file please.");
+        } else {
+            this.setState({ file: e.target.files[0] })
+        }
+        
     }
 
 
