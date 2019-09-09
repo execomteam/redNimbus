@@ -7,28 +7,59 @@ namespace Either.Test
     [TestFixture]
     public class EitherTest
     {
-        public Either<Error, Dollars> rightDollars = new Right<Error, Dollars>(new Dollars { Amount = 40 });
-        public Either<Error, Euros> rightEuros = new Right<Error, Euros>(new Euros { Amount = 100 });
+        Either<IError, Success1> success1 = new Right<IError, Success1>(new Success1());
 
-        public Either<Error, Dollars> leftDollars = new Left<Error, Dollars>(new Error() { Code = Code.Minus });
-        public Either<Error, Euros> LeftEuros = new Left<Error, Euros>(new Error() { Code = Code.Minus });
+        Either<IError, Success1> error1 = new Left<IError, Success1>(new Error1());
+        Either<IError, Success1> error2 = new Left<IError, Success1>(new Error2());
+        Either<IError, Success1> error3 = new Left<IError, Success1>(new Error3());
 
-        public Either<Error, Dollars> zeroDollars = new Left<Error, Dollars>(new Error() { Code = Code.Zero });
+        Either<IError, Outcome> outcomeOk = new Right<IError, Outcome>(new Outcome("ok"));
+        Either<IError, Outcome> outcomeErr1 = new Left<IError, Outcome>(new Error1());
+
+        #region helpers
+
+        public Either<IError, Success2> ReturnSuccess2(Success1 either)
+        {
+            return new Right<IError, Success2>(new Success2());
+        }
+
+        public Outcome ConvertError1ToOutcome(IError error)
+        {
+            return new Outcome("error1");
+        }
+
+        public Outcome ConvertError2ToOutcome(IError error)
+        {
+            return new Outcome("error2");
+        }
+
+        public Outcome ConvertDefaultErrorToOutcome()
+        {
+            return new Outcome("defaultError");
+        }
+
+        public Outcome ConvertDefaultErrorToOutcome2(IError error)
+        {
+            return new Outcome("defaultError");
+        }
+
+        #endregion
 
         #region map_adapter_1
 
         [Test]
-        public void When_EitherMapAdapter1Called_Expect_RightValue()       
-        {                                                               
-            Either<Error,double> restMoney = rightDollars.Map(Pay10dollars);              
-            Assert.That( restMoney is Right<Error, double> e && (double)e == 30);
+        public void When_EitherMapAdapter1Called_Expect_Right()
+        {
+
+            var result = success1.Map((s) => new Success1());
+            Assert.That(result is Right<IError, Success1>);
         }
 
         [Test]
-        public void When_EitherMapAdapter1Called_Expect_LeftValue()
+        public void When_EitherMapAdapter1Called_Expect_Left()
         {
-            Either<Error, double> error = leftDollars.Map(Pay10dollars);
-            Assert.That(error is Left<Error, double> e && ((Error)e).Code == Code.Minus);
+            var result = error1.Map((s) => new Success1());
+            Assert.That(result is Left<IError, Success1>);
         }
 
         #endregion
@@ -36,36 +67,37 @@ namespace Either.Test
         #region map_adapter_2
 
         [Test]
-        public void When_EitherMapAdapter2Called_Expect_RightValue()
+        public void When_EitherMapAdapter2Called_Expect_Right()
         {
-            Either<Error, Dollars> exchanged = rightEuros.Map(ExchangeEuroToDollars);
-            Assert.That(exchanged is Right<Error, Dollars> e && ((Dollars)e).Amount == 80);
+            var result = success1.Map(ReturnSuccess2);
+            Assert.That(result is Right<IError, Success2>);
         }
 
+
         [Test]
-        public void When_EItherMapAdapter2Called_Expect_LeftValue()
+        public void When_EItherMapAdapter2Called_Expect_Left()
         {
-            Either<Error, Dollars> error = LeftEuros.Map(ExchangeEuroToDollars);
-            Assert.That(error is Left<Error, Dollars> e && ((Error)e).Code == Code.Minus);
+            var result = error1.Map(ReturnSuccess2);
+            Assert.That(result is Left<IError, Success2>);
         }
 
         #endregion
 
         #region map_adapter_3
-        
+
         [Test]
-        public void When_EitherMapAdapter3Called_Expect_RightValue()
+        public void When_EitherMapAdapter3Called_Expect_Right()
         {
-            Either<Error, bool> isThatStatementTrue = rightDollars.Map(IWillBuyYouAPresent);
-            Assert.That(isThatStatementTrue is Right<Error, bool> r && (bool)r == true);
-            
+            var result = success1.Map(() => new Outcome("Ok"));
+            Assert.That(result is Right<IError, Outcome>);
         }
-        
+
+
         [Test]
-        public void When_EitherMapAdapter3Called_Expect_LeftValue()
+        public void When_EitherMapAdapter3Called_Expect_Left()
         {
-            Either<Error, bool> isThatStatementTrue = leftDollars.Map(IWillBuyYouAPresent);
-            Assert.That(isThatStatementTrue is Left<Error, bool> e && ((Error)e).Code == Code.Minus);
+            var result = error1.Map(() => new Outcome("Ok"));
+            Assert.That(result is Left<IError, Outcome>);
         }
 
         #endregion
@@ -73,18 +105,17 @@ namespace Either.Test
         #region reduce_adapter_1
 
         [Test]
-        public void When_EitherReduceAdapter1Called_Expect_RightValue()
+        public void When_EitherReduceAdapter1Called_Expect_Right()
         {
-            Either<Error, Dollars> balance = rightDollars.Reduce(HandleMinusError);
-            Assert.That(balance is Right<Error, Dollars>);
+            Either<IError, Outcome> res = outcomeOk.Reduce(ConvertDefaultErrorToOutcome2);
+            Assert.That(res is Right<IError, Outcome>);
         }
 
         [Test]
-        public void When_EitherReduceAdapter1Called_Expect_LeftValue()
+        public void When_EitherReduceAdapter1Called_Expect_Left()
         {
-            //leftDollars have minus
-            Either<Error, Dollars> balance = leftDollars.Reduce(HandleMinusError);
-            Assert.That(balance is Right<Error, Dollars> b && ((Dollars)b).Amount == -1);
+            Either<IError, Outcome> res = outcomeErr1.Reduce(ConvertDefaultErrorToOutcome2);
+            Assert.That(res is Right<IError, Outcome>);
         }
 
         #endregion
@@ -92,24 +123,24 @@ namespace Either.Test
         #region reduce_adapter_2
 
         [Test]
-        public void When_EitherReduceAdapter2Called_Expect_RightValueAndDollarMinus()
+        public void When_EitherReduceAdapter2Called_Expect_Right1()
         {
-            Either<Error, Dollars> balance = leftDollars.Reduce(HandleMinusError, e => e.Code is Code.Minus);
-            Assert.That(balance is Right<Error, Dollars> b && ((Dollars)b).Amount == -1);
+            var result = outcomeOk.Reduce(ConvertError1ToOutcome, e => e is Error1);
+            Assert.That(result is Right<IError, Outcome>);
         }
 
         [Test]
-        public void When_EitherReduceAdapter2Called_Expect_LeftValue()
+        public void When_EitherReduceAdapter2Called_Expect_Right2()
         {
-            Either<Error, Dollars> error = leftDollars.Reduce(HandleMinusError, e => e.Code is Code.Zero);
-            Assert.That(error is Left<Error, Dollars> b);
+            var result = outcomeErr1.Reduce(ConvertError1ToOutcome, e => e is Error1);
+            Assert.That(result is Right<IError, Outcome>);
         }
 
         [Test]
-        public void When_EitherReduceAdapter2Called_Expect_RightValueAndPositiveDollars()
+        public void When_EitherReduceAdapter2Called_Expect_Left()
         {
-            Either<Error, Dollars> error = rightDollars.Reduce(HandleMinusError, e => e.Code is Code.Minus);
-            Assert.That(error is Right<Error, Dollars> b && ((Dollars)b).Amount > 0);
+            var result = outcomeErr1.Reduce(ConvertError1ToOutcome, e => e is Error2);
+            Assert.That(result is Left<IError, Outcome>);
         }
 
         #endregion
@@ -117,77 +148,104 @@ namespace Either.Test
         #region reduce_adapter_3
 
         [Test]
-        public void When_EitherAdapretReduce3Called_Expect_LoanRightValue()
+        public void When_EitherAdapterReduce3Called_Expect_Outcome1()
         {
-            Either<Error, Dollars> load = zeroDollars.Reduce(Loan20Dollars);
-            Assert.That(load is Right<Error, Dollars> l && ((Dollars)l).Amount == 20);
+            var result = outcomeOk.Reduce(ConvertDefaultErrorToOutcome);
+            Assert.That(result is Outcome r && r.message == "ok");
+        }
+
+
+        [Test]
+        public void When_EitherAdapterReduce3Called_Expect_Outcome2()
+        {
+            var result = outcomeErr1.Reduce(ConvertDefaultErrorToOutcome);
+            Assert.That(result is Outcome r && r.message == "defaultError");
+        }
+
+        #endregion
+
+        #region combinations
+
+        [Test]
+        public void When_CombineMapAndReduce_Expect_Ok()
+        {
+            var result = success1
+                .Map(s => s)                                            //map adapter 1
+                .Map(ReturnSuccess2)                                    //map adapter 2
+                .Map(() => new Outcome("ok"))                           //map adapter 3
+                .Reduce(ConvertError1ToOutcome, e => e is Error1)       //reduce adapter 2
+                .Reduce(ConvertError2ToOutcome, e => e is Error2)       //reduce adapter 2
+                .Reduce(ConvertDefaultErrorToOutcome);                  //reduce adapter 3
+
+            Assert.That(result is Outcome r && r.message == "ok");
+
         }
 
         [Test]
-        public void When_EitherAdapretReduce3Called_Expect_OriginalRightValue()
+        public void When_CombineMapAndReduce_Expect_Error1()
         {
-            Either<Error, Dollars> load = rightDollars.Reduce(Loan20Dollars);
-            Assert.That(load is Right<Error, Dollars> l && ((Dollars)l).Amount == 40);
+            var result = error1
+                .Map(s => s)                                            //map adapter 1
+                .Map(ReturnSuccess2)                                    //map adapter 2
+                .Map(() => new Outcome("ok"))                           //map adapter 3
+                .Reduce(ConvertError1ToOutcome, e => e is Error1)       //reduce adapter 2
+                .Reduce(ConvertError2ToOutcome, e => e is Error2)       //reduce adapter 2
+                .Reduce(ConvertDefaultErrorToOutcome);                  //reduce adapter 3
+
+            Assert.That(result is Outcome r && r.message == "error1");
+        }
+
+        [Test]
+        public void When_CombineMapAndReduce_Expect_Error2()
+        {
+            var result = error2
+                .Map(s => s)                                            //map adapter 1
+                .Map(ReturnSuccess2)                                    //map adapter 2
+                .Map(() => new Outcome("ok"))                           //map adapter 3
+                .Reduce(ConvertError1ToOutcome, e => e is Error1)       //reduce adapter 2
+                .Reduce(ConvertError2ToOutcome, e => e is Error2)       //reduce adapter 2
+                .Reduce(ConvertDefaultErrorToOutcome);                  //reduce adapter 3
+
+            Assert.That(result is Outcome r && r.message == "error2");
+        }
+
+        [Test]
+        public void When_CombineMapAndReduce_Expect_DefaultError()
+        {
+            var result = error3
+                .Map(s => s)                                            //map adapter 1
+                .Map(ReturnSuccess2)                                    //map adapter 2
+                .Map(() => new Outcome("ok"))                           //map adapter 3
+                .Reduce(ConvertError1ToOutcome, e => e is Error1)       //reduce adapter 2
+                .Reduce(ConvertError2ToOutcome, e => e is Error2)       //reduce adapter 2
+                .Reduce(ConvertDefaultErrorToOutcome);                  //reduce adapter 3
+
+            Assert.That(result is Outcome r && r.message == "defaultError");
         }
 
         #endregion
 
-
-        #region test_helper_methods
-
-        private Dollars Loan20Dollars()
-        {
-            return new Dollars() { Amount = 20 };
-        }
-
-        private Dollars HandleZeroError(Error error)
-        {
-            return new Dollars() { Amount = (int)error.Code };
-            
-        }
-
-        private Dollars HandleMinusError(Error error)
-        {
-            return new Dollars() { Amount = (int)error.Code };
-        }
-
-
-        private double Pay10dollars(Dollars money)
-        {
-            return money.Amount -= 10;
-        }
-
-        private Either<Error, Dollars> ExchangeEuroToDollars(Euros euros)
-        {
-            return new Right<Error, Dollars>(new Dollars() { Amount = euros.Amount * 0.8 });
-        }
-
-        private bool IWillBuyYouAPresent()
-        {
-            return true;
-        }
-        #endregion
-
     }
 
-    public class Dollars
+    public class Outcome
     {
-        public double Amount { get; set; }
+        public string message;
+
+        public Outcome(string message)
+        {
+            this.message = message;
+        }
     }
 
-    public class Euros
-    {
-        public double Amount { get; set; }
-    }
+    public class Success1 { }
 
-    public class Error
-    {
-        public Code Code { get; set; }
-    }
+    public class Success2 { }
 
-    public enum Code
-    {
-        Zero = 0,
-        Minus = -1
-    }
+    public interface IError { }
+
+    public class Error1 : IError { }
+
+    public class Error2 : IError { }
+
+    public class Error3 : IError { }
 }
