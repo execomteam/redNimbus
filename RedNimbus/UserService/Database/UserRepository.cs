@@ -80,16 +80,5 @@ namespace UserService.Database
         {
             return _mapper.Map<UserDB>(user);
         }
-
-        public void RemoveUser(string userEmail)
-        {
-            UserDB user;
-            using (context = new DatabaseContext())
-            {
-                user = context.Users.First(u => u.Email.Equals(userEmail));
-                context.Remove(user);
-                context.SaveChanges();
-            }
-        }
     }
 }
