@@ -30,12 +30,7 @@ namespace RedNimbus.API.Services
                 }
             };
 
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topic = temp.Pop();
-            NetMQFrame empty = temp.Pop();
-            temp.Push(topic);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
 
@@ -59,12 +54,7 @@ namespace RedNimbus.API.Services
                 }
             };
 
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topic = temp.Pop();
-            NetMQFrame empty = temp.Pop();
-            temp.Push(topic);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
 
