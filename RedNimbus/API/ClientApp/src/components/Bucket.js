@@ -12,6 +12,7 @@ class Bucket extends React.Component
         super(props);
 
         this.state = {
+            path: "/",
             folders: [],
             files: [],
             createModalShow: false,
@@ -35,10 +36,10 @@ class Bucket extends React.Component
         
         
         let path
-        if (typeof this.props.path === 'undefined')
+        if (typeof this.state.path === 'undefined')
             path = "http://localhost:65001/api/bucket";
         else
-            path = "http://localhost:65001/api/bucket" + this.props.path;
+            path = "http://localhost:65001/api/bucket" + this.state.path;
         
         axios.get(path, options).then(
             (resp) => this.onSuccessHandler(resp),
@@ -140,7 +141,7 @@ class Bucket extends React.Component
         };
 
 
-        this.props.changePath(newPath);
+        this.setState({ path: newPath});
         let path = "http://localhost:65001/api/bucket/post";
         
         axios.post(path, { Path: newPath }, options).then(
@@ -153,10 +154,10 @@ class Bucket extends React.Component
         const options = {
             headers: { 'token': localStorage.getItem("token") }
         };
-        let helpPath = this.props.path;
+        let helpPath = this.state.path;
         if (helpPath.slice(-1) === "/") {
-            let newPath = this.props.path + folderName + "/";
-            this.props.changePath(newPath);
+            let newPath = this.state.path + folderName + "/";
+            this.setState({ path: newPath });
             let path = "http://localhost:65001/api/bucket/post";
             axios.post(path, { Path: newPath }, options).then(
                 (resp) => this.onSuccessHandler(resp),
@@ -169,12 +170,12 @@ class Bucket extends React.Component
         return (
             <div className="container">
                 <div className="card-body">
-                    <h2 className="card-title text-left">{this.props.name+": " + this.props.path}</h2>
+                    <h2 className="card-title text-left">{this.props.name+": " + this.state.path}</h2>
                 </div>
                 <div className="row">
                     <div className="col-md-2">
                         <SideNav
-                            path={this.props.path}
+                            path={this.state.path}
 
                             changePath={this.changePath}
 
@@ -189,9 +190,9 @@ class Bucket extends React.Component
                     </div>
                     <div className="col-md-10">   
                         <br />
-                        <FolderGroup deletingBucket={this.deletingBucket} content={this.state.folders} enterFolder={this.enterFolder} path={this.props.path}/>
+                        <FolderGroup deletingBucket={this.deletingBucket} content={this.state.folders} enterFolder={this.enterFolder} path={this.state.path}/>
                         <hr/>
-                        <FileGroup deletingFile={this.deletingFile} content={this.state.files} path={this.props.path}/>
+                        <FileGroup deletingFile={this.deletingFile} content={this.state.files} path={this.state.path}/>
                     </div>
                 </div>
             </div>

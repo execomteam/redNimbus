@@ -11,8 +11,6 @@ export default class App extends React.Component{
     constructor(props) {
         super(props);
 
-        this.changePath = this.changePath.bind(this);
-
         if (localStorage.getItem('token') === null || localStorage.getItem('token') === undefined ){
             this.state = {
                 isLoggedIn: false,
@@ -20,8 +18,7 @@ export default class App extends React.Component{
                 lastName: '',
                 email: '',
                 id: '',
-                key: '',
-                path: "/"
+                key: ''
             };
         } else {
             let token = localStorage.getItem('token');
@@ -65,11 +62,7 @@ export default class App extends React.Component{
         localStorage.clear();
     }
 
-    changePath(newPath){
-        this.setState({
-            path: newPath
-        });
-    }
+    
 
     render()
     {
@@ -99,7 +92,7 @@ export default class App extends React.Component{
                         </Navbar.Collapse>
                     </Navbar>
                     
-                        <Routes changeState={this.changeState} user={this.state} signOut={this.signOut} changePath={this.changePath} path={this.state.path}/>
+                        <Routes changeState={this.changeState} user={this.state} signOut={this.signOut} />
                     </div>
                 </Router>
             );
