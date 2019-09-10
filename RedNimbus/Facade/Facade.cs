@@ -75,11 +75,13 @@ namespace RedNimbus.Facade
             NetMQFrame idFrame = message[0];
             NetMQFrame topicFrame = message[2];
             NetMQFrame dataFrame = message[3];
+            NetMQFrame byteFrame = message[4];
 
             NetMQMessage dealerMessage = new NetMQMessage();
             dealerMessage.Append(topicFrame);
             dealerMessage.Append(idFrame);
             dealerMessage.Append(dataFrame);
+            dealerMessage.Append(byteFrame);
 
             return dealerMessage;
         }
@@ -97,12 +99,13 @@ namespace RedNimbus.Facade
             NetMQFrame topicFrame = message[0];
             NetMQFrame idFrame = message[1];
             NetMQFrame dataFrame = message[2];
+            NetMQFrame byteFrame = message[3];
 
             routerMessage.Append(idFrame);
             routerMessage.AppendEmptyFrame();
             routerMessage.Append(topicFrame);
-            routerMessage.AppendEmptyFrame();
             routerMessage.Append(dataFrame);
+            routerMessage.Append(byteFrame);
 
             return routerMessage;
         }
@@ -128,7 +131,5 @@ namespace RedNimbus.Facade
         {
             _routerSocket.SendMultipartMessage(ToRouterMessage(message));
         }
-
-       
     }
 }

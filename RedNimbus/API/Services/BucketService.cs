@@ -22,7 +22,6 @@ namespace RedNimbus.API.Services
 {
     public class BucketService : BaseService
     {
-
         //Get user Buckets
         public Either<IError, List<string>> Get(string token)
         {
@@ -35,16 +34,10 @@ namespace RedNimbus.API.Services
                 }
             };
 
-
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
-             
+
             if (responseTopic.Equals("Response"))
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
@@ -68,16 +61,9 @@ namespace RedNimbus.API.Services
                 }
             };
 
-
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
-
 
             if (responseTopic.Equals("Response"))
             {
@@ -117,13 +103,7 @@ namespace RedNimbus.API.Services
                 };
             }
 
-
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
 
@@ -136,7 +116,6 @@ namespace RedNimbus.API.Services
             }
 
             return new Left<IError, StringDto>(GetError(response));
-
         }
 
         public Either<IError, StringDto> DeleteBucket(string token, StringDto bucketName)
@@ -150,16 +129,9 @@ namespace RedNimbus.API.Services
                 }
             };
 
-
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
-
 
             if (responseTopic.Equals("Response"))
             {
@@ -169,7 +141,6 @@ namespace RedNimbus.API.Services
             }
 
             return new Left<IError, StringDto>(GetError(response));
-
         }
         
         public Either<IError, UploadFileDto> UploadFile(string token, UploadFileDto uploadFile)
