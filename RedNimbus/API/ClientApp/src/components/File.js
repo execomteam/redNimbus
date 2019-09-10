@@ -1,6 +1,8 @@
 ﻿import React from 'react';
 import { Button } from "react-bootstrap";
 import axios from 'axios';
+import { saveAs } from 'file-saver';
+
 
 class File extends React.Component {
     constructor(props) {
@@ -44,7 +46,7 @@ class File extends React.Component {
     }
 
     onSuccessHandlerForDownload(resp) {
-        download(this.props.name, resp.data.value);
+        saveAs(resp.data.value, this.props.name);
     }
 
     render() {
@@ -73,19 +75,6 @@ class File extends React.Component {
             </div>
         );
     }
-}
-
-function download(filename, value) {
-    var element = document.createElement('a');
-    element.setAttribute('href', value);
-    element.setAttribute('download', filename);
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
 }
 
 export default File;
