@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.IO.Compression;
 
 namespace RedNimbus.LambdaService
 {
@@ -8,6 +8,13 @@ namespace RedNimbus.LambdaService
     {
         public static void UnzipSource()
         {
+            string sourcePath = @".\test.zip";
+            string targetPath = @".\";
+
+            targetPath = Path.GetFullPath(targetPath);
+
+
+
             throw new NotImplementedException();
         }
 
