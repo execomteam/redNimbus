@@ -6,7 +6,15 @@ class CreateLambda extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            file: null
+        }
+
         this.createLambda = this.createLambda.bind(this);
+
+        this.onChange = this.onChange.bind(this);
+
     }
 
     createLambda(event) {
@@ -21,11 +29,21 @@ class CreateLambda extends React.Component {
         var runtime = document.getElementById("runtime").value;
         var trigger = document.getElementById("trigger").value;
 
-        axios.post("http://localhost:65001/api/lambda/createLambda", { Name: lambdaName, Runtime: runtime, Trigger: trigger }, options).then(
-            (resp) => this.onSuccessHandler(resp),
-            (resp) => this.onErrorHandler(resp)
-        );
+        var pathL = this.props.path;
+
+            let fileReader = new FileReader();
+
+            fileReader.onload = (event) => {
+                axios.post("http://localhost:65001/api/lambda/createLambda", { "File": event.target.result, "Path": this.props.path, "Value": this.state.file.name, "Name": lambdaName, "Runtime": runtime, "Trigger": trigger }, options).then(
+                    (resp) => this.onSuccessHandler(resp),
+                    (resp) => this.onErrorHandler(resp)
+                );
+
+            
+            fileReader.readAsDataURL(this.state.file);
+        }
     }
+
 
     onErrorHandler(resp) {
         alert(resp.response.data);
@@ -72,7 +90,13 @@ class CreateLambda extends React.Component {
                                     <option value="GET">GET</option>
                                     <option value="POST">POST</option>
                                 </select>
+                                <br />
+                                <div>
+                                    <label>Select File</label>
+                                    <input type="file" name="file" id="file" onChange={this.onChange} />
+                                </div>
                             </div>
+                            <hr/>
                             <Button type="submit">Create</Button>
                             <Button onClick={() => this.props.onHide(false)}>Close</Button>
                         </form>
