@@ -77,6 +77,10 @@ export default class App extends React.Component{
                             <LinkContainer to="/bucket">
                                 <NavItem>Bucket</NavItem>
                             </LinkContainer>
+                            <LinkContainer to="/lambda">
+                                <NavItem>Lambda</NavItem>
+                            </LinkContainer>
+
                         </Nav>
                         <Navbar.Collapse>
                             <Nav pullRight>
