@@ -21,19 +21,22 @@ class UploadFile extends React.Component {
                 'token': localStorage.getItem("token")                                             
             }
         };
-
-        let fileReader = new FileReader();
-
-        fileReader.onload = (event) => {
-            axios.post("http://localhost:65001/api/bucket/uploadFile", { "File": event.target.result, "Path": this.props.path, "Value": this.state.file.name}, options).then(
-                (resp) => this.onSuccessHandler(resp),
-                (resp) => this.onErrorHandler(resp)
-            );
-
+        
+        if(this.state.file == null){
+            alert("You must choose file before upload.");
+        }else{
+            let fileReader = new FileReader();
+    
+            fileReader.onload = (event) => {
+                axios.post("http://localhost:65001/api/bucket/uploadFile", { "File": event.target.result, "Path": this.props.path, "Value": this.state.file.name}, options).then(
+                    (resp) => this.onSuccessHandler(resp),
+                    (resp) => this.onErrorHandler(resp)
+                );
+            
+            }
+            fileReader.readAsDataURL(this.state.file);
         }
 
-        fileReader.readAsDataURL(this.state.file);
-        
 
     }
 

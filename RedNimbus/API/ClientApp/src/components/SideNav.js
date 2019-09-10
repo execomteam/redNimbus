@@ -21,7 +21,11 @@ class SideNav extends React.Component{
         }
     }
 
-    render(){
+    render() {
+        var type = "folder"
+        if (this.props.path == "/")
+            type = "bucket";
+
         return (
             <div>
                 <div>
@@ -29,12 +33,13 @@ class SideNav extends React.Component{
                 </div>
 
                 <div>
-                <CreateNewBucket
-                    addNewBucket={this.props.addNewBucket}
-                    show={this.props.createModalShow}
-                    onHide={this.props.setCreateModalShow}
-                    path={this.props.path}
-                />
+                    <CreateNewBucket
+                        type={type}
+                        addNewBucket={this.props.addNewBucket}
+                        show={this.props.createModalShow}
+                        onHide={this.props.setCreateModalShow}
+                        path={this.props.path}
+                    />
                 </div>
                 <div>
                     <UploadFile
@@ -45,8 +50,6 @@ class SideNav extends React.Component{
                     />
                 </div>
             </div>
-
-                
         );
     }
 }

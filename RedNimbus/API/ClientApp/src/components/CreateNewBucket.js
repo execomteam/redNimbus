@@ -38,7 +38,7 @@ class CreateNewBucket extends React.Component {
         return (
             <div>
                 <Button variant="primary" onClick={()=>this.props.onHide(true)}>
-                    Create new bucket
+                    Create new {this.props.type}
                 </Button>
                 <Modal
                 show={this.props.show}
@@ -48,7 +48,7 @@ class CreateNewBucket extends React.Component {
                 >
                     <Modal.Header closeButton>
                         <Modal.Title id="contained-modal-title-vcenter">
-                        New Bucket
+                            New {this.props.type}
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>

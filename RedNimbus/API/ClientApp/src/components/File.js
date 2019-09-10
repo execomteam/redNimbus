@@ -28,10 +28,10 @@ class File extends React.Component {
 
     onSuccessHandler(resp) {
         this.props.deletingFile(resp.data);
-       
+        
     }
 
-    downloadFile(event) {
+    async downloadFile(event) {
         event.preventDefault();
         const options = {
             headers: { 'token': localStorage.getItem("token") }

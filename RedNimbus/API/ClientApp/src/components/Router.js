@@ -15,7 +15,7 @@ class Routes extends React.Component {
     render(){
             return (<Switch>
                 <Route exact path="/" render={(props) => <Home user={this.props.user} />} />
-                <Route path="/bucket" render={(props) => <Bucket changePath={this.props.changePath} path={this.props.path} />} />
+                <Route path="/bucket" render={(props) => <Bucket changePath={this.props.changePath} path={this.props.path} name={this.props.user.firstName} />} />
                 <Route path="/signout" render={(props) => <SignOut signOut={this.props.signOut} />} />
                 <Route path="/login" render={(props) => <LoginForm changeState={this.props.changeState} />} />
                 <Route path="/register" render={(props) => <RegistrationForm />} />

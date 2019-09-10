@@ -44,8 +44,7 @@ namespace RedNimbus.API.Services
             NetMQMessage response = RequestSocketFactory.SendRequest(temp);
 
             string responseTopic = response.First.ConvertToString();
-
-
+             
             if (responseTopic.Equals("Response"))
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
@@ -282,7 +281,39 @@ namespace RedNimbus.API.Services
         {
             string extension = Path.GetExtension(name);
 
-            return "data:text/plain";
+            return "data:" + GetContentType(name);
+        }
+
+        private static string GetContentType(string path)
+        {
+            var types = GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            if(types.ContainsKey(ext))
+                return types[ext];
+            return "";
+        }
+
+
+        private static Dictionary<string, string> GetMimeTypes()
+        {
+            return new Dictionary<string, string>
+            {
+                {".txt", "text/plain"},
+                {".pdf", "application/pdf"},
+                {".doc", "application/vnd.ms-word"},
+                {".docx", "application/vnd.ms-word"},
+                {".xls", "application/vnd.ms-excel"},
+                {".xlsx", "application/vnd.openxmlformats  officedocument.spreadsheetml.sheet"},  
+                {".png", "image/png"},
+                {".jpg", "image/jpeg"},
+                {".jpeg", "image/jpeg"},
+                {".gif", "image/gif"},
+                {".csv", "text/csv"},
+                {".exe", "application/vnd.microsoft.portable-executable"},
+                {".xsd", "application/xml"},
+                {".rar", "application/x-rar-compressed"},
+                {".zip", "application/zip"}
+            };
         }
 
     }

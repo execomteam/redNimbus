@@ -104,9 +104,17 @@ class Bucket extends React.Component
     }
 
     uploadFile(file) {
-        this.setState(prevState => ({
-            files: [...prevState.files, file.value]
-        }));
+        let arr = this.state.files;
+        let found = false;
+        for (var i = 0; i < arr.length && !found; i++) {
+            found = (arr[i] === file.value);
+        }
+
+        if (!found) {
+            this.setState(prevState => ({
+                files: [...prevState.files, file.value]
+            }));
+        }
     }
 
     setCreateModalShow(value){
@@ -160,6 +168,9 @@ class Bucket extends React.Component
     render() {
         return (
             <div className="container">
+                <div className="card-body">
+                    <h2 className="card-title text-left">{this.props.name+": " + this.props.path}</h2>
+                </div>
                 <div className="row">
                     <div className="col-md-2">
                         <SideNav

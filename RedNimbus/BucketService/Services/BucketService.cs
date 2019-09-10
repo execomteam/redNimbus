@@ -220,6 +220,11 @@ namespace RedNimbus.BucketService.Services
                 {
                     FileSystemService.CreateFolder(HomePath(msg.Data.Token));
                 }
+                if (fileAsByteArray.Length > 350000000)
+                {
+                    SendErrorMessage("File size limit exceed.", Either.Enums.ErrorCode.PutFileError, msg.Id);
+                    return;
+                }
                 msg.Data.Successful = FileSystemService.ByteArrayToFile(absolutePath, fileAsByteArray);
             }
 
