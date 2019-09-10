@@ -54,6 +54,12 @@ class CreateLambda extends React.Component {
         this.props.onHide();
     }
 
+    onChange(e) {
+        e.preventDefault();
+        this.setState({ file: e.target.files[0] })
+    }
+
+
     render() {
         return (
             <div>
