@@ -19,7 +19,7 @@ class RegistrationForm extends React.Component{
             errorLastName: '',
             errorPassword: '',
             errorRepeatedPassword: '',
-            errorPhonePassword: '',
+            errorPhoneNumber: '',
             errorUnknown: '',
             tosCheckbox: false
         };
@@ -57,67 +57,81 @@ class RegistrationForm extends React.Component{
                     errorLastName: '',
                     errorEmail: '',
                     errorPassword: '',
-                    errorRepeatedPassword: ''
+                    errorRepeatedPassword: '',
+                    errorPhoneNumber: ''
                 });
-            var isError = false;
-            if (self.state.password !== self.state.repeatedPassword) {
-                self.setState({
-                    errorPassword: 'Passwords do not match'
-                });
-                return;
-            }
-            if (self.state.password == null || self.state.password.trim() === '') {
-                self.setState({
-                    errorPassword: 'Passwords can not be empty',
-                });
-                return;
-
-            }
-            if (self.state.repeatedPassword == null || self.state.repeatedPassword.trim() === '') {
-                self.setState({
-                    errorRepeatedPassword: 'Passwords can not be empty',
-                });
-                return;
-            }
-            if (self.state.firstName == null || self.state.firstName.trim() === '') //check null empty or whitespace
-            {
-                self.setState({
-                    errorFirstName: 'Firstname can not be empty'
-                });
-                return;
-            }
-            if (self.state.lastName == null || self.state.lastName.trim() === '')
-            {
-                self.setState({
-                    errorLastName: 'Lastname can not be empty'
-                });
-                return;
-            }
-            if (self.state.email == null || self.state.email.trim() === '') {
-                self.setState({
-                    errorEmail: 'Email must be in following format: example@provier.domain'
-                });
-                return;
-            } else {
-                var parts = self.state.email.split('@');
-                if (parts.length == 2) {
-                    var rightParts = parts[1].split('.');
-                    if (rightParts.length != 2) {
+                var isError = false;
+                if (self.state.password !== self.state.repeatedPassword) {
+                    self.setState({
+                        errorPassword: 'Passwords do not match',
+                        errorRepeatedPassword: 'Passwords do not match'
+                    });
+                    isError = true;
+                
+                }
+                if (self.state.password == null || self.state.password.trim() === '') {
+                    self.setState({
+                        errorPassword: 'Passwords can not be empty',
+                    });
+                    isError = true;
+                }
+                if (self.state.repeatedPassword == null || self.state.repeatedPassword.trim() === '') {
+                    self.setState({
+                        errorRepeatedPassword: 'Passwords can not be empty',
+                    });
+                    isError = true;
+                }
+                if (self.state.firstName == null || self.state.firstName.trim() === '') //check null empty or whitespace
+                {
+                    self.setState({
+                        errorFirstName: 'Firstname can not be empty'
+                    });
+                    isError = true;
+                }
+                if (self.state.lastName == null || self.state.lastName.trim() === '')
+                {
+                    self.setState({
+                        errorLastName: 'Lastname can not be empty'
+                    });
+                    isError = true;
+                }
+                if (self.state.email == null || self.state.email.trim() === '') {
+                    self.setState({
+                        errorEmail: 'Email must be in following format: example@provier.domain'
+                    });
+                    isError = true;
+                } else {
+                    var parts = self.state.email.split('@');
+                    if (parts.length == 2) {
+                        var rightParts = parts[1].split('.');
+                        if (rightParts.length != 2) {
+                            self.setState({
+                                errorEmailName: 'Email must be in following format: example@provicer.domain'
+                            });
+                            isError = true;
+                        }
+                    }
+                    else {
                         self.setState({
                             errorEmailName: 'Email must be in following format: example@provicer.domain'
                         });
-                        return;
+                        isError = true;
                     }
                 }
-                else {
-                    self.setState({
-                        errorEmailName: 'Email must be in following format: example@provicer.domain'
-                    });
-                    return;
+                
+                if (!(self.state.phoneNumber == null || self.state.phoneNumber.trim() === ''))
+                {
+                    if (!/^\d+$/.test(self.state.phoneNumber)) {
+                        self.setState({
+                            errorPhoneNumber: 'PhoneNumber can contain only numbers'
+                        });
+                        isError = true;
+                    }
                 }
-            }
 
-            self.SendRegisterRequest();
+                if (!isError) {
+                    self.SendRegisterRequest();
+                }
             
         });
     }
@@ -183,7 +197,7 @@ class RegistrationForm extends React.Component{
                 self.props.history.push("/login");
             },
             (response) => {
-                self.handleError(response)
+                self.handleError(response);
             }
         );
 

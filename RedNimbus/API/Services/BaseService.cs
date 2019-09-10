@@ -26,6 +26,7 @@ namespace RedNimbus.API.Services
                 case Either.Enums.ErrorCode.PasswordWrongFormat:
                 case Either.Enums.ErrorCode.EmailAlreadyUsed:
                 case Either.Enums.ErrorCode.PasswordsDoNotMatch:
+                case Either.Enums.ErrorCode.PhoneNumberWrongFormat:
                 //Bucket service:
                 case Either.Enums.ErrorCode.NumberOfBucketsExeeded:
                     return new FormatError(errorMessage.Data.MessageText, errorCode);

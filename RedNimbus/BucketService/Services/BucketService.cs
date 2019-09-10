@@ -45,10 +45,6 @@ namespace RedNimbus.BucketService.Services
             }
             else
             {
-                if (!Directory.Exists(HomePath(msg.Data.Token)))
-                {
-                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
-                }
                 msg.Data.Successful = FileSystemService.DeleteFolder(absolutePath);
             }
 
@@ -184,10 +180,6 @@ namespace RedNimbus.BucketService.Services
             }
             else
             {
-                if (!Directory.Exists(HomePath(msg.Data.Token)))
-                {
-                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
-                }
                 msg.Data.Successful = FileSystemService.DeleteFolder(absolutePath);
             }
 
@@ -284,10 +276,6 @@ namespace RedNimbus.BucketService.Services
             }
             else
             {
-                if (!Directory.Exists(HomePath(msg.Data.Token)))
-                {
-                    FileSystemService.CreateFolder(HomePath(msg.Data.Token));
-                }
                 msg.Data.Successful = FileSystemService.DeleteFile(absolutePath);
             }
             
