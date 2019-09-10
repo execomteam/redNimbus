@@ -1,4 +1,5 @@
-﻿using NetMQ;
+﻿using DTO;
+using NetMQ;
 using RedNimbus.API.Helper;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.Communication;
@@ -14,18 +15,6 @@ namespace RedNimbus.API.Services
 {
     public class LambdaService : BaseService, ILambdaService
     {
-        public CreateLambdaDto LambdaMessageToDto(LambdaMessage message)
-        {
-            return new CreateLambdaDto
-            {
-                Name = message.Name,
-                Trigger = message.Trigger,
-                Runtime = message.Runtime,
-                OwnerToken = message.OwnerId,
-                ImageId = message.ImageId,
-                Guid = message.Guid
-            };
-        }
         public Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createlambda)
         {
             Message<LambdaMessage> message = new Message<LambdaMessage>("CreateLambda")
@@ -53,20 +42,20 @@ namespace RedNimbus.API.Services
             if (responseTopic == "Response")
             {
                 Message<LambdaMessage> successMessage = new Message<LambdaMessage>(response);
-                return new Right<IError, CreateLambdaDto>(LambdaMessageToDto(successMessage.Data));
+                return new Right<IError, CreateLambdaDto>(LambdaConverter.LambdaMessageToDto(successMessage.Data));
             }
 
             return new Left<IError, CreateLambdaDto>(GetError(response));
         }
 
-       /* public Either<IError, string> GetLambda(string path, string token)
+        public Either<IError, string> GetLambda(string lambdaId, string token)
         {
-            Message<LambdaMessage> message = new Message<LambdaMessage>("lambda/get")
+            Message<GetLambdaMessage> message = new Message<GetLambdaMessage>("GetLambda")
             {
-                Data = new LambdaMessage()
+                Data = new GetLambdaMessage()
                 {
-
-
+                    Token = token,
+                    LambdaId = lambdaId
                 }
             };
 
@@ -76,32 +65,16 @@ namespace RedNimbus.API.Services
             temp.Push(topic);
 
             NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+
             string responseTopic = response.First.ConvertToString();
 
-            if (responseTopic.Equals("Response"))
+            if (responseTopic == "Response")
             {
-                Message<LambdaMessage> successMessage = new Message<LambdaMessage>(response);
-                return successMessage.Data;
-                
+                Message<GetLambdaMessage> successMessage = new Message<GetLambdaMessage>(response);
+                return successMessage.Data.Result;
             }
-            return GetError(response);
-        }*/
-    }
-    public class CreateLambdaDto
-    {
-        public string Name { get; set; }
-
-        public LambdaMessage.Types.TriggerType Trigger { get; set; }
-
-        public LambdaMessage.Types.RuntimeType Runtime { get; set; }
-
-        public string OwnerToken { get; set; }
-
-        public string ImageId { get; set; }
-
-        public string Guid { get; set; }
-
-        public byte[] File { get; set; }
-
+            
+            return new Left<IError, string>(GetError(response));
+        }
     }
 }
