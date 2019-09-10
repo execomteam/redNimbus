@@ -1,5 +1,6 @@
 ﻿using NetMQ;
 using RedNimbus.Communication;
+using RedNimbus.Messages;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,6 +16,7 @@ namespace RedNimbus.LambdaService
 
         private void HandleCreateLambda(NetMQMessage obj)
         {
+            Message<LambdaMessage> message = new Message<LambdaMessage>(obj);
             throw new NotImplementedException();
         }
     }

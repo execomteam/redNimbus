@@ -6,25 +6,27 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RedNimbus.API.Controllers;
 using RedNimbus.API.Services;
+using RedNimbus.API.Services.Interfaces;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/lambda")]
     [ApiController]
     public class LambdaController : BaseController
     {
-        public LambdaService _lambdaService;
-        public LambdaController(LambdaService lambdaService)
+        public ILambdaService _lambdaService;
+        public LambdaController(ILambdaService lambdaService)
         {
             _lambdaService = lambdaService;
         }
 
-        [HttpGet]
-        public IActionResult Get()
+        //call with ...api/lambda/create
+        [HttpPost("create")]
+        public IActionResult Create(CreateLambdaDto dto)
         {
-            return _lambdaService.GetLambda()
+            return _lambdaService.CreateLambda(dto)
                 .Map(() => AllOk())
                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
