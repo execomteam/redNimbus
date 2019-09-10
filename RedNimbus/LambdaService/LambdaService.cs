@@ -18,13 +18,17 @@ namespace RedNimbus.LambdaService
         private void HandleCreateLambda(NetMQMessage obj)
         {
             Message<LambdaMessage> message = new Message<LambdaMessage>(obj);
-            throw new NotImplementedException();
+            message.Topic = "Response";
+            SendMessage(message.ToNetMQMessage());
+            //throw new NotImplementedException();
         }
 
         private void HandleGetLambda(NetMQMessage obj)
         {
             Message<GetLambdaMessage> message = new Message<GetLambdaMessage>(obj);
-            throw new NotImplementedException();
+            message.Topic = "Response";
+            SendMessage(message.ToNetMQMessage());
+            //throw new NotImplementedException();
         }
     }
 }
