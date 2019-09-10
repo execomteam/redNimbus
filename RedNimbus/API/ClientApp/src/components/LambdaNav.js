@@ -11,6 +11,7 @@ class LambdaNav extends React.Component {
                     addLambda={this.props.addLambda}
                     show={this.props.createModalShow}
                     onHide={this.props.setCreateModalShow}
+                    path={this.props.path}
                 />
             </div>
         );

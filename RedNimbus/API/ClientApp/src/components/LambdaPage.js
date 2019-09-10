@@ -16,11 +16,13 @@ class LambdaPage extends React.Component {
         this.setCreateModalShow = this.setCreateModalShow.bind(this);
         this.addLambda = this.addLambda.bind(this);
 
+        let path = "http://localhost:65001/api/lambda";
+
         const options = {
             headers: { 'token': localStorage.getItem("token") }
         };
 
-        axios.get("http://localhost:65001/api/lambda", options).then(
+        axios.get(path, options).then(
             (resp) => this.onSuccessHandler(resp),
             (resp) => this.onErrorHandler(resp)
         );
@@ -31,9 +33,17 @@ class LambdaPage extends React.Component {
     }
 
     addLambda(lambda) {
-        this.setState(prevState => ({
-            lambdas: [...prevState.lambdas, lambda.value]
-        }));
+        let arr = this.state.lambdas;
+        let found = false;
+        for (var i = 0; i < arr.length && !found; i++) {
+            found = (arr[i] === lambda.value);
+        }
+
+        if (!found) {
+            this.setState(prevState => ({
+                lambdas: [...prevState.lambdas, lambda.value]
+            }));
+        }
     }
 
     onSuccessHandler(resp) {
@@ -63,11 +73,17 @@ class LambdaPage extends React.Component {
             <div className="container">
                 <div className="row">
                     <div className="col-md-2">
-                        <LambdaNav addLambda={this.addLambda} createModalShow={this.state.createModalShow} setCreateModalShow={this.setCreateModalShow} onClick={this.onClickeCreateLambda} />
+                        <LambdaNav
+                            path={this.props.path}
+
+                            addLambda={this.addLambda}
+                            createModalShow={this.state.createModalShow}
+                            setCreateModalShow={this.setCreateModalShow}
+                        />
                     </div>
                     <div className="col-md-10">
                         <br />
-                        <LambdaGroup content={this.state.lambdas} />
+                        <LambdaGroup content={this.state.lambdas} path={this.props.path} />
                     </div>
                 </div>
             </div>

@@ -11,7 +11,7 @@ class LambdaGroup extends React.Component {
             <div className="card-group">
                 {
                     this.props.content.map((value, index) => {
-                        return <Lambda key={index} name={value} />
+                        return <Lambda key={index} name={value} path={this.props.path} />
                     })
                 }
             </div>
