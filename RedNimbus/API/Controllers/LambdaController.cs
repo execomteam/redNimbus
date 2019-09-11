@@ -15,6 +15,7 @@ namespace API.Controllers
 {
     [Route("api/lambda")]
     [ApiController]
+    [System.Runtime.InteropServices.Guid("13CFBDF0-499A-40A8-966F-F74B38407A24")]
     public class LambdaController : BaseController
     {
         public ILambdaService _lambdaService;
@@ -44,5 +45,13 @@ namespace API.Controllers
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
         }
+
+        [HttpGet]
+        public IActionResult Get() =>
+            _lambdaService.GetUserLambda(Request.Headers["token"])
+                .Map((x) => AllOk(x))
+                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+
     }
 }

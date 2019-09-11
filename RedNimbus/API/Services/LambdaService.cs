@@ -66,5 +66,10 @@ namespace RedNimbus.API.Services
             
             return new Left<IError, string>(GetError(response));
         }
+
+        public Either<IError, string> GetUserLambda(string token)
+        {
+            return "pogodio";
+        }
     }
 }
