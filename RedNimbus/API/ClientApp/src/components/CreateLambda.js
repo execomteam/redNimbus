@@ -26,20 +26,23 @@ class CreateLambda extends React.Component {
             headers: { 'token': localStorage.getItem("token") }
         };
 
+
+
         var lambdaName = document.getElementById("lambdaName").value;
         var runtime = document.getElementById("runtime").value;
         var trigger = document.getElementById("trigger").value;
 
+        var formData = new FormData();
 
-        var pathL = this.props.path;
+        formData.append('file', this.state.file);
+        formData.append('Name', lambdaName);
+        formData.append('Runtime', runtime);
+        formData.append('Trigger', trigger);
 
-        let fileReader = new FileReader();
-
-
-        axios.post("http://localhost:65001/api/lambda/create", {"Name": lambdaName, "Runtime": runtime == ".NET Core" ? 0 : 1, "Trigger": trigger == "GET" ? 0 : 1 }, options).then(
+        axios.post("http://localhost:65001/api/lambda/create", formData , options).then(
             (resp) => this.onSuccessHandler(resp),
             (resp) => this.onErrorHandler(resp)
-                );
+        );
 
       
     }
@@ -50,13 +53,16 @@ class CreateLambda extends React.Component {
     }
 
     onSuccessHandler(resp) {
-        this.props.addLambda(resp.data.Name);
+        this.props.addLambda(resp.data.name);
         this.props.onHide();
     }
 
     onChange(e) {
         e.preventDefault();
         this.setState({ file: e.target.files[0] })
+     
+
+        
     }
 
 
@@ -78,7 +84,7 @@ class CreateLambda extends React.Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <form onSubmit={this.createLambda}>
+                        <form onSubmit={this.createLambda} id="lambdaForm">
                             <div className="form-group">
                                 <input type="text"
                                     className="form-control form-control-sm"
@@ -89,7 +95,7 @@ class CreateLambda extends React.Component {
                                 />
                                 <br/>
                                 <select id="runtime" name="runtime" className="form-control form-control-sm" required>
-                                    <option value=".NET Core">.NET Core</option>
+                                    <option value="CSHARP">.NET Core</option>
                                 </select>
                                 <br />
                                 <select id="trigger" name="trigger" className="form-control form-control-sm" required>
