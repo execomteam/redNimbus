@@ -135,9 +135,7 @@ namespace RedNimbus.API.Services
 
             if (responseTopic.Equals("Response"))
             {
-                Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
-
-                return new Right<IError, StringDto>(bucketName);
+                 return new Right<IError, StringDto>(bucketName);
             }
 
             return new Left<IError, StringDto>(GetError(response));
@@ -170,8 +168,6 @@ namespace RedNimbus.API.Services
 
             if (responseTopic.Equals("Response"))
             {
-                Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
-
                 return new Right<IError, UploadFileDto>(uploadFile);
             }
 
@@ -198,9 +194,7 @@ namespace RedNimbus.API.Services
 
             if (responseTopic.Equals("Response"))
             {
-                Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
-
-                return new Right<IError, StringDto>(fileName);
+                 return new Right<IError, StringDto>(fileName);
             }
 
             return new Left<IError, StringDto>(GetError(response));
@@ -239,13 +233,7 @@ namespace RedNimbus.API.Services
 
         }
 
-        public static string Translate(string name)
-        {
-            string extension = Path.GetExtension(name);
-
-            return "data:" + GetContentType(name);
-        }
-
+        
         private static string GetContentType(string path)
         {
             var types = GetMimeTypes();

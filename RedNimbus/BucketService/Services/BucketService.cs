@@ -16,12 +16,14 @@ namespace RedNimbus.BucketService.Services
     public class BucketService : BaseService
     {
         private string _path;
+        private int _maxFileSize;
         private ITokenManager _tokenManager;
 
-        public BucketService(string path, ITokenManager manager) : base()
+        public BucketService(string path, ITokenManager manager, int maxFileSize) : base()
         {
             _path = path;
             _tokenManager = manager;
+            _maxFileSize = maxFileSize;
 
             Subscribe("bucket/createBucket", CreateBucket);
             Subscribe("bucket/deleteBucket", DeleteBucket);
@@ -212,7 +214,7 @@ namespace RedNimbus.BucketService.Services
                 {
                     FileSystemService.CreateFolder(HomePath(msg.Data.Token));
                 }
-                if (fileAsByteArray.Length > 350000000)
+                if (fileAsByteArray.Length > _maxFileSize)
                 {
                     SendErrorMessage("File size limit exceed.", Either.Enums.ErrorCode.PutFileError, msg.Id);
                     return;
