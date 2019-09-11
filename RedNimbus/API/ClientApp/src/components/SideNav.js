@@ -26,6 +26,23 @@ class SideNav extends React.Component{
         if (this.props.path == "/")
             type = "bucket";
 
+        if (this.props.path == "/") {
+            return (
+                <div>
+                    <div>
+                        <CreateNewBucket
+                            type={type}
+                            addNewBucket={this.props.addNewBucket}
+                            show={this.props.createModalShow}
+                            onHide={this.props.setCreateModalShow}
+                            path={this.props.path}
+                        />
+                    </div>
+                </div>
+            );
+
+        }
+
         return (
             <div>
                 <div>
