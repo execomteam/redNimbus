@@ -143,7 +143,6 @@ namespace RedNimbus.API.Services
         
         public Either<IError, UploadFileDto> UploadFile(string token, UploadFileDto uploadFile)
         {
-            //string[] decodeHelp = uploadFile.File.Split(",");
             if(uploadFile.Path.Equals("/"))
                 return new Left<IError, UploadFileDto>(new FormatError("You must be in bucket to upload file.", Either.Enums.ErrorCode.PutFileError));
             Message<BucketMessage> message;
