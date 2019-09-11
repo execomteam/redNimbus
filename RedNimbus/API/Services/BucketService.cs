@@ -145,20 +145,24 @@ namespace RedNimbus.API.Services
         
         public Either<IError, UploadFileDto> UploadFile(string token, UploadFileDto uploadFile)
         {
-            string[] decodeHelp = uploadFile.File.Split(",");
+            //string[] decodeHelp = uploadFile.File.Split(",");
             if(uploadFile.Path.Equals("/"))
                 return new Left<IError, UploadFileDto>(new FormatError("You must be in bucket to upload file.", Either.Enums.ErrorCode.PutFileError));
+            Message<BucketMessage> message;
 
-            Message<BucketMessage> message = new Message<BucketMessage>("bucket/putFile")
+            using (Stream stream = new MemoryStream())
             {
-                Data = new BucketMessage()
+                uploadFile.File.CopyTo(stream);
+                message = new Message<BucketMessage>("bucket/putFile")
                 {
-                    Token = token,
-                    Path = uploadFile.Path + uploadFile.Value
-                },
-                Bytes = new NetMQFrame(System.Convert.FromBase64String(decodeHelp[1]))
-            };
-
+                    Data = new BucketMessage()
+                    {
+                        Token = token,
+                        Path = uploadFile.Path + uploadFile.Value
+                    },
+                    Bytes = new NetMQFrame(stream.ToByteArray())
+                };
+            }
             NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
             
             string responseTopic = response.First.ConvertToString();

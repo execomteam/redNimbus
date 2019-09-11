@@ -57,9 +57,11 @@ namespace RedNimbus.API.Controllers
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         
+
+
         [HttpPost("uploadFile")]
-        [RequestSizeLimit(100000000)]
-        public IActionResult UploadFile([FromBody]UploadFileDto uploadFile) =>
+        [DisableRequestSizeLimit]
+        public IActionResult UploadFile([FromForm]UploadFileDto uploadFile) =>
             _bucketService.UploadFile(Request.Headers["token"], uploadFile)
                 .Map((x) => AllOk(x))
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)

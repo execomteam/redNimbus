@@ -33,7 +33,7 @@ class File extends React.Component {
         
     }
 
-    async downloadFile(event) {
+    downloadFile(event) {
         event.preventDefault();
         const options = {
             headers: { 'token': localStorage.getItem("token") }

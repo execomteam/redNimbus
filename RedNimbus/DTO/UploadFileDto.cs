@@ -7,7 +7,7 @@ namespace DTO
 {
     public class UploadFileDto
     {
-        public string File { get; set; }
+        public IFormFile File { get; set; }
         public string Path { get; set; }
         public string Value { get; set; }
     }

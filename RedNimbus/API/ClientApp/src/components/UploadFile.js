@@ -13,33 +13,29 @@ class UploadFile extends React.Component {
         this.onSuccessHandler = this.onSuccessHandler.bind(this);
         this.onErrorHandler = this.onErrorHandler.bind(this);
     }
+
+
     
+
     onFormSubmit(e) {
-        e.preventDefault(); 
-        const options = {
-            headers: {
-                'token': localStorage.getItem("token")                                             
-            }
-        };
-        
-        if(this.state.file == null){
+        e.preventDefault();
+        if (this.state.file == null) {
             alert("You must choose file before upload.");
-        }else{
-            let fileReader = new FileReader();
-    
-            fileReader.onload = (event) => {
-                axios.post("http://localhost:65001/api/bucket/uploadFile", { "File": event.target.result, "Path": this.props.path, "Value": this.state.file.name}, options).then(
-                    (resp) => this.onSuccessHandler(resp),
-                    (resp) => this.onErrorHandler(resp)
-                );
-            
-            }
-            fileReader.readAsDataURL(this.state.file);
+        }else {
+            helper(this.props.path, this.state.file).then(
+                data => {
+                    axios.post("http://localhost:65001/api/bucket/uploadFile", data.formData, data.options).then(
+                        (resp) => this.onSuccessHandler(resp),
+                        (resp) => this.onErrorHandler(resp)
+                    );
+                }
+            );
+
         }
-
-
+        
     }
 
+    
     onChange(e) {
         e.preventDefault();
         let file_size = e.target.files[0].size;
@@ -95,6 +91,26 @@ class UploadFile extends React.Component {
             </div>
 
         )
+    }
+
+}
+
+async function helper(path, file) {
+    
+    const options = {
+        headers: {
+            'token': localStorage.getItem("token")
+        }
+    };
+
+    let formData = new FormData();
+    formData.append("Path", path);
+    formData.append("File", file);
+    formData.append("Value", file.name);
+
+    return {
+        formData: formData,
+        options: options
     }
 
 }
