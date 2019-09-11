@@ -10,7 +10,7 @@ namespace Either.Test
     public class MapAdapter3Tests
     {
         [Test]
-        public void When_EitherMapAdapter3Called_Expect_Right()
+        public void Map_OverSuccess1_ExpectOutcome()
         {
             //Arrange
             Either<IError, Success1> success = new Right<IError, Success1>(new Success1());
@@ -22,7 +22,7 @@ namespace Either.Test
 
 
         [Test]
-        public void When_EitherMapAdapter3Called_Expect_Left()
+        public void Map_OverError1_ExpectError()
         {
             //Arrange
             Either<IError, Success1> error = new Left<IError, Success1>(new Error1());

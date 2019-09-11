@@ -10,7 +10,7 @@ namespace Either.Test
     public class MapReduceCombinationTests
     {
         [Test]
-        public void When_CombineMapAndReduce_Expect_Ok()
+        public void MapReduceCombination_OverSuccess1_ExpectOkOutcome()
         {
             //Arrange
             Either<IError, Success1> success1 = new Right<IError, Success1>(new Success1());
@@ -29,7 +29,7 @@ namespace Either.Test
         }
 
         [Test]
-        public void When_CombineMapAndReduce_Expect_Error1()
+        public void MapReduceCombination_OverError1_ExpectError1Outcome()
         {
             //Arrange
             Either<IError, Success1> error1 = new Left<IError, Success1>(new Error1());
@@ -47,7 +47,7 @@ namespace Either.Test
         }
 
         [Test]
-        public void When_CombineMapAndReduce_Expect_Error2()
+        public void MapReduceCombination_OverError2_ExpectError2Outcome()
         {
             //Arrange
             Either<IError, Success1> error2 = new Left<IError, Success1>(new Error2());
@@ -65,7 +65,7 @@ namespace Either.Test
         }
 
         [Test]
-        public void When_CombineMapAndReduce_Expect_DefaultError()
+        public void MapReduceCombination_OverError3_ExpectDefaultErrorOutcome()
         {
             //Arrange
             Either<IError, Success1> error3 = new Left<IError, Success1>(new Error3());

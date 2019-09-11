@@ -10,7 +10,7 @@ namespace Either.Test
     public class ReduceAdapter2Tests
     {
         [Test]
-        public void When_EitherReduceAdapter2Called_Expect_Right1()
+        public void Reduce_OverOkOutcome_ExpectOkOutcome()
         {
             //Arrange
             Either<IError, Outcome> outcomeOk = new Right<IError, Outcome>(new Outcome("ok"));
@@ -18,10 +18,11 @@ namespace Either.Test
             var result = outcomeOk.Reduce(ConvertError1ToOutcome, e => e is Error1);
             //Assert
             Assert.That(result is Right<IError, Outcome>);
+            Assert.That(((Outcome)((Right<IError, Outcome>)result)).message == "ok");
         }
 
         [Test]
-        public void When_EitherReduceAdapter2Called_Expect_Right2()
+        public void Reduce_OverError1_ExpectError1Outcome()
         {
             //Arrange
             Either<IError, Outcome> outcomeErr = new Left<IError, Outcome>(new Error1());
@@ -29,10 +30,11 @@ namespace Either.Test
             var result = outcomeErr.Reduce(ConvertError1ToOutcome, e => e is Error1);
             //Assert
             Assert.That(result is Right<IError, Outcome>);
+            Assert.That(((Outcome)((Right<IError, Outcome>)result)).message == "error1");
         }
 
         [Test]
-        public void When_EitherReduceAdapter2Called_Expect_Left()
+        public void Reduce_OverError1_ExpectError1()
         {
             //Arrange
             Either<IError, Outcome> outcomeErr = new Left<IError, Outcome>(new Error1());
@@ -41,6 +43,7 @@ namespace Either.Test
             //Assert
             Assert.That(result is Left<IError, Outcome>);
         }
+
         public Outcome ConvertError1ToOutcome(IError error)
         {
             return new Outcome("error1");

@@ -10,7 +10,7 @@ namespace Either.Test
     public class ReduceAdapter1Tests
     {
         [Test]
-        public void When_EitherReduceAdapter1Called_Expect_Right()
+        public void Reduce_OverOkOutcome_ExpectOkOutcome()
         {
             //Arrange
             Either<IError, Outcome> outcomeOk = new Right<IError, Outcome>(new Outcome("ok"));
@@ -22,7 +22,7 @@ namespace Either.Test
         }
 
         [Test]
-        public void When_EitherReduceAdapter1Called_Expect_Left()
+        public void Reduce_OverError1_ExpectErrorOutcome()
         {
             //Arrange
             Either<IError, Outcome> outcomeErr = new Left<IError, Outcome>(new Error1());
