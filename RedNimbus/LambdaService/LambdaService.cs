@@ -46,7 +46,7 @@ namespace RedNimbus.LambdaService
             {
                 responseMessage.Data.Token = "";
                 responseMessage.Data.LambdaId = requestMessage.Data.LambdaId;
-                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(StatusCode.NotAuthorized, null));
+                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.NotAuthorized, null));
                 SendMessage(responseMessage.ToNetMQMessage());
             }
 
@@ -57,18 +57,17 @@ namespace RedNimbus.LambdaService
             try
             {
                 result = ExecuteLambda(requestMessage.Data.LambdaId);
-                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(StatusCode.Ok, result));
+                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.Ok, result));
             }
             catch (ArgumentException)
             {
-                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(StatusCode.LambdaUnacceptableReturnValue, null));
+                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.LambdaUnacceptableReturnValue, null));
                 
             }
             catch (Exception)
             {
-                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(StatusCode.InternalError, null));           
+                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.InternalError, null));           
             }
-
 
             SendMessage(responseMessage.ToNetMQMessage());
 
@@ -122,24 +121,5 @@ namespace RedNimbus.LambdaService
 
             return result;
         }
-    }
-
-    public class LambdaReturnValue
-    {
-        public string Data { get; private set; }
-        public StatusCode StatusCode { get; private set; }
-        public LambdaReturnValue(StatusCode statusCode, string data)
-        {
-            StatusCode = statusCode;
-            Data = data;
-        }
-    }
-
-    public enum StatusCode
-    {
-        Ok = 0,
-        LambdaUnacceptableReturnValue,
-        InternalError,
-        NotAuthorized
     }
 }
