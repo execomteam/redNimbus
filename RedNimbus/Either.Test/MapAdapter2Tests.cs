@@ -15,7 +15,7 @@ namespace Either.Test
             //Arrange
             Either<IError, Success1> success = new Right<IError, Success1>(new Success1());
             //Act
-            var result = success.Map(ReturnSuccess);
+            var result = success.Map(ReturnSuccess2Object);
             //Assert
             Assert.That(result is Right<IError, Success2>);
         }
@@ -26,12 +26,12 @@ namespace Either.Test
             //Arrange
             Either<IError, Success1> error = new Left<IError, Success1>(new Error1());
             //Act
-            var result = error.Map(ReturnSuccess);
+            var result = error.Map(ReturnSuccess2Object);
             //Assert
             Assert.That(result is Left<IError, Success2>);
         }
 
-        public Either<IError, Success2> ReturnSuccess(Success1 either)
+        public Either<IError, Success2> ReturnSuccess2Object(Success1 either)
         {
             return new Right<IError, Success2>(new Success2());
         }

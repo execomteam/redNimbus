@@ -17,8 +17,8 @@ namespace Either.Test
             //Act
             var result = success1
                 .Map(s => s)                                            //map adapter 1
-                .Map(ReturnSuccess)                                    //map adapter 2
-                .Map(() => new Outcome("ok"))                           //map adapter 3
+                .Map(ReturnSuccess)                                     //map adapter 2
+                .Map(ReturnOkOutcome)                                   //map adapter 3
                 .Reduce(ConvertError1ToOutcome, e => e is Error1)       //reduce adapter 2
                 .Reduce(ConvertError2ToOutcome, e => e is Error2)       //reduce adapter 2
                 .Reduce(ConvertDefaultErrorToOutcome);                  //reduce adapter 3
@@ -36,8 +36,8 @@ namespace Either.Test
             //Act
             var result = error1
                 .Map(s => s)                                            //map adapter 1
-                .Map(ReturnSuccess)                                    //map adapter 2
-                .Map(() => new Outcome("ok"))                           //map adapter 3
+                .Map(ReturnSuccess)                                     //map adapter 2
+                .Map(ReturnOkOutcome)                                   //map adapter 3
                 .Reduce(ConvertError1ToOutcome, e => e is Error1)       //reduce adapter 2
                 .Reduce(ConvertError2ToOutcome, e => e is Error2)       //reduce adapter 2
                 .Reduce(ConvertDefaultErrorToOutcome);                  //reduce adapter 3
@@ -54,8 +54,8 @@ namespace Either.Test
             //Act
             var result = error2
                 .Map(s => s)                                            //map adapter 1
-                .Map(ReturnSuccess)                                    //map adapter 2
-                .Map(() => new Outcome("ok"))                           //map adapter 3
+                .Map(ReturnSuccess)                                     //map adapter 2
+                .Map(ReturnOkOutcome)                                   //map adapter 3
                 .Reduce(ConvertError1ToOutcome, e => e is Error1)       //reduce adapter 2
                 .Reduce(ConvertError2ToOutcome, e => e is Error2)       //reduce adapter 2
                 .Reduce(ConvertDefaultErrorToOutcome);                  //reduce adapter 3
@@ -72,8 +72,8 @@ namespace Either.Test
             //Act
             var result = error3
                 .Map(s => s)                                            //map adapter 1
-                .Map(ReturnSuccess)                                    //map adapter 2
-                .Map(() => new Outcome("ok"))                           //map adapter 3
+                .Map(ReturnSuccess)                                     //map adapter 2
+                .Map(ReturnOkOutcome)                                   //map adapter 3
                 .Reduce(ConvertError1ToOutcome, e => e is Error1)       //reduce adapter 2
                 .Reduce(ConvertError2ToOutcome, e => e is Error2)       //reduce adapter 2
                 .Reduce(ConvertDefaultErrorToOutcome);                  //reduce adapter 3
@@ -85,6 +85,11 @@ namespace Either.Test
         public Either<IError, Success2> ReturnSuccess(Success1 either)
         {
             return new Right<IError, Success2>(new Success2());
+        }
+
+        public Outcome ReturnOkOutcome()
+        {
+            return new Outcome("ok");
         }
 
         public Outcome ConvertError1ToOutcome(IError error)
