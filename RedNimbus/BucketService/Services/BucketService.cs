@@ -200,7 +200,7 @@ namespace RedNimbus.BucketService.Services
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
             string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
-            byte[] fileAsByteArray = msg.Data.File.ToByteArray();
+            byte[] fileAsByteArray = msg.Bytes.ToByteArray();
 
             if (absolutePath == null)
             {
@@ -256,7 +256,7 @@ namespace RedNimbus.BucketService.Services
             if (fileAsByteArray != null)
             {
                 msg.Data.Successful = true;
-                msg.Data.File = ByteString.CopyFrom(fileAsByteArray);
+                msg.Bytes =  new NetMQFrame(fileAsByteArray);
                 SendMessage(msg.ToNetMQMessage());
             }
             else

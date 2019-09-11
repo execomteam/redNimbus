@@ -154,18 +154,13 @@ namespace RedNimbus.API.Services
                 Data = new BucketMessage()
                 {
                     Token = token,
-                    Path = uploadFile.Path + uploadFile.Value,
-                    File = ByteString.CopyFrom(System.Convert.FromBase64String(decodeHelp[1]))
-                }     
+                    Path = uploadFile.Path + uploadFile.Value
+                },
+                Bytes = new NetMQFrame(System.Convert.FromBase64String(decodeHelp[1]))
             };
+
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
             
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
-
             string responseTopic = response.First.ConvertToString();
 
 
@@ -192,12 +187,7 @@ namespace RedNimbus.API.Services
             };
 
 
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
 
@@ -225,12 +215,7 @@ namespace RedNimbus.API.Services
             };
 
 
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
 
@@ -238,7 +223,7 @@ namespace RedNimbus.API.Services
             if (responseTopic.Equals("Response"))
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
-                byte[] data = successMessage.Data.File.ToByteArray();
+                byte[] data = successMessage.Bytes.ToByteArray();
                 string base64Str = Convert.ToBase64String(data);
                 fileName.Value = Translate(fileName.Value)+ ";base64," + base64Str;
                 return new Right<IError, StringDto>(fileName);
