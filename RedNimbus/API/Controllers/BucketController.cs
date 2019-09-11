@@ -77,7 +77,7 @@ namespace RedNimbus.API.Controllers
         [HttpPost("downloadFile")]
         public IActionResult DownloadFile([FromBody]StringDto fileName) =>
             _bucketService.DownloadFile(Request.Headers["token"], fileName)
-                .Map((x) => AllOk(x))
+                .Map((x) => (IActionResult)File(x.File, x.Type, x.Value))
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
     }

@@ -207,7 +207,7 @@ namespace RedNimbus.API.Services
 
         }
 
-        public Either<IError, StringDto> DownloadFile(string token, StringDto fileName)
+        public Either<IError, DownloadFileDto> DownloadFile(string token, StringDto fileName)
         {
             Message<BucketMessage> message = new Message<BucketMessage>("bucket/getFile")
             {
@@ -228,12 +228,14 @@ namespace RedNimbus.API.Services
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
                 byte[] data = successMessage.Bytes.ToByteArray();
-                string base64Str = Convert.ToBase64String(data);
-                fileName.Value = Translate(fileName.Value)+ ";base64," + base64Str;
-                return new Right<IError, StringDto>(fileName);
+                DownloadFileDto upload = new DownloadFileDto();
+                upload.File = data;
+                upload.Value = fileName.Value;
+                upload.Type = GetContentType(fileName.Value);
+                return new Right<IError, DownloadFileDto>(upload);
             }
 
-            return new Left<IError, StringDto>(GetError(response));
+            return new Left<IError, DownloadFileDto>(GetError(response));
 
         }
 
@@ -250,7 +252,7 @@ namespace RedNimbus.API.Services
             var ext = Path.GetExtension(path).ToLowerInvariant();
             if(types.ContainsKey(ext))
                 return types[ext];
-            return "";
+            return "text/plain";
         }
 
 

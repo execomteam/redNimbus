@@ -36,7 +36,8 @@ class File extends React.Component {
     downloadFile(event) {
         event.preventDefault();
         const options = {
-            headers: { 'token': localStorage.getItem("token") }
+            headers: { 'token': localStorage.getItem("token") },
+            responseType: 'blob'
         };
 
         axios.post("http://localhost:65001/api/bucket/downloadFile", { Value: this.props.name, Path: this.props.path }, options).then(
@@ -44,9 +45,11 @@ class File extends React.Component {
             (resp) => this.onErrorHandler(resp)
         );
     }
-
+    
     onSuccessHandlerForDownload(resp) {
-        saveAs(resp.data.value, this.props.name);
+        var blob = new Blob([resp.data], {type: resp.data.type});
+
+        saveAs(blob, this.props.name);
     }
 
     render() {
