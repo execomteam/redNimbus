@@ -37,7 +37,7 @@ namespace RedNimbus.API.Services
             NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
-
+             
             if (responseTopic.Equals("Response"))
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
