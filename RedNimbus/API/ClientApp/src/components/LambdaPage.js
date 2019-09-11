@@ -33,29 +33,16 @@ class LambdaPage extends React.Component {
     }
 
     addLambda(lambda) {
-        let arr = this.state.lambdas;
-        let found = false;
-        for (var i = 0; i < arr.length && !found; i++) {
-            found = (arr[i] === lambda.value);
-        }
-
-        if (!found) {
-            this.setState(prevState => ({
-                lambdas: [...prevState.lambdas, lambda.value]
-            }));
-        }
+        this.setState(prevState => ({
+            lambdas: [...prevState.lambdas, lambda]
+        }));
     }
 
     onSuccessHandler(resp) {
         var tempLambdas = [];
 
         for (var i = 0; i < resp.data.length; i++) {
-            if (resp.data[i] === '*') {
-                continue;
-            }
-
             tempLambdas.push(resp.data[i]);
-
         }
         this.setState({
             lambdas: tempLambdas

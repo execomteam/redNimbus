@@ -7,14 +7,15 @@ class CreateLambda extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            file: null
-        }
-
         this.createLambda = this.createLambda.bind(this);
-
         this.onChange = this.onChange.bind(this);
 
+        this.state = {
+            file: null,
+            lambdaName: '',
+            runtime: '',
+            trigger: ''
+        }
     }
 
     createLambda(event) {
@@ -29,19 +30,18 @@ class CreateLambda extends React.Component {
         var runtime = document.getElementById("runtime").value;
         var trigger = document.getElementById("trigger").value;
 
+
         var pathL = this.props.path;
 
-            let fileReader = new FileReader();
+        let fileReader = new FileReader();
 
-            fileReader.onload = (event) => {
-                axios.post("http://localhost:65001/api/lambda/createLambda", { "File": event.target.result, "Path": this.props.path, "Value": this.state.file.name, "Name": lambdaName, "Runtime": runtime, "Trigger": trigger }, options).then(
-                    (resp) => this.onSuccessHandler(resp),
-                    (resp) => this.onErrorHandler(resp)
+
+        axios.post("http://localhost:65001/api/lambda/create", {"Name": lambdaName, "Runtime": runtime == ".NET Core" ? 0 : 1, "Trigger": trigger == "GET" ? 0 : 1 }, options).then(
+            (resp) => this.onSuccessHandler(resp),
+            (resp) => this.onErrorHandler(resp)
                 );
 
-            
-            fileReader.readAsDataURL(this.state.file);
-        }
+      
     }
 
 
@@ -50,7 +50,7 @@ class CreateLambda extends React.Component {
     }
 
     onSuccessHandler(resp) {
-        this.props.addLambda(resp.data);
+        this.props.addLambda(resp.data.Name);
         this.props.onHide();
     }
 
@@ -70,7 +70,7 @@ class CreateLambda extends React.Component {
                     show={this.props.show}
                     size="lg"
                     aria-labelledby="contained-modal-title-vcenter"
-                    centered
+                    centered = "true"
                 >
                     <Modal.Header>
                         <Modal.Title id="contained-modal-title-vcenter">

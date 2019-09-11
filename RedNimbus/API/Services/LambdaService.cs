@@ -24,9 +24,9 @@ namespace RedNimbus.API.Services
                     Name = createlambda.Name,
                     Trigger = createlambda.Trigger,
                     Runtime = createlambda.Runtime,
-                    OwnerId = createlambda.OwnerToken,
-                    ImageId = createlambda.ImageId,
-                    Guid = createlambda.Guid
+                    OwnerId = "",
+                    ImageId = "",
+                    Guid = ""
                 }
             };
 
