@@ -11,7 +11,7 @@ class FileGroup extends React.Component {
             <div className="card-group">
                 {
                     this.props.content.map((value, index) => {
-                        return <File key={index} name={value}/>
+                        return <File deletingFile={this.props.deletingFile} key={index} name={value} path={this.props.path}/>
                     })
                 }
             </div>
