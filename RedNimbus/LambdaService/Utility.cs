@@ -4,51 +4,56 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using NetMQ;
+using RedNimbus.Communication;
+using RedNimbus.Messages;
 
 namespace RedNimbus.LambdaService
 {
     public static class Utility
     {
-        public static void DoStuff()
+        public static Guid CreateLambda(Message<LambdaMessage> message)
         {
-            UnzipSource();
-            GeneratePythonDockerfile();
-            BuildImage();
+            Guid guid = Guid.NewGuid();
+
+            ExtractSourceFile(message.Bytes.ToByteArray(), guid);
+
+            if (message.Data.Runtime == LambdaMessage.Types.RuntimeType.Csharp)
+                GenerateAspNetDockerfile(guid);
+            else if (message.Data.Runtime == LambdaMessage.Types.RuntimeType.Python)
+                GeneratePythonDockerfile(guid);
+
+            BuildImage(guid);
+
+            RemoveSourceFile(guid);
+
+            return guid;
         }
 
-        public static void UnzipSource()
+        private static void ExtractSourceFile(byte[] file, Guid guid)
         {
-            Console.WriteLine("Extracting source...");
+            string targetPath = $".\\{guid}";
 
-            string sourcePath = @".\Test.zip";
-            string targetPath = @".\Test";
-
-            targetPath = Path.GetFullPath(targetPath);
-            if (!targetPath.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
-                targetPath += Path.DirectorySeparatorChar;
-
-            //ZipFile.CreateFromDirectory(startPath, zipPath);
-            ZipFile.ExtractToDirectory(sourcePath, targetPath);
-
-            // TODO: Delete .zip file in case of successful extraction
-
-            Console.WriteLine("Source extracted");
+            using (var stream = new MemoryStream(file))
+            {
+                using (var archive = new ZipArchive(stream))
+                {
+                    archive.ExtractToDirectory(targetPath);
+                }
+            }
         }
 
-        /// <summary>
-        /// ASP.NET Core 2.1
-        /// </summary>
-        private static void GenerateAspNetDockerfile()
+        private static void GenerateAspNetDockerfile(Guid guid)
         {
-            Console.WriteLine("Generating Dockerfile...");
-
-            string path = @".\Test\";
+            string path = $".\\{guid}\\";
 
             var projectName = Directory.EnumerateFiles(path, "*.csproj", SearchOption.TopDirectoryOnly)
                                        .Select(p => Path.GetFileNameWithoutExtension(p))
                                        .ToList()
                                        .FirstOrDefault()
                                        .ToString();
+
+            // TODO: Add error handling
 
             using (StreamWriter sw = File.CreateText(path + "Dockerfile"))
             {
@@ -68,13 +73,13 @@ namespace RedNimbus.LambdaService
                 sw.WriteLine("COPY --from=publish /app .");
                 sw.WriteLine($"ENTRYPOINT [\"dotnet\", \"{projectName}.dll\"]");
             }
-
-            Console.WriteLine("Dockerfile generated");
         }
 
-        private static void GeneratePythonDockerfile()
+        private static void GeneratePythonDockerfile(Guid guid)
         {
-            string path = @".\Test\";
+            string path = $".\\{guid}\\";
+
+            // TODO: Add error handling
 
             var projectName = Directory.EnumerateFiles(path, "main.py", SearchOption.TopDirectoryOnly)
                                        .Select(p => Path.GetFileNameWithoutExtension(p))
@@ -93,17 +98,17 @@ namespace RedNimbus.LambdaService
             }
         }
 
-        public static void BuildImage()
+        private static void BuildImage(Guid guid)
         {
             Console.WriteLine("Building image...");
-
-            string path = @".\Test\";
+            Console.WriteLine(guid);
+            string path = $".\\{guid}\\";
 
             ProcessStartInfo processInfo = new ProcessStartInfo()
             {
                 WorkingDirectory = path,
                 FileName = "docker",
-                Arguments = $"build -t pytestimage .",
+                Arguments = $"build -t {guid} .",
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -120,7 +125,9 @@ namespace RedNimbus.LambdaService
 
                 result = process.StandardOutput.ReadToEnd().Trim();
 
+                Console.WriteLine(result);
                 process.WaitForExit();
+                Console.WriteLine("Exited");
 
                 if (!process.HasExited)
                     process.Kill();
@@ -129,6 +136,13 @@ namespace RedNimbus.LambdaService
             }
 
             Console.WriteLine("Building image finished");
+        }
+
+        private static void RemoveSourceFile(Guid guid)
+        {
+            string targetPath = $".\\{guid}";
+
+            Directory.Delete(targetPath, true);
         }
     }
 }

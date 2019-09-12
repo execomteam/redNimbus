@@ -95,12 +95,12 @@ class CreateLambda extends React.Component {
                                 />
                                 <br/>
                                 <select id="runtime" name="runtime" className="form-control form-control-sm" required>
-                                    <option value="CSHARP">.NET Core</option>
+                                    <option value="CSHARP">.NET Core 2.1</option>
+                                    <option value="PYTHON">Python 3</option>
                                 </select>
                                 <br />
                                 <select id="trigger" name="trigger" className="form-control form-control-sm" required>
                                     <option value="GET">GET</option>
-                                    <option value="POST">POST</option>
                                 </select>
                                 <br />
                                 <div>
