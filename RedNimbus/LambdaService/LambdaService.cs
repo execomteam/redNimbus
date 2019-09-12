@@ -33,7 +33,6 @@ namespace RedNimbus.LambdaService
             Message<GetLambdaMessage> message = new Message<GetLambdaMessage>(obj);
             message.Topic = "Response";
             SendMessage(message.ToNetMQMessage());
-            //throw new NotImplementedException();
         }
     }
 }
