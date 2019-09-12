@@ -1,71 +1,29 @@
 import React from 'react';
 import CreateNewBucket from './CreateNewBucket'
-import UploadFile from './UploadFile'
 import {Button } from "react-bootstrap";
 
 class SideNav extends React.Component{
-    constructor(props) {
-        super(props);
-        this.changePath = this.changePath.bind(this);
-    }
-
-    changePath() {
-        let path = this.props.path;
-        if (path != "/") {
-            let indexOfSlash = path.lastIndexOf("/");
-            path = path.slice(0, indexOfSlash);
-            indexOfSlash = path.lastIndexOf("/");
-            path = path.slice(0, indexOfSlash);
-            path = path + "/";
-            this.props.changePath(path);
-        }
-    }
-
-    render() {
-        var type = "folder"
-        if (this.props.path == "/")
-            type = "bucket";
-
-        if (this.props.path == "/") {
-            return (
-                <div>
-                    <div>
-                        <CreateNewBucket
-                            type={type}
-                            addNewBucket={this.props.addNewBucket}
-                            show={this.props.createModalShow}
-                            onHide={this.props.setCreateModalShow}
-                            path={this.props.path}
-                        />
-                    </div>
-                </div>
-            );
-
-        }
-
+    /*
+    <ul className="nav flex-column">
+                    <li className="nav-item">
+                        <a style={{hidden: true}} className="nav-link active" href="/bucket"></a>
+                    </li>
+                    <li className="nav-item">
+                        <a style={{hidden: true}} className="nav-link" href="#"></a>
+                    </li>
+                </ul>
+    */
+    render(){
         return (
-            <div>
-                <div>
-                    <Button onClick={this.changePath}>Go back</Button>
-                </div>
 
                 <div>
                     <CreateNewBucket
-                        type={type}
                         addNewBucket={this.props.addNewBucket}
                         show={this.props.createModalShow}
                         onHide={this.props.setCreateModalShow}
-                        path={this.props.path}
                     />
-                </div>
-                <div>
-                    <UploadFile
-                        uploadFile={this.props.uploadFile}
-                        path={this.props.path}
-                        show={this.props.uploadModalShow}
-                        onHide={this.props.setUploadModalShow}
-                    />
-                </div>
+
+
             </div>
         );
     }

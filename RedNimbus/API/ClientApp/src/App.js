@@ -10,7 +10,6 @@ export default class App extends React.Component{
 
     constructor(props) {
         super(props);
-
         if (localStorage.getItem('token') === null || localStorage.getItem('token') === undefined ){
             this.state = {
                 isLoggedIn: false,
@@ -47,8 +46,7 @@ export default class App extends React.Component{
             lastName: resp.data.lastName,
             email: resp.data.email,
             id: resp.data.id,
-            key: resp.data.key,
-            path: "/"
+            key: resp.data.key
         });
 
         localStorage.setItem('token', this.state.key);
@@ -61,8 +59,6 @@ export default class App extends React.Component{
 
         localStorage.clear();
     }
-
-    
 
     render()
     {
@@ -92,7 +88,7 @@ export default class App extends React.Component{
                         </Navbar.Collapse>
                     </Navbar>
                     
-                        <Routes changeState={this.changeState} user={this.state} signOut={this.signOut} />
+                    <Routes changeState={this.changeState} user={this.state} signOut={this.signOut}/>
                     </div>
                 </Router>
             );
@@ -121,7 +117,7 @@ export default class App extends React.Component{
                         </Navbar.Collapse>
                     </Navbar>
                     
-                        <Routes changeState={this.changeState} user={this.state} signOut={this.signOut} />
+                    <Routes changeState={this.changeState} user={this.state} signOut={this.signOut}/>
                     
                 </div>
                 </Router>

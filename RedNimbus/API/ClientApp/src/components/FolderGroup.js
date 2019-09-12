@@ -11,7 +11,7 @@ class FolderGroup extends React.Component {
             <div className="card-group">
                 {
                     this.props.content.map((value, index) => {
-                        return <Folder deletingBucket={this.props.deletingBucket} key={index} name={value} enterFolder={this.props.enterFolder} path={this.props.path}/>
+                        return <Folder deletingBucket = {this.props.deletingBucket} key={index} name={value}/>
                     })
                 }
             </div>

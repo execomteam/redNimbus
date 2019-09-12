@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DTO;
 using Google.Protobuf;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +36,7 @@ namespace RedNimbus.API.Services
             NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
-             
+
             if (responseTopic.Equals("Response"))
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
@@ -79,29 +78,14 @@ namespace RedNimbus.API.Services
 
         public Either<IError, StringDto> CreateBucket(string token, StringDto bucketName)
         {
-            Message<BucketMessage> message;
-            if (bucketName.Path.Equals("/"))
+            Message<BucketMessage> message = new Message<BucketMessage>("bucket/createBucket")
             {
-                message = new Message<BucketMessage>("bucket/createBucket")
+                Data = new BucketMessage()
                 {
-                    Data = new BucketMessage()
-                    {
-                        Token = token,
-                        Path = bucketName.Path + bucketName.Value
-                    }
-                };
-            }
-            else
-            {
-                message = new Message<BucketMessage>("bucket/createFolder")
-                {
-                    Data = new BucketMessage()
-                    {
-                        Token = token,
-                        Path = bucketName.Path + "/" + bucketName.Value
-                    }
-                };
-            }
+                    Token = token,
+                    Path = "/" + bucketName.Value
+                }
+            };
 
             NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
@@ -125,146 +109,22 @@ namespace RedNimbus.API.Services
                 Data = new BucketMessage()
                 {
                     Token = token,
-                    Path = bucketName.Path+ "/" + bucketName.Value
+                    Path = "/" + bucketName.Value
                 }
             };
 
             NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
-
-            if (responseTopic.Equals("Response"))
-            {
-                 return new Right<IError, StringDto>(bucketName);
-            }
-
-            return new Left<IError, StringDto>(GetError(response));
-        }
-        
-        public Either<IError, UploadFileDto> UploadFile(string token, UploadFileDto uploadFile)
-        {
-            if(uploadFile.Path.Equals("/"))
-                return new Left<IError, UploadFileDto>(new FormatError("You must be in bucket to upload file.", Either.Enums.ErrorCode.PutFileError));
-            Message<BucketMessage> message;
-
-            using (Stream stream = new MemoryStream())
-            {
-                uploadFile.File.CopyTo(stream);
-                message = new Message<BucketMessage>("bucket/putFile")
-                {
-                    Data = new BucketMessage()
-                    {
-                        Token = token,
-                        Path = uploadFile.Path + uploadFile.Value
-                    },
-                    Bytes = new NetMQFrame(stream.ToByteArray())
-                };
-            }
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
-            
-            string responseTopic = response.First.ConvertToString();
-
-
-            if (responseTopic.Equals("Response"))
-            {
-                return new Right<IError, UploadFileDto>(uploadFile);
-            }
-
-            return new Left<IError, UploadFileDto>(GetError(response));
-
-        }
-
-        public Either<IError, StringDto> DeleteFile(string token, StringDto fileName)
-        {
-            Message<BucketMessage> message = new Message<BucketMessage>("bucket/deleteFile")
-            {
-                Data = new BucketMessage()
-                {
-                    Token = token,
-                    Path = fileName.Path + "/" + fileName.Value
-                }
-            };
-
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
-
-            string responseTopic = response.First.ConvertToString();
-
-
-            if (responseTopic.Equals("Response"))
-            {
-                 return new Right<IError, StringDto>(fileName);
-            }
-
-            return new Left<IError, StringDto>(GetError(response));
-
-        }
-
-        public Either<IError, DownloadFileDto> DownloadFile(string token, StringDto fileName)
-        {
-            Message<BucketMessage> message = new Message<BucketMessage>("bucket/getFile")
-            {
-                Data = new BucketMessage()
-                {
-                    Token = token,
-                    Path = fileName.Path + "/" + fileName.Value
-                }
-            };
-
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
-
-            string responseTopic = response.First.ConvertToString();
-
 
             if (responseTopic.Equals("Response"))
             {
                 Message<BucketMessage> successMessage = new Message<BucketMessage>(response);
-                byte[] data = successMessage.Bytes.ToByteArray();
-                DownloadFileDto upload = new DownloadFileDto();
-                upload.File = data;
-                upload.Value = fileName.Value;
-                upload.Type = GetContentType(fileName.Value);
-                return new Right<IError, DownloadFileDto>(upload);
+
+                return new Right<IError, StringDto>(bucketName);
             }
 
-            return new Left<IError, DownloadFileDto>(GetError(response));
-
+            return new Left<IError, StringDto>(GetError(response));
         }
-
-        
-        private static string GetContentType(string path)
-        {
-            var types = GetMimeTypes();
-            var ext = Path.GetExtension(path).ToLowerInvariant();
-            if(types.ContainsKey(ext))
-                return types[ext];
-            return "text/plain";
-        }
-
-
-        private static Dictionary<string, string> GetMimeTypes()
-        {
-            return new Dictionary<string, string>
-            {
-                {".txt", "text/plain"},
-                {".pdf", "application/pdf"},
-                {".doc", "application/vnd.ms-word"},
-                {".docx", "application/vnd.ms-word"},
-                {".xls", "application/vnd.ms-excel"},
-                {".xlsx", "application/vnd.openxmlformats  officedocument.spreadsheetml.sheet"},  
-                {".png", "image/png"},
-                {".jpg", "image/jpeg"},
-                {".jpeg", "image/jpeg"},
-                {".gif", "image/gif"},
-                {".csv", "text/csv"},
-                {".exe", "application/vnd.microsoft.portable-executable"},
-                {".xsd", "application/xml"},
-                {".rar", "application/x-rar-compressed"},
-                {".zip", "application/zip"}
-            };
-        }
-
     }
 }
-
