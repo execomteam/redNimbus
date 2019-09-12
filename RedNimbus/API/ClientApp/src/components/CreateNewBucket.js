@@ -17,15 +17,13 @@ class CreateNewBucket extends React.Component {
         };
 
         var bucketName = document.getElementById("newBucketName").value;
-        var pth = this.props.path;
-
         var format = /[ <>:"\\\/|?*]/;
         if (format.test(bucketName)) {
             alert('Name contain unacceptable characters');
             return;
         }
 
-        axios.post("http://localhost:65001/api/bucket/createBucket", {Path: pth, Value: bucketName}, options).then(
+        axios.post("http://localhost:65001/api/bucket/createBucket", {Value: bucketName}, options).then(
             (resp) => this.onSuccessHandler(resp),
             (resp) => this.onErrorHandler(resp)
         );
@@ -44,7 +42,7 @@ class CreateNewBucket extends React.Component {
         return (
             <div>
                 <Button variant="primary" onClick={()=>this.props.onHide(true)}>
-                    Create new {this.props.type}
+                    Create new bucket
                 </Button>
                 <Modal
                 show={this.props.show}
@@ -52,9 +50,9 @@ class CreateNewBucket extends React.Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
                 >
-                    <Modal.Header >
+                    <Modal.Header>
                         <Modal.Title id="contained-modal-title-vcenter">
-                            New {this.props.type}
+                        New Bucket
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>

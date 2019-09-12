@@ -14,7 +14,6 @@ using RedNimbus.DTO;
 using RedNimbus.Either.Errors;
 using RedNimbus.Either;
 using RedNimbus.Messages;
-using DTO;
 
 namespace RedNimbus.API.Controllers
 {
@@ -35,9 +34,12 @@ namespace RedNimbus.API.Controllers
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
 
-        [HttpPost("post")]
-        public IActionResult ListBucketContent([FromBody]StringDto val) => 
-            _bucketService.ListBucketContent(Request.Headers["token"], val.Path)
+        
+        
+        
+        [HttpGet("{id}")]
+        public IActionResult ListBucketContent(string id) => 
+            _bucketService.ListBucketContent(Request.Headers["token"], id)
                 .Map((x) => AllOk(x))
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
@@ -56,29 +58,6 @@ namespace RedNimbus.API.Controllers
                 .Map((x) => AllOk(x))
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
-        
 
-
-        [HttpPost("uploadFile")]
-        [RequestSizeLimit(360000000)]
-        public IActionResult UploadFile([FromForm]UploadFileDto uploadFile) =>
-            _bucketService.UploadFile(Request.Headers["token"], uploadFile)
-                .Map((x) => AllOk(x))
-                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
-                .Reduce(InternalServisErrorHandler);
-
-        [HttpPost("deleteFile")]
-        public IActionResult DeleteFile([FromBody]StringDto fileName) =>
-            _bucketService.DeleteFile(Request.Headers["token"], fileName)
-                .Map((x) => AllOk(x))
-                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
-                .Reduce(InternalServisErrorHandler);
-
-        [HttpPost("downloadFile")]
-        public IActionResult DownloadFile([FromBody]StringDto fileName) =>
-            _bucketService.DownloadFile(Request.Headers["token"], fileName)
-                .Map((x) => (IActionResult)File(x.File, x.Type, x.Value))
-                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
-                .Reduce(InternalServisErrorHandler);
     }
 }
