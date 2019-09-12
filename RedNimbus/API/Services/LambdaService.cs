@@ -8,6 +8,7 @@ using RedNimbus.Either.Errors;
 using RedNimbus.Messages;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +18,10 @@ namespace RedNimbus.API.Services
     {
         public Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createlambda)
         {
+            var memoryStream = new MemoryStream();
+            createlambda.File.OpenReadStream().CopyTo(memoryStream);
+
+
             Message<LambdaMessage> message = new Message<LambdaMessage>("CreateLambda")
             {
                 Data = new LambdaMessage()
@@ -24,10 +29,11 @@ namespace RedNimbus.API.Services
                     Name = createlambda.Name,
                     Trigger = createlambda.Trigger,
                     Runtime = createlambda.Runtime,
-                    OwnerId = createlambda.OwnerToken,
-                    ImageId = createlambda.ImageId,
-                    Guid = createlambda.Guid
-                }
+                    OwnerId = "",
+                    ImageId = "",
+                    Guid = ""
+                },
+                Bytes = new NetMQFrame(memoryStream.ToArray())
             };
 
             NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());

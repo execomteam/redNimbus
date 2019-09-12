@@ -26,7 +26,7 @@ namespace API.Controllers
 
         //call with ...api/lambda/create
         [HttpPost("create")]
-        public IActionResult Create(CreateLambdaDto dto)
+        public IActionResult Create([FromForm]CreateLambdaDto dto)
         {
             return _lambdaService.CreateLambda(dto)
                 .Map((id) => AllOk(id)) //return lambda id

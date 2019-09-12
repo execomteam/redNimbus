@@ -1,7 +1,5 @@
 ﻿using RedNimbus.Messages;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace DTO
 {
@@ -19,7 +17,7 @@ namespace DTO
 
         public string Guid { get; set; }
 
-        public byte[] File { get; set; }
+        public IFormFile File { get; set; }
 
     }
 }

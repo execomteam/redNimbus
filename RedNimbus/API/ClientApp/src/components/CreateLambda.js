@@ -7,14 +7,15 @@ class CreateLambda extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            file: null
-        }
-
         this.createLambda = this.createLambda.bind(this);
-
         this.onChange = this.onChange.bind(this);
 
+        this.state = {
+            file: null,
+            lambdaName: '',
+            runtime: '',
+            trigger: ''
+        }
     }
 
     createLambda(event) {
@@ -25,23 +26,25 @@ class CreateLambda extends React.Component {
             headers: { 'token': localStorage.getItem("token") }
         };
 
+
+
         var lambdaName = document.getElementById("lambdaName").value;
         var runtime = document.getElementById("runtime").value;
         var trigger = document.getElementById("trigger").value;
 
-        var pathL = this.props.path;
+        var formData = new FormData();
 
-            let fileReader = new FileReader();
+        formData.append('file', this.state.file);
+        formData.append('Name', lambdaName);
+        formData.append('Runtime', runtime);
+        formData.append('Trigger', trigger);
 
-            fileReader.onload = (event) => {
-                axios.post("http://localhost:65001/api/lambda/createLambda", { "File": event.target.result, "Path": this.props.path, "Value": this.state.file.name, "Name": lambdaName, "Runtime": runtime, "Trigger": trigger }, options).then(
-                    (resp) => this.onSuccessHandler(resp),
-                    (resp) => this.onErrorHandler(resp)
-                );
+        axios.post("http://localhost:65001/api/lambda/create", formData , options).then(
+            (resp) => this.onSuccessHandler(resp),
+            (resp) => this.onErrorHandler(resp)
+        );
 
-            
-            fileReader.readAsDataURL(this.state.file);
-        }
+      
     }
 
 
@@ -50,13 +53,16 @@ class CreateLambda extends React.Component {
     }
 
     onSuccessHandler(resp) {
-        this.props.addLambda(resp.data);
+        this.props.addLambda(resp.data.name);
         this.props.onHide();
     }
 
     onChange(e) {
         e.preventDefault();
         this.setState({ file: e.target.files[0] })
+     
+
+        
     }
 
 
@@ -70,7 +76,7 @@ class CreateLambda extends React.Component {
                     show={this.props.show}
                     size="lg"
                     aria-labelledby="contained-modal-title-vcenter"
-                    centered
+                    centered = "true"
                 >
                     <Modal.Header>
                         <Modal.Title id="contained-modal-title-vcenter">
@@ -78,7 +84,7 @@ class CreateLambda extends React.Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <form onSubmit={this.createLambda}>
+                        <form onSubmit={this.createLambda} id="lambdaForm">
                             <div className="form-group">
                                 <input type="text"
                                     className="form-control form-control-sm"
@@ -89,12 +95,12 @@ class CreateLambda extends React.Component {
                                 />
                                 <br/>
                                 <select id="runtime" name="runtime" className="form-control form-control-sm" required>
-                                    <option value=".NET Core">.NET Core</option>
+                                    <option value="CSHARP">.NET Core 2.1</option>
+                                    <option value="PYTHON">Python 3</option>
                                 </select>
                                 <br />
                                 <select id="trigger" name="trigger" className="form-control form-control-sm" required>
                                     <option value="GET">GET</option>
-                                    <option value="POST">POST</option>
                                 </select>
                                 <br />
                                 <div>

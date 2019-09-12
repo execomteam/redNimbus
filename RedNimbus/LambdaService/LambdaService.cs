@@ -26,11 +26,14 @@ namespace RedNimbus.LambdaService
         private void HandleCreateLambda(NetMQMessage obj)
         {
             Message<LambdaMessage> message = new Message<LambdaMessage>(obj);
+
+            Guid guid = Utility.CreateLambda(message);
+
             message.Topic = "Response";
+            message.Bytes = new NetMQFrame("");
+            message.Data.Guid = guid.ToString();
+
             SendMessage(message.ToNetMQMessage());
-            throw new NotImplementedException();
-
-
         }
 
         private void HandleGetLambda(NetMQMessage obj)
