@@ -25,7 +25,8 @@ namespace RedNimbus.LambdaService.Helper
             }
             catch(Exception)
             {
-                return Guid.Empty;
+                RemoveSourceFile(lambdaId);
+                lambdaId = Guid.Empty;
             }
 
             return lambdaId;
@@ -56,7 +57,7 @@ namespace RedNimbus.LambdaService.Helper
             using (StreamWriter sw = File.CreateText(sourcePath + "Dockerfile"))
             {
                 string content = File.ReadAllText($".\\Resources\\{templateName}");          
-                sw.Write(string.Format(content, guid));
+                sw.Write(string.Format(content, projectName));
             }
         }
 
@@ -113,6 +114,8 @@ namespace RedNimbus.LambdaService.Helper
                 RedirectStandardError = true
             };
 
+            int exitCode;
+
             using (var process = new Process())
             {
                 process.StartInfo = processInfo;
@@ -121,9 +124,8 @@ namespace RedNimbus.LambdaService.Helper
 
                 string result = process.StandardOutput.ReadToEnd().Trim();
 
-                Console.WriteLine(result);
-
                 process.WaitForExit();
+                exitCode = process.ExitCode;
 
                 if (!process.HasExited)
                     process.Kill();
@@ -131,13 +133,17 @@ namespace RedNimbus.LambdaService.Helper
                 process.Close();
             }
 
-            Console.WriteLine("Building image finished");
+            Console.WriteLine($"Image building process finished with exit code {exitCode}.");
+
+            if (exitCode != 0)
+                throw new Exception();
         }
 
         private void RemoveSourceFile(Guid guid)
         {
             string sourcePath = $".\\{guid}";
-            Directory.Delete(sourcePath, true);
+            if(Directory.Exists(sourcePath))
+                Directory.Delete(sourcePath, true);
         }
 
         public string ExecuteLambda(string guid)

@@ -65,7 +65,7 @@ class CreateLambda extends React.Component {
 
         MySweetAlert.fire({
             title: "Lambda created successfully",
-            text: "Lambda ID: " + resp.data.guid,
+            text: "URL: http://localhost:65001/api/lambda/" + resp.data.guid,
             type: "success",
           });
 
