@@ -59,7 +59,7 @@ namespace RedNimbus.LambdaService
 
             try
             {
-                result = ExecuteLambda(requestMessage.Data.LambdaId);
+                result = Utility.ExecuteLambda(requestMessage.Data.LambdaId);
                 responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.Ok, result));
             }
             catch (ArgumentException)
@@ -76,53 +76,6 @@ namespace RedNimbus.LambdaService
 
         }
 
-        private string ExecuteLambda(string id)
-        {
-            if(id == "1")
-            {
-                throw new ArgumentException();
-            }else if(id == "2")
-            {
-                throw new Exception();
-            }
-            else
-            {
-                return "uspeo si jarane";
-            }
-        }
-
-        private string ExecuteLambdaOriginal(string id)
-        {
-            ProcessStartInfo processInfo = new ProcessStartInfo()
-            {
-                FileName = "docker",
-                Arguments = $"run --rm --name {id}container {id}",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            string result = string.Empty;
-
-            using (var process = new Process())
-            {
-                process.StartInfo = processInfo;
-
-                process.Start();
-
-                //possible exception if lambda does not return string!!!
-                result = process.StandardOutput.ReadToEnd().Trim();
-
-                process.WaitForExit();
-
-                if (!process.HasExited)
-                    process.Kill();
-
-                process.Close();
-            }
-
-            return result;
-        }
+        
     }
 }

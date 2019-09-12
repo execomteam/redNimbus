@@ -129,5 +129,42 @@ namespace RedNimbus.LambdaService
 
             Directory.Delete(targetPath, true);
         }
+
+        public static string ExecuteLambda(string id)
+        {
+            //Should check reg. db first
+
+            ProcessStartInfo processInfo = new ProcessStartInfo()
+            {
+                FileName = "docker",
+                Arguments = $"run --rm {id}",
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            string result = string.Empty;
+
+            using (var process = new Process())
+            {
+                process.StartInfo = processInfo;
+
+                process.Start();
+
+                //possible exception if lambda does not return string!!!
+                result = process.StandardOutput.ReadToEnd().Trim();
+
+                process.WaitForExit();
+
+                if (!process.HasExited)
+                    process.Kill();
+
+                process.Close();
+            }
+
+            return result;
+        }
+
     }
 }
