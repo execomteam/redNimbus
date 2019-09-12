@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RedNimbus.LambdaService
+namespace RedNimbus.LambdaService.Helper
 {
     public enum LambdaStatusCode
     {

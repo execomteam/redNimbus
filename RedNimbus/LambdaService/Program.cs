@@ -1,4 +1,4 @@
-﻿using System;
+﻿using RedNimbus.LambdaService.Helper;
 
 namespace RedNimbus.LambdaService
 {
@@ -6,7 +6,7 @@ namespace RedNimbus.LambdaService
     {
         static void Main(string[] args)
         {
-            LambdaService service = new LambdaService(new TokenManager.TokenManager());
+            Services.LambdaService service = new Services.LambdaService(new TokenManager.TokenManager(), new LambdaHelper());
             service.Start();
         }
     }
