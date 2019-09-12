@@ -20,20 +20,17 @@ class UploadFile extends React.Component {
     onFormSubmit(e) {
         e.preventDefault();
         if (this.state.file == null) {
-            alert("You must choose file before upload.");
+            alert("You must choose valid file before upload.");
         } else {
-            if (this.state.file != null) {
-                helper(this.props.path, this.state.file).then(
-                    data => {
-                        axios.post("http://localhost:65001/api/bucket/uploadFile", data.formData, data.options).then(
-                            (resp) => this.onSuccessHandler(resp),
-                            (resp) => this.onErrorHandler(resp)
-                        );
-                    }
-                );
-            } else {
-                alert("You must choose valid file to upload.");
-            }
+            helper(this.props.path, this.state.file).then(
+                data => {
+                    axios.post("http://localhost:65001/api/bucket/uploadFile", data.formData, data.options).then(
+                        (resp) => this.onSuccessHandler(resp),
+                        (resp) => this.onErrorHandler(resp)
+                    );
+                }
+            );
+            
         }
         
     }
