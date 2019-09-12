@@ -21,16 +21,19 @@ class UploadFile extends React.Component {
         e.preventDefault();
         if (this.state.file == null) {
             alert("You must choose file before upload.");
-        }else {
-            helper(this.props.path, this.state.file).then(
-                data => {
-                    axios.post("http://localhost:65001/api/bucket/uploadFile", data.formData, data.options).then(
-                        (resp) => this.onSuccessHandler(resp),
-                        (resp) => this.onErrorHandler(resp)
-                    );
-                }
-            );
-
+        } else {
+            if (this.state.file != null) {
+                helper(this.props.path, this.state.file).then(
+                    data => {
+                        axios.post("http://localhost:65001/api/bucket/uploadFile", data.formData, data.options).then(
+                            (resp) => this.onSuccessHandler(resp),
+                            (resp) => this.onErrorHandler(resp)
+                        );
+                    }
+                );
+            } else {
+                alert("You must choose valid file to upload.");
+            }
         }
         
     }
@@ -41,6 +44,7 @@ class UploadFile extends React.Component {
         let file_size = e.target.files[0].size;
         if (file_size > 350000000) {
             alert("File size limit is 350MB. Choose another file please.");
+            this.setState({ file: null });
         } else {
             this.setState({ file: e.target.files[0] })
         }
