@@ -13,6 +13,5 @@ namespace RedNimbus.API.Services.Interfaces
     {
         Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createlambda);
         Either<IError, string> GetLambda(string lambdaId, string token);
-        Either<IError, string> GetUserLambda(string token);
     }
 }

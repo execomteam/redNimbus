@@ -1,6 +1,10 @@
 ﻿import React from 'react';
 import { Modal, Button } from "react-bootstrap";
 import axios from 'axios';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+const MySweetAlert = withReactContent(Swal)
 
 class CreateLambda extends React.Component {
 
@@ -43,26 +47,35 @@ class CreateLambda extends React.Component {
             (resp) => this.onSuccessHandler(resp),
             (resp) => this.onErrorHandler(resp)
         );
-
-      
     }
 
 
     onErrorHandler(resp) {
-        alert(resp.response.data);
+        MySweetAlert.fire({
+            title: "Error occured",
+            text: resp.response.data.message,
+            type: "error",
+            button: true
+          });
+
     }
 
     onSuccessHandler(resp) {
-        this.props.addLambda(resp.data.name);
+        //this.props.addLambda(resp.data.name);
+
+        MySweetAlert.fire({
+            title: "Lambda created successfully",
+            text: "URL: http://localhost:65001/api/lambda/" + resp.data.guid,
+            type: "success",
+          });
+
+        this.setState({ redirect: this.state.redirect === false });
         this.props.onHide();
     }
 
     onChange(e) {
         e.preventDefault();
         this.setState({ file: e.target.files[0] })
-     
-
-        
     }
 
 
@@ -95,12 +108,12 @@ class CreateLambda extends React.Component {
                                 />
                                 <br/>
                                 <select id="runtime" name="runtime" className="form-control form-control-sm" required>
-                                    <option value="CSHARP">.NET Core</option>
+                                    <option value="CSHARP">.NET Core 2.1</option>
+                                    <option value="PYTHON">Python 3</option>
                                 </select>
                                 <br />
                                 <select id="trigger" name="trigger" className="form-control form-control-sm" required>
                                     <option value="GET">GET</option>
-                                    <option value="POST">POST</option>
                                 </select>
                                 <br />
                                 <div>

@@ -1,8 +1,4 @@
-﻿using AutoMapper;
-using GalaSoft.MvvmLight.Ioc;
-using LambdaService.Mappings;
-using RedNimbus.LambdaService.Database;
-using System;
+﻿using RedNimbus.LambdaService.Helper;
 
 namespace RedNimbus.LambdaService
 {
@@ -10,9 +6,8 @@ namespace RedNimbus.LambdaService
     {
         static void Main(string[] args)
         {
-            //simpleioc
-            LambdaService lambdaService = new LambdaService();
-            lambdaService.Start();
+            Services.LambdaService service = new Services.LambdaService(new TokenManager.TokenManager(), new LambdaHelper());
+            service.Start();
         }
     }
 }

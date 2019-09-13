@@ -6,11 +6,7 @@ using RedNimbus.Communication;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 using RedNimbus.Messages;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RedNimbus.API.Services
 {
@@ -71,11 +67,6 @@ namespace RedNimbus.API.Services
             }
             
             return new Left<IError, string>(GetError(response));
-        }
-
-        public Either<IError, string> GetUserLambda(string token)
-        {
-            return "pogodio";
         }
     }
 }

@@ -17,7 +17,9 @@
     "react-scripts": "1.0.17",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "sweetalert2": "^8.17.1",
+    "sweetalert2-react-content": "^1.1.0"
   },
   "scripts": {
     "start": "rimraf ./build && react-scripts start",

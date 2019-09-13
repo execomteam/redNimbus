@@ -24,7 +24,6 @@ namespace API.Controllers
             _lambdaService = lambdaService;
         }
 
-        //call with ...api/lambda/create
         [HttpPost("create")]
         public IActionResult Create([FromForm]CreateLambdaDto dto)
         {
@@ -45,13 +44,5 @@ namespace API.Controllers
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
         }
-
-        [HttpGet]
-        public IActionResult Get() =>
-            _lambdaService.GetUserLambda(Request.Headers["token"])
-                .Map((x) => AllOk(x))
-                .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
-                .Reduce(InternalServisErrorHandler);
-
     }
 }
