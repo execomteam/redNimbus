@@ -89,7 +89,6 @@ namespace RedNimbus.BucketService.Services
                     SendErrorMessage("Maximum number of buckets is 5", Either.Enums.ErrorCode.NumberOfBucketsExeeded, msg.Id);
                     return;
                 }
-                
             }
 
             if (msg.Data.Successful)

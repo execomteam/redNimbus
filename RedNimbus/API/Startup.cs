@@ -63,6 +63,7 @@ namespace RedNimbus.API
             services.AddSingleton(typeof(IRestUserService), new RestUserService("http://localhost:65000/"));
             services.AddSingleton(typeof(IUserService), new UserService());
             services.AddSingleton(typeof(BucketService), new BucketService());
+            services.AddSingleton(typeof(ILambdaService), new LambdaService());
             services.AddEitherServiceMapper();
 
         }
