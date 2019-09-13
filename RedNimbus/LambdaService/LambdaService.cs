@@ -13,6 +13,7 @@ namespace RedNimbus.LambdaService
         {
             Subscribe("CreateLambda", HandleCreateLambda);
             Subscribe("GetLambda", HandleGetLambda);
+
         }
 
         private void HandleCreateLambda(NetMQMessage obj)
