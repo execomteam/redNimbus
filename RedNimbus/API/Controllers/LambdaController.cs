@@ -33,9 +33,11 @@ namespace API.Controllers
                 .Reduce(InternalServisErrorHandler);
         }
 
-        //note:
-        //return value of lambda MUST BE some object that can be
-        //coverted in JSON obj
+        /// <summary>
+        /// return value of lambda MUST BE some object that can be coverted in JSON obj
+        /// </summary>
+        /// <param name="lambdaId"></param>
+        /// <returns></returns>
         [HttpGet("{lambdaId}")]
         public IActionResult Get([FromRoute] string lambdaId)
         {

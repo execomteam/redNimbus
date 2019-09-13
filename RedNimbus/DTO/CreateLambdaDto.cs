@@ -1,5 +1,6 @@
 ﻿using RedNimbus.Messages;
 using Microsoft.AspNetCore.Http;
+using static RedNimbus.Messages.LambdaMessage.Types;
 
 namespace DTO
 {
@@ -7,9 +8,9 @@ namespace DTO
     {
         public string Name { get; set; }
 
-        public LambdaMessage.Types.TriggerType Trigger { get; set; }
+        public TriggerType Trigger { get; set; }
 
-        public LambdaMessage.Types.RuntimeType Runtime { get; set; }
+        public RuntimeType Runtime { get; set; }
 
         public string OwnerToken { get; set; }
 
