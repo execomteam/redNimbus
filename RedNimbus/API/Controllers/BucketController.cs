@@ -60,7 +60,7 @@ namespace RedNimbus.API.Controllers
 
 
         [HttpPost("uploadFile")]
-        [RequestSizeLimit(360000000)]
+        [RequestSizeLimit(350001000)]
         public IActionResult UploadFile([FromForm]UploadFileDto uploadFile) =>
             _bucketService.UploadFile(Request.Headers["token"], uploadFile)
                 .Map((x) => AllOk(x))
