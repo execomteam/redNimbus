@@ -34,8 +34,6 @@ namespace RedNimbus.LambdaService.Database
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<LambdaDB>().HasAlternateKey(e => e.ImageId);
-
             modelBuilder.Entity<LambdaDB>().Property(e => e.Trigger).HasConversion(
             t => t.ToString(),
             t => (LambdaMessage.Types.TriggerType)Enum.Parse(typeof(LambdaMessage.Types.TriggerType), t));

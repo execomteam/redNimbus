@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LambdaService.Mappings
+namespace RedNimbus.LambdaService.Mappings
 {
     public class Mapping : Profile
     {

@@ -40,7 +40,10 @@ namespace RedNimbus.LambdaService.Services
                 {
                     Data = new LambdaMessage()
                     {
-                        Guid = lambdaId.ToString()
+                        Guid = lambdaId.ToString(),
+                        Name = requestMessage.Data.Name,
+                        Runtime = requestMessage.Data.Runtime,
+                        Trigger = requestMessage.Data.Trigger
                     },
                     Id = requestMessage.Id
                 };
@@ -49,7 +52,8 @@ namespace RedNimbus.LambdaService.Services
                 {
                     Name = responseMessage.Data.Name,
                     Trigger = responseMessage.Data.Trigger,
-                    Runtime = responseMessage.Data.Runtime
+                    Runtime = responseMessage.Data.Runtime,
+                    Guid = responseMessage.Data.Guid
                 };
 
                 _lambdaManagment.AddLambda(lambda);

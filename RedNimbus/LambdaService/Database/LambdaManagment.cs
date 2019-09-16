@@ -32,23 +32,6 @@ namespace RedNimbus.LambdaService.Database
             return _mapper.Map<Lambda>(lambda);
         }
 
-        public Lambda GetLambdaByImageId(string imageId)
-        {
-            LambdaDB lambda = new LambdaDB();
-
-            using (var context = new LambdaContext())
-            {
-                lambda = context.Lambdas.First(l => l.Equals(imageId));
-            }
-
-            if (lambda == null)
-            {
-                return null;
-            }
-
-            return _mapper.Map<Lambda>(lambda);
-        }
-
         public void AddLambda(Lambda l)
         {
             LambdaDB lambda = _mapper.Map<LambdaDB>(l);

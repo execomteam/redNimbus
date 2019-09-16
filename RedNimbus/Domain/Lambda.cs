@@ -11,10 +11,7 @@ namespace RedNimbus.Domain
         public LambdaMessage.Types.TriggerType Trigger { get; set; }
 
         public LambdaMessage.Types.RuntimeType Runtime { get; set; }
-        public Guid OwnerToken { get; set; }
 
-        public Guid ImageId { get; set; }
-
-        public Guid Guid { get; set; }
+        public string Guid { get; set; }
     }
 }

@@ -8,7 +8,6 @@ namespace RedNimbus.LambdaService.Database
     public interface ILambdaManagment
     {
         Lambda GetLambdaById(string guid);
-        Lambda GetLambdaByImageId(string imageId);
         void AddLambda(Lambda l);
         void DeleteLambda(Lambda l);
     }

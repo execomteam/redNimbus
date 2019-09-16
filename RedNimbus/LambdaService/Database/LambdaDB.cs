@@ -16,11 +16,6 @@ namespace RedNimbus.LambdaService.Database
 
         public LambdaMessage.Types.RuntimeType Runtime { get; set; }
 
-        public string OwnerToken { get; set; }
-
-        
-        public string ImageId { get; set; }
-
         [Key]
         public string Guid { get; set; }
 
