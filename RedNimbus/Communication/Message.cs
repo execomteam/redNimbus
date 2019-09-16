@@ -58,7 +58,7 @@ namespace RedNimbus.Communication
 
                 Bytes = message.Pop();
             }
-            else
+               else
             {
                 Topic = message.Pop().ConvertToString();
 

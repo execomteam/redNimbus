@@ -1,0 +1,9 @@
+﻿syntax = "proto3";
+package RedNimbus.Messages;
+
+message LogMessage {
+	string Sender = 1;
+	string Date = 2;
+	string Time = 3;
+	string Payload = 4;
+}

@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaService", "LambdaServ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Either.Test", "Either.Test\Either.Test.csproj", "{9534FD08-D79A-46AB-8B93-3041546CA804}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerService", "Logger\LoggerService.csproj", "{4F9AB087-7854-4732-A194-482EC8ADA89F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,7 +91,14 @@ Global
 		{47CD8133-419B-4CEE-998C-479C3B29F562}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47CD8133-419B-4CEE-998C-479C3B29F562}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47CD8133-419B-4CEE-998C-479C3B29F562}.Release|Any CPU.Build.0 = Release|Any CPU
-
+		{9534FD08-D79A-46AB-8B93-3041546CA804}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9534FD08-D79A-46AB-8B93-3041546CA804}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9534FD08-D79A-46AB-8B93-3041546CA804}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9534FD08-D79A-46AB-8B93-3041546CA804}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F9AB087-7854-4732-A194-482EC8ADA89F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F9AB087-7854-4732-A194-482EC8ADA89F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F9AB087-7854-4732-A194-482EC8ADA89F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F9AB087-7854-4732-A194-482EC8ADA89F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
