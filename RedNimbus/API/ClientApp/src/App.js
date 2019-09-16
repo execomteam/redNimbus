@@ -88,14 +88,15 @@ export default class App extends React.Component{
                         </Nav>
                         <Navbar.Collapse>
                             <Nav pullRight>
-                                
+                                <LinkContainer to="/deactivateAccount">
+                                    <NavItem>Deactivate Account</NavItem>
+                                </LinkContainer>
                                 <LinkContainer to="/signout">
                                     <NavItem>signOut</NavItem>
                                 </LinkContainer>
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>
-                    
                         <Routes changeState={this.changeState} user={this.state} signOut={this.signOut} />
                     </div>
                 </Router>

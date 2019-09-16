@@ -53,7 +53,7 @@ namespace RedNimbus.API.Controllers
                 .Reduce(InternalServisErrorHandler);
         }
 
-        [HttpPost("deactivateAccount")]
+        [HttpPost("deactivateUserAccount")]
         public IActionResult deactivateAccount()
         {
             var token = Request.Headers["token"];

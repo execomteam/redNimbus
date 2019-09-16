@@ -6,6 +6,7 @@ import Home from './Home'
 import SignOut from './SignOut'
 import Bucket from './Bucket'
 import LambdaPage from './LambdaPage'
+import DeactivateAccount from './DeactivateAccount'
 
 class Routes extends React.Component {
     
@@ -21,6 +22,7 @@ class Routes extends React.Component {
                 <Route path="/signout" render={(props) => <SignOut signOut={this.props.signOut} />} />
                 <Route path="/login" render={(props) => <LoginForm changeState={this.props.changeState} />} />
                 <Route path="/register" render={(props) => <RegistrationForm />} />
+                <Route path="/deactivateAccount" render = {(props) => <DeactivateAccount />} />
             </Switch>
             );
         }
