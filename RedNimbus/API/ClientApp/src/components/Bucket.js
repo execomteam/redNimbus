@@ -12,20 +12,36 @@ class Bucket extends React.Component
         super(props);
 
         this.state = {
+            path: "/",
             folders: [],
             files: [],
-            createModalShow: false
+            createModalShow: false,
+            uploadModalShow: false
         }
         
         this.addNewBucket = this.addNewBucket.bind(this);
         this.setCreateModalShow = this.setCreateModalShow.bind(this);
         this.deletingBucket = this.deletingBucket.bind(this);
+        this.deletingFile = this.deletingFile.bind(this);
+
+        this.setUploadModalShow = this.setUploadModalShow.bind(this);
+        this.uploadFile = this.uploadFile.bind(this);
+
+        this.changePath = this.changePath.bind(this);
+        this.enterFolder = this.enterFolder.bind(this);
 
         const options = {
             headers: { 'token': localStorage.getItem("token")}
         };
-
-        axios.get("http://localhost:65001/api/bucket", options).then(
+        
+        
+        let path
+        if (typeof this.state.path === 'undefined')
+            path = "http://localhost:65001/api/bucket";
+        else
+            path = "http://localhost:65001/api/bucket" + this.state.path;
+        
+        axios.get(path, options).then(
             (resp) => this.onSuccessHandler(resp),
             (resp) => this.onErrorHandler(resp)
         );
@@ -77,6 +93,31 @@ class Bucket extends React.Component
         this.setState({folders: arr});
     }
 
+    deletingFile(file) {
+        let arr = this.state.files;
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] === file.value) {
+                arr.splice(i, 1);
+            }
+        }
+
+        this.setState({ files: arr });
+    }
+
+    uploadFile(file) {
+        let arr = this.state.files;
+        let found = false;
+        for (var i = 0; i < arr.length && !found; i++) {
+            found = (arr[i] === file.value);
+        }
+
+        if (!found) {
+            this.setState(prevState => ({
+                files: [...prevState.files, file.value]
+            }));
+        }
+    }
+
     setCreateModalShow(value){
         this.setState({
             createModalShow: value
@@ -87,18 +128,71 @@ class Bucket extends React.Component
             deleteModalShow: value
         });
     }
+
+    setUploadModalShow(value) {
+        this.setState({
+            uploadModalShow: value
+        });
+    }
+
+    changePath(newPath) {
+        const options = {
+            headers: { 'token': localStorage.getItem("token") }
+        };
+
+
+        this.setState({ path: newPath});
+        let path = "http://localhost:65001/api/bucket/post";
+        
+        axios.post(path, { Path: newPath }, options).then(
+            (resp) => this.onSuccessHandler(resp),
+            (resp) => this.onErrorHandler(resp)
+        );
+    }
+
+    enterFolder(folderName) {
+        const options = {
+            headers: { 'token': localStorage.getItem("token") }
+        };
+        let helpPath = this.state.path;
+        if (helpPath.slice(-1) === "/") {
+            let newPath = this.state.path + folderName + "/";
+            this.setState({ path: newPath });
+            let path = "http://localhost:65001/api/bucket/post";
+            axios.post(path, { Path: newPath }, options).then(
+                (resp) => this.onSuccessHandler(resp),
+                (resp) => this.onErrorHandler(resp)
+            );
+        }
+    }
+
     render() {
         return (
             <div className="container">
+                <div className="card-body">
+                    <h2 className="card-title text-left">{this.props.name+": " + this.state.path}</h2>
+                </div>
                 <div className="row">
                     <div className="col-md-2">
-                        <SideNav addNewBucket={this.addNewBucket} createModalShow={this.state.createModalShow} setCreateModalShow={this.setCreateModalShow} onClick={this.onClickeCreateNewBucket} />
+                        <SideNav
+                            path={this.state.path}
+
+                            changePath={this.changePath}
+
+                            uploadFile={this.uploadFile}
+                            uploadModalShow={this.state.uploadModalShow}
+                            setUploadModalShow={this.setUploadModalShow}
+                           
+                            addNewBucket={this.addNewBucket}
+                            createModalShow={this.state.createModalShow}
+                            setCreateModalShow={this.setCreateModalShow}
+                             />
                     </div>
                     <div className="col-md-10">   
                         <br />
-                        <FolderGroup deletingBucket={this.deletingBucket} content={this.state.folders}/>
+                        <FolderGroup deletingBucket={this.deletingBucket} content={this.state.folders} enterFolder={this.enterFolder} path={this.state.path}/>
                         <hr/>
-                        <FileGroup content={this.state.files}/>
+                        <FileGroup deletingFile={this.deletingFile} content={this.state.files} path={this.state.path}/>
                     </div>
                 </div>
             </div>

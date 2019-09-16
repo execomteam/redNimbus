@@ -4,7 +4,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
-const MySweetAlert = withReactContent(Swal)
+const LambdaCreatedAlert = withReactContent(Swal)
 
 class CreateLambda extends React.Component {
 
@@ -51,7 +51,7 @@ class CreateLambda extends React.Component {
 
 
     onErrorHandler(resp) {
-        MySweetAlert.fire({
+        LambdaCreatedAlert.fire({
             title: "Error occured",
             text: resp.response.data.message,
             type: "error",
@@ -61,9 +61,8 @@ class CreateLambda extends React.Component {
     }
 
     onSuccessHandler(resp) {
-        //this.props.addLambda(resp.data.name);
 
-        MySweetAlert.fire({
+        LambdaCreatedAlert.fire({
             title: "Lambda created successfully",
             text: "URL: http://localhost:65001/api/lambda/" + resp.data.guid,
             type: "success",

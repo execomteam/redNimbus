@@ -77,11 +77,9 @@ namespace RedNimbus.LambdaService.Helper
                     return extension;
             }
 
-            var projectName = Directory.EnumerateFiles(path, extension, SearchOption.TopDirectoryOnly)
+            return Directory.EnumerateFiles(path, extension, SearchOption.TopDirectoryOnly)
                            .Select(p => Path.GetFileNameWithoutExtension(p))
                            .ToList().FirstOrDefault().ToString();
-
-            return projectName;
         }
 
         private string GetTemplateName(RuntimeType runtimeType)
