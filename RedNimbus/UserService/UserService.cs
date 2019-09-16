@@ -26,6 +26,7 @@ namespace RedNimbus.UserService
             Subscribe("RegisterUser", HandleRegisterUser);
             Subscribe("AuthenticateUser", HandleAuthenticateUser);
             Subscribe("GetUser", HandleGetUser);
+            Subscribe("DeactivateUserAccount", HandleDeactivateUserAccount);
             
             _tokenManager = tokenManager;
             _userRepository = repository;
@@ -183,6 +184,36 @@ namespace RedNimbus.UserService
             };
 
             NetMQMessage msg = userMessage.ToNetMQMessage();
+            SendMessage(msg);
+        }
+
+        private void HandleDeactivateUserAccount(NetMQMessage message)
+        {
+            Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
+
+            if (tokenMessage.Data.Token == null)
+            {
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
+            }
+
+            Guid id = _tokenManager.ValidateToken(tokenMessage.Data.Token);
+            if (id.Equals(Guid.Empty))
+            {
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
+            }
+
+            if (_userRepository.GetUserById(id) == null)
+            {
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                return;
+            }
+
+            _userRepository.DeactivateUserAccount(id);
+
+            Message<TokenMessage> userMessage = new Message<TokenMessage>("Response");
+            NetMQMessage msg = tokenMessage.ToNetMQMessage();
             SendMessage(msg);
         }
 

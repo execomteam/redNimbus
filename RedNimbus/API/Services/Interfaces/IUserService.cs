@@ -9,7 +9,7 @@ namespace RedNimbus.API.Services.Interfaces
     {
         Either<IError, User> RegisterUser(User user);
         Either<IError, KeyDto> Authenticate(User user);
-
         Either<IError, User> GetUserByToken(string token);
+        Either<IError, Empty> deactivateUserAccount(string token);
     }
 }

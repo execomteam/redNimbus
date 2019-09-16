@@ -52,5 +52,15 @@ namespace RedNimbus.API.Controllers
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         }
+
+        [HttpPost("deactivateAccount")]
+        public IActionResult deactivateAccount()
+        {
+            var token = Request.Headers["token"];
+            return _userService.deactivateUserAccount(Request.Headers["token"])
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+        }
     }
 }
