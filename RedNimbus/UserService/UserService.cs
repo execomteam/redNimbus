@@ -87,9 +87,7 @@ namespace RedNimbus.UserService
                 LastName = userMessage.Data.LastName,
                 Email = userMessage.Data.Email,
                 Password = HashHelper.ComputeHash(userMessage.Data.Password),
-                PhoneNumber = userMessage.Data.PhoneNumber,
-                EmailConfirmation = num,
-                ActiveAccount = false
+                PhoneNumber = userMessage.Data.PhoneNumber
             };
 
             try
@@ -130,12 +128,7 @@ namespace RedNimbus.UserService
                 {
                 var registeredUser = _userRepository.GetUserByEmail(userMessage.Data.Email);
 
-                if (!registeredUser.ActiveAccount)
-                {
-                    SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
-                    return;
-                }
-
+                
                 if (registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
                 {
                     Message<TokenMessage> tokenMessage = new Message<TokenMessage>("Response");

@@ -20,6 +20,5 @@ namespace UserService.Database.Model
 
         public bool ActiveAccount { get; set; }
 
-        public int EmailConfirmation { get; set; }
     }
 }
