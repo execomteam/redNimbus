@@ -24,7 +24,7 @@ namespace RedNimbus.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody]CreateUserDto createUserDto) => _mapper.Map<User>(createUserDto)
+        public IActionResult Post([FromBody]CreateUserDto createUserDto) =>  _mapper.Map<User>(createUserDto)
                 .Map(_userService.RegisterUser)
                 .Map(() => AllOk())
                 .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed)
@@ -36,16 +36,17 @@ namespace RedNimbus.API.Controllers
         }
 
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto) => _mapper.Map<User>(authenticateUserDto)
+        public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto) =>
+            _mapper.Map<User>(authenticateUserDto)
                .Map(_userService.Authenticate)
                .Map(x => AllOk(new KeyDto() { Key = x.Key }))
                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
                .Reduce(InternalServisErrorHandler);
 
-        [HttpPost("get")]
-        public IActionResult Get([FromBody]KeyDto keyDto)
+        [HttpGet]
+        public IActionResult Get()
         {
-            return _userService.GetUserByToken(keyDto.Key)
+            return _userService.GetUserByToken(Request.Headers["token"])
                 .Map(_mapper.Map<UserDto>)
                 .Map(x => AllOk(x))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)

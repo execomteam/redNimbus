@@ -7,4 +7,5 @@ message UserMessage {
 	string Email = 3;
 	string Password = 4;
 	string PhoneNumber = 5;
+	string Token = 6;
 }

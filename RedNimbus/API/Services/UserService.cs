@@ -6,9 +6,7 @@ using RedNimbus.Communication;
 using RedNimbus.DTO;
 using RedNimbus.Domain;
 using NetMQ;
-using System;
 using RedNimbus.API.Helper;
-using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
 namespace RedNimbus.API.Services
 {
@@ -26,16 +24,10 @@ namespace RedNimbus.API.Services
                     Password = user.Password
                 }
             };
-           
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-        
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
-
 
             if (responseTopic.Equals("Response"))
             {
@@ -49,17 +41,16 @@ namespace RedNimbus.API.Services
 
         public Either<IError, KeyDto> Authenticate(User user)
         {
-            Message<UserMessage> message = new Message<UserMessage>("AuthenticateUser");
+            Message<UserMessage> message = new Message<UserMessage>("AuthenticateUser")
+            {
+                Data = new UserMessage()
+                {
+                    Email = user.Email,
+                    Password = user.Password
+                }
+            };
 
-            message.Data.Email = user.Email;
-            message.Data.Password = user.Password;
-
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
 
@@ -76,20 +67,17 @@ namespace RedNimbus.API.Services
             return new Left<IError, KeyDto>(GetError(response));
         }
 
-        
-
         public Either<IError, User> GetUserByToken(string token)
         {
-            Message<TokenMessage> message = new Message<TokenMessage>("GetUser");
+            Message<TokenMessage> message = new Message<TokenMessage>("GetUser")
+            {
+                Data = new TokenMessage()
+                {
+                    Token = token
+                }
+            };
 
-            message.Data.Token = token;
-
-            NetMQMessage temp = message.ToNetMQMessage();
-            NetMQFrame topicFrame = temp.Pop();
-            NetMQFrame emptyFrame = temp.Pop();
-            temp.Push(topicFrame);
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(temp);
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
 
             string responseTopic = response.First.ConvertToString();
 
@@ -100,7 +88,8 @@ namespace RedNimbus.API.Services
                 User user = new User
                 {
                     FirstName = successMessage.Data.FirstName,
-                    LastName = successMessage.Data.LastName
+                    LastName = successMessage.Data.LastName,
+                    Key = successMessage.Data.Token
                 };
 
                 return new Right<IError, User>(user);
@@ -108,6 +97,5 @@ namespace RedNimbus.API.Services
 
             return new Left<IError, User>(GetError(response));
         }
-
     }
 }

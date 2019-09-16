@@ -6,6 +6,7 @@ namespace RedNimbus.DTO
 {
     public class StringDto
     {
+        public string Path { get; set; }
         public string Value { get; set; }
     }
 }

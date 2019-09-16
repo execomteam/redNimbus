@@ -1,22 +1,24 @@
 ﻿using RedNimbus.Communication;
 using RedNimbus.Messages;
+using RedNimbus.TokenManager;
+using System;
 
 namespace RedNimbus.BucketService.Helper
 {
-    public static class MessageHelper
+    public class MessageHelper
     {
         
-        public static string GetAbsolutePath(string rootPath, Message<BucketMessage> msg)
+        public static string GetAbsolutePath(string rootPath, Message<BucketMessage> msg, ITokenManager tokenManager)
         {
             string relativePath = msg.Data.Path;
-            string userGuid = MessageHelper.Decode(msg.Data.Token);
-            return rootPath + userGuid + relativePath;
-        }
-        
-        //TODO: Decode token to get GUID
-        public static string Decode(string token)
-        {
-            return "Spisak";
+            Guid guid = tokenManager.ValidateToken(msg.Data.Token);
+            if (guid.Equals(Guid.Empty))
+            {
+                return null;
+            }
+
+            return rootPath + guid.ToString("B") + relativePath;
+
         }
 
         public static string GetNameFromPath(string path)
