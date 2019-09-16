@@ -6,7 +6,9 @@ using RedNimbus.TokenManager;
 using System;
 using RedNimbus.LambdaService.Services.Interfaces;
 using RedNimbus.LambdaService.Helper;
+using RedNimbus.LambdaService.Database;
 using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
+using RedNimbus.Domain;
 
 namespace RedNimbus.LambdaService.Services
 {
@@ -14,11 +16,13 @@ namespace RedNimbus.LambdaService.Services
     {
         ITokenManager _tokenManager;
         ILambdaHelper _lambdaHelper;
+        ILambdaManagment _lambdaManagment;
 
-        public LambdaService(ITokenManager tokenManager, ILambdaHelper lambdaHelper) : base()
+        public LambdaService(ITokenManager tokenManager, ILambdaHelper lambdaHelper, ILambdaManagment lambdaManagment) : base()
         {
             _tokenManager = tokenManager;
             _lambdaHelper = lambdaHelper;
+            _lambdaManagment = lambdaManagment;
             
             Subscribe("CreateLambda", HandleCreateLambda);
             Subscribe("GetLambda", HandleGetLambda);
@@ -40,6 +44,15 @@ namespace RedNimbus.LambdaService.Services
                     },
                     Id = requestMessage.Id
                 };
+
+                Lambda lambda = new Lambda()
+                {
+                    Name = responseMessage.Data.Name,
+                    Trigger = responseMessage.Data.Trigger,
+                    Runtime = responseMessage.Data.Runtime
+                };
+
+                _lambdaManagment.AddLambda(lambda);
 
                 SendMessage(responseMessage.ToNetMQMessage());
             }
