@@ -233,4 +233,6 @@ _Pvt_Extensions
 # FAKE - F# Make
 .fake/
 /RedNimbus/UserService/DBConfig.json
-/RedNimbus/BucketService/BucketConfig.json
+RedNimbus/BucketService/bucketConfig.json
+RedNimbus/BucketService/BucketService.csproj
+RedNimbus/BucketService/BucketService.csproj

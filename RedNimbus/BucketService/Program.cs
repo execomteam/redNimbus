@@ -10,7 +10,7 @@ namespace RedNimbus.BucketService
         {
             try
             {
-                Services.BucketService bucketService = new Services.BucketService(ConfigHelper.LoadConfig(), new TokenManager.TokenManager());
+                Services.BucketService bucketService = new Services.BucketService(ConfigHelper.LoadConfig(), new TokenManager.TokenManager(), 350000000);
                 bucketService.Start();
             }
             catch(Exception e)

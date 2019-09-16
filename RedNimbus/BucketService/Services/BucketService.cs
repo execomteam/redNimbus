@@ -16,12 +16,14 @@ namespace RedNimbus.BucketService.Services
     public class BucketService : BaseService
     {
         private string _path;
+        private int _maxFileSize;
         private ITokenManager _tokenManager;
 
-        public BucketService(string path, ITokenManager manager) : base()
+        public BucketService(string path, ITokenManager manager, int maxFileSize) : base()
         {
             _path = path;
             _tokenManager = manager;
+            _maxFileSize = maxFileSize;
 
             Subscribe("bucket/createBucket", CreateBucket);
             Subscribe("bucket/deleteBucket", DeleteBucket);
@@ -87,7 +89,6 @@ namespace RedNimbus.BucketService.Services
                     SendErrorMessage("Maximum number of buckets is 5", Either.Enums.ErrorCode.NumberOfBucketsExeeded, msg.Id);
                     return;
                 }
-                
             }
 
             if (msg.Data.Successful)
@@ -139,7 +140,7 @@ namespace RedNimbus.BucketService.Services
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
             string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
-
+            string folderName = null;
             if (absolutePath == null)
             {
                 msg.Data.Successful = false;
@@ -150,13 +151,16 @@ namespace RedNimbus.BucketService.Services
                 {
                     FileSystemService.CreateFolder(HomePath(msg.Data.Token));
                 }
-                msg.Data.Successful = FileSystemService.CreateFolder(absolutePath) != null;
+                folderName = FileSystemService.CreateFolder(absolutePath);
+                msg.Data.Successful = folderName != null;
             }
 
             msg.Topic = _returnTopic;
 
             if (msg.Data.Successful)
             {
+                msg.Topic = _returnTopic;
+                msg.Data.ReturnItems.Add(folderName);
                 SendMessage(msg.ToNetMQMessage());
             }
             else
@@ -197,7 +201,7 @@ namespace RedNimbus.BucketService.Services
         {
             Message<BucketMessage> msg = new Message<BucketMessage>(message);
             string absolutePath = MessageHelper.GetAbsolutePath(_path, msg, _tokenManager);
-            byte[] fileAsByteArray = msg.Data.File.ToByteArray();
+            byte[] fileAsByteArray = msg.Bytes.ToByteArray();
 
             if (absolutePath == null)
             {
@@ -208,6 +212,11 @@ namespace RedNimbus.BucketService.Services
                 if (!Directory.Exists(HomePath(msg.Data.Token)))
                 {
                     FileSystemService.CreateFolder(HomePath(msg.Data.Token));
+                }
+                if (fileAsByteArray.Length > _maxFileSize)
+                {
+                    SendErrorMessage("File size limit exceed.", Either.Enums.ErrorCode.PutFileError, msg.Id);
+                    return;
                 }
                 msg.Data.Successful = FileSystemService.ByteArrayToFile(absolutePath, fileAsByteArray);
             }
@@ -248,7 +257,7 @@ namespace RedNimbus.BucketService.Services
             if (fileAsByteArray != null)
             {
                 msg.Data.Successful = true;
-                msg.Data.File = ByteString.CopyFrom(fileAsByteArray);
+                msg.Bytes =  new NetMQFrame(fileAsByteArray);
                 SendMessage(msg.ToNetMQMessage());
             }
             else

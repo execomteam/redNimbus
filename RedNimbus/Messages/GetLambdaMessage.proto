@@ -1,0 +1,8 @@
+﻿syntax = "proto3";
+package RedNimbus.Messages;
+
+message GetLambdaMessage{
+	string token = 1;
+	string lambdaId = 2;
+	string result = 3;
+}

@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +43,11 @@ namespace RedNimbus.API
                 configuration.RootPath = "ClientApp/build";
             });
 
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 350001000;
+            });
+
             // Auto Mapper Configuration
             var mappingConfig = new MapperConfiguration(mc =>
             {
@@ -57,6 +63,7 @@ namespace RedNimbus.API
             services.AddSingleton(typeof(IRestUserService), new RestUserService("http://localhost:65000/"));
             services.AddSingleton(typeof(IUserService), new UserService());
             services.AddSingleton(typeof(BucketService), new BucketService());
+            services.AddSingleton(typeof(ILambdaService), new LambdaService());
             services.AddEitherServiceMapper();
 
         }

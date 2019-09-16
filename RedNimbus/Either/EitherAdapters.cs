@@ -16,6 +16,7 @@ namespace RedNimbus.Either
             }
             return (TLeft)(Left<TLeft,TRight>)either;
         }
+
         public static Either<TLeft, TRightResult> Map<TLeft, TRight, TRightResult>(this Either<TLeft,TRight> either, Func<TRight, Either<TLeft, TRightResult>> func)
         {
             if (either is Right<TLeft, TRight> right)
@@ -31,11 +32,8 @@ namespace RedNimbus.Either
             {
                 return func();
             }
-            else
-            {
-                var x = (Left<TLeft, TRight>)either;
-                return (TLeft)x;
-            }
+
+            return (TLeft)(Left<TLeft, TRight>)either;
         }
 
         public static TRight Reduce<TLeft, TRight>(this Either<TLeft, TRight> either, Func<TLeft, TRight> func)
@@ -52,8 +50,7 @@ namespace RedNimbus.Either
         {
             if (either is Left<TLeft, TRight> left)
             {
-
-                return when(left) ?  func(left) : either;
+                return when(left) ? func(left) : either;
             }
 
             return (Right<TLeft, TRight>)either;
