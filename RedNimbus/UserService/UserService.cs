@@ -37,13 +37,13 @@ namespace RedNimbus.UserService
         {
             if (!Validation.IsFirstNameValid(userMessage.Data.FirstName))
             {
-                SendErrorMessage("First Name is empty.", ErrorCode.FirstNameNullEmptyOrWhiteSpace, userMessage.Id);
+                SendErrorMessage("Invalid First Name format.", ErrorCode.FirstNameNullEmptyOrWhiteSpace, userMessage.Id);
                 return false;
             }
 
             if (!Validation.IsLastNameValid(userMessage.Data.LastName))
             {
-                SendErrorMessage("Last Name is empty.", ErrorCode.LastNameNullEmptyOrWhiteSpace, userMessage.Id);
+                SendErrorMessage("Invalid Last Name format.", ErrorCode.LastNameNullEmptyOrWhiteSpace, userMessage.Id);
                 return false;
             }
 
@@ -60,7 +60,7 @@ namespace RedNimbus.UserService
             }
             if (!String.IsNullOrWhiteSpace(userMessage.Data.PhoneNumber) && !Validation.IsPhoneValid(userMessage.Data.PhoneNumber))
             {
-                SendErrorMessage("Phone number wrong format", ErrorCode.PhoneNumberWrongFormat, userMessage.Id);
+                SendErrorMessage("Invalid phone number format.", ErrorCode.PhoneNumberWrongFormat, userMessage.Id);
                 return false;
             }
 
