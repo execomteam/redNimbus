@@ -19,5 +19,7 @@ namespace UserService.Database.Model
         public string PhoneNumber { get; set; }
 
         public bool ActiveAccount { get; set; }
+
+        public int EmailConfirmation { get; set; }
     }
 }

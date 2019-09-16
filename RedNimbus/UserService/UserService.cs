@@ -76,6 +76,10 @@ namespace RedNimbus.UserService
                 return;
             }
 
+            Random rnd = new Random();
+
+            int num = rnd.Next(1000000000);
+
             User user = new User
             {
                 Id = Guid.NewGuid(),
@@ -84,6 +88,8 @@ namespace RedNimbus.UserService
                 Email = userMessage.Data.Email,
                 Password = HashHelper.ComputeHash(userMessage.Data.Password),
                 PhoneNumber = userMessage.Data.PhoneNumber,
+                EmailConfirmation = num,
+                ActiveAccount = false
             };
 
             try
@@ -123,6 +129,13 @@ namespace RedNimbus.UserService
             if (_userRepository.CheckIfExists(email))
                 {
                 var registeredUser = _userRepository.GetUserByEmail(userMessage.Data.Email);
+
+                if (!registeredUser.ActiveAccount)
+                {
+                    SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
+                    return;
+                }
+
                 if (registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
                 {
                     Message<TokenMessage> tokenMessage = new Message<TokenMessage>("Response");
