@@ -1,12 +1,13 @@
 ﻿using System;
 
-namespace MailService
+namespace RedNimbus.MailService
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Services.MailService mailService = new Services.MailService();
+            mailService.Start();
         }
     }
 }

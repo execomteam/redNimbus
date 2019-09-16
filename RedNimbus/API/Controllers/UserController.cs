@@ -52,5 +52,14 @@ namespace RedNimbus.API.Controllers
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         }
+
+        [HttpGet("/emailConfirmation/{token}")]
+        public IActionResult EmailConfirmation(string token)
+        {
+            return _userService.EmailConfirmation(token)
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+        }
     }
 }

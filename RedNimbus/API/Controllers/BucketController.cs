@@ -57,8 +57,6 @@ namespace RedNimbus.API.Controllers
                 .Reduce(NotFoundErrorHandler, x => x is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         
-
-
         [HttpPost("uploadFile")]
         [RequestSizeLimit(350001000)]
         public IActionResult UploadFile([FromForm]UploadFileDto uploadFile) =>
