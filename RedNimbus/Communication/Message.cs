@@ -28,6 +28,11 @@ namespace RedNimbus.Communication
         public T Data { get; set; } = new T();
 
         /// <summary>
+        /// Represents a frame containing a byte array, used for file transfer.
+        /// </summary>
+        public NetMQFrame Bytes { get; set; }
+
+        /// <summary>
         /// Create a new Message instance.
         /// </summary>
         /// <param name="topic">String representation of the topic for the message.</param>
@@ -42,12 +47,26 @@ namespace RedNimbus.Communication
         /// <param name="message">Instance of NetMQMessage class.</param>
         public Message(NetMQMessage message)
         {
-            Topic = message.Pop().ConvertToString();
+            if(message.FrameCount == 4)
+            {
+                Topic = message.Pop().ConvertToString();
 
-            Id = message.Pop();
+                Id = message.Pop();
 
-            NetMQFrame data = message.Pop();
-            Data.MergeFrom(data.ToByteArray());
+                NetMQFrame data = message.Pop();
+                Data.MergeFrom(data.ToByteArray());
+
+                Bytes = message.Pop();
+            }
+            else
+            {
+                Topic = message.Pop().ConvertToString();
+
+                NetMQFrame data = message.Pop();
+                Data.MergeFrom(data.ToByteArray());
+
+                Bytes = message.Pop();
+            }
         }
 
         /// <summary>
@@ -60,13 +79,19 @@ namespace RedNimbus.Communication
 
             message.Append(Topic);
 
-            message.Append(Id);
+            if (Id != null)
+                message.Append(Id);
 
             MemoryStream stream = new MemoryStream();
             Data.WriteTo(stream);
 
             NetMQFrame dataFrame = new NetMQFrame(stream.ToArray());
             message.Append(dataFrame);
+
+            if (Bytes == null)
+                message.AppendEmptyFrame();
+            else
+                message.Append(Bytes);
 
             return message;
         }

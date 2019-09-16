@@ -1,0 +1,21 @@
+﻿syntax = "proto3";
+package RedNimbus.Messages;
+
+message LambdaMessage {
+	string Name = 1;
+	TriggerType Trigger = 2;
+	RuntimeType Runtime = 3;
+	string OwnerId = 4;
+	string ImageId = 5;
+	string Guid = 6;
+
+	enum TriggerType {
+		GET = 0;
+		POST = 1;
+	}
+
+	enum RuntimeType {
+		CSHARP = 0;
+		PYTHON = 1;
+	}
+}
