@@ -10,6 +10,7 @@ using RedNimbus.API.Services;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.Either;
 using RedNimbus.Either.Mappings;
+using RedNimbus.LogLibrary;
 
 namespace RedNimbus.API
 {

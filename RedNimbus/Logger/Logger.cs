@@ -1,57 +1,59 @@
 ﻿using Google.Protobuf;
 using NetMQ;
-using NetMQ.Sockets;
+using RedNimbus.LogLibrary;
 using RedNimbus.Messages;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
-namespace LoggerService
+namespace RedNimbus.LoggerService
 {
     public class Logger
     {
-    }
+        private ILogReceiver _receiver;
+        string _logFilePath;
 
-    public class LogSender : IDisposable
-    {
-        private DealerSocket _sender;
-
-        public LogSender(string loggerEndpoint)
+        public Logger(string endpoint, string logFilePath)
         {
-            _sender = new DealerSocket();
-            _sender.Connect(loggerEndpoint);
+            _logFilePath = logFilePath;
+            _receiver = new LogReceiver(endpoint, MessageHandler);
         }
 
-        public void Dispose()
+        public Logger(ILogReceiver receiver)
         {
-            _sender.Close();
+            _receiver = receiver;
         }
 
-        public void Send(string requestId, LogMessage log)
+        public void Start()
         {
-            NetMQMessage message = new NetMQMessage();
-            NetMQFrame idFrame = new NetMQFrame(requestId);
-            NetMQFrame dataFrame; 
+            _receiver.Start();
+        }
 
-            using (var stream = new MemoryStream()) {
-                log.WriteTo(stream);
-                dataFrame = new NetMQFrame(stream.ToArray()); 
+        public void Stop()
+        {
+            _receiver.Stop();
+        }
+
+        private void MessageHandler(NetMQMessage message)
+        {
+            Console.WriteLine("Hello from messageHandler");
+            using (var writer = new StreamWriter(_logFilePath, true))
+            {
+                writer.WriteLine(ComposeLogMessage(message));
             }
-
-            message.Append(idFrame);
-            message.Append(dataFrame);
-
-            _sender.SendMultipartMessage(message);
         }
-    }
 
-    public class LogReceiver
-    {
-        private DealerSocket _receiver;
-        public LogReceiver()
+        private string ComposeLogMessage(NetMQMessage message)
         {
+            //get request id
+            Guid requestId = new Guid(message.Pop().ToByteArray());
 
+            //get log message
+            LogMessage data = new LogMessage();
+            data.MergeFrom(message.Pop().ToByteArray());
+
+            //compose message format
+            // date | time | id | sender |  
+            return String.Format("{0} | {1} | reqId: {2} | type: {3} | origin: {4} | payload: {5}", data.Date, data.Time, requestId.ToString(), data.Type, data.Sender, data.Payload);
         }
     }
 }

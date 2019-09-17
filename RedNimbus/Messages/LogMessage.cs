@@ -24,13 +24,16 @@ namespace RedNimbus.Messages {
     static LogMessageReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChBMb2dNZXNzYWdlLnByb3RvEhJSZWROaW1idXMuTWVzc2FnZXMiSQoKTG9n",
-            "TWVzc2FnZRIOCgZTZW5kZXIYASABKAkSDAoERGF0ZRgCIAEoCRIMCgRUaW1l",
-            "GAMgASgJEg8KB1BheWxvYWQYBCABKAliBnByb3RvMw=="));
+            "ChBMb2dNZXNzYWdlLnByb3RvEhJSZWROaW1idXMuTWVzc2FnZXMiuwEKCkxv",
+            "Z01lc3NhZ2USDgoGU2VuZGVyGAEgASgJEgwKBERhdGUYAiABKAkSDAoEVGlt",
+            "ZRgDIAEoCRIPCgdQYXlsb2FkGAQgASgJEjQKBFR5cGUYBSABKA4yJi5SZWRO",
+            "aW1idXMuTWVzc2FnZXMuTG9nTWVzc2FnZS5Mb2dUeXBlIjoKB0xvZ1R5cGUS",
+            "CAoESW5mbxAAEg0KCUV4Y2VwdGlvbhABEgsKB1dhcm5pbmcQAhIJCgVFcnJv",
+            "chADYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.LogMessage), global::RedNimbus.Messages.LogMessage.Parser, new[]{ "Sender", "Date", "Time", "Payload" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.LogMessage), global::RedNimbus.Messages.LogMessage.Parser, new[]{ "Sender", "Date", "Time", "Payload", "Type" }, null, new[]{ typeof(global::RedNimbus.Messages.LogMessage.Types.LogType) }, null, null)
           }));
     }
     #endregion
@@ -66,6 +69,7 @@ namespace RedNimbus.Messages {
       date_ = other.date_;
       time_ = other.time_;
       payload_ = other.payload_;
+      type_ = other.type_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -118,6 +122,17 @@ namespace RedNimbus.Messages {
       }
     }
 
+    /// <summary>Field number for the "Type" field.</summary>
+    public const int TypeFieldNumber = 5;
+    private global::RedNimbus.Messages.LogMessage.Types.LogType type_ = global::RedNimbus.Messages.LogMessage.Types.LogType.Info;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::RedNimbus.Messages.LogMessage.Types.LogType Type {
+      get { return type_; }
+      set {
+        type_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as LogMessage);
@@ -135,6 +150,7 @@ namespace RedNimbus.Messages {
       if (Date != other.Date) return false;
       if (Time != other.Time) return false;
       if (Payload != other.Payload) return false;
+      if (Type != other.Type) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -145,6 +161,7 @@ namespace RedNimbus.Messages {
       if (Date.Length != 0) hash ^= Date.GetHashCode();
       if (Time.Length != 0) hash ^= Time.GetHashCode();
       if (Payload.Length != 0) hash ^= Payload.GetHashCode();
+      if (Type != global::RedNimbus.Messages.LogMessage.Types.LogType.Info) hash ^= Type.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -174,6 +191,10 @@ namespace RedNimbus.Messages {
         output.WriteRawTag(34);
         output.WriteString(Payload);
       }
+      if (Type != global::RedNimbus.Messages.LogMessage.Types.LogType.Info) {
+        output.WriteRawTag(40);
+        output.WriteEnum((int) Type);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -193,6 +214,9 @@ namespace RedNimbus.Messages {
       }
       if (Payload.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Payload);
+      }
+      if (Type != global::RedNimbus.Messages.LogMessage.Types.LogType.Info) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -216,6 +240,9 @@ namespace RedNimbus.Messages {
       }
       if (other.Payload.Length != 0) {
         Payload = other.Payload;
+      }
+      if (other.Type != global::RedNimbus.Messages.LogMessage.Types.LogType.Info) {
+        Type = other.Type;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -244,9 +271,27 @@ namespace RedNimbus.Messages {
             Payload = input.ReadString();
             break;
           }
+          case 40: {
+            Type = (global::RedNimbus.Messages.LogMessage.Types.LogType) input.ReadEnum();
+            break;
+          }
         }
       }
     }
+
+    #region Nested types
+    /// <summary>Container for nested types declared in the LogMessage message type.</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static partial class Types {
+      public enum LogType {
+        [pbr::OriginalName("Info")] Info = 0,
+        [pbr::OriginalName("Exception")] Exception = 1,
+        [pbr::OriginalName("Warning")] Warning = 2,
+        [pbr::OriginalName("Error")] Error = 3,
+      }
+
+    }
+    #endregion
 
   }
 

@@ -6,6 +6,9 @@ using RedNimbus.DTO;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 using RedNimbus.Either.Mappings;
+using RedNimbus.LogLibrary;
+using RedNimbus.Messages;
+using System;
 
 namespace RedNimbus.API.Controllers
 {
@@ -16,19 +19,42 @@ namespace RedNimbus.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IEitherMapper _mapper;
+        private ILogSender _logSender;
 
         public UserController(IUserService userService, IEitherMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;
+            _logSender = new LogSender("tcp://127.0.0.1:8887");
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody]CreateUserDto createUserDto) =>  _mapper.Map<User>(createUserDto)
+        public IActionResult Post([FromBody]CreateUserDto createUserDto)
+        {
+            Guid requestId = Guid.NewGuid();
+
+            return _mapper.Map<User>(createUserDto)
+                .Map((u) => SendLogMessage(requestId, u, "UserController/Post - Request Received"))
                 .Map(_userService.RegisterUser)
+                .Map((u) => SendLogMessage(requestId, u, "UserController/Post - Successful"))
                 .Map(() => AllOk())
                 .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed)
                 .Reduce(this.InternalServisErrorHandler);
+        }
+
+        private User SendLogMessage(Guid id, User u, string origin)
+        {
+            _logSender.Send(id, new LogMessage()
+            {
+                Date = DateTime.Now.ToShortDateString().ToString(),
+                Time = DateTime.Now.TimeOfDay.ToString(),
+                Type = LogMessage.Types.LogType.Info,
+                Payload = u.ToString(),
+                Sender = origin
+            });
+
+            return u;
+        }
 
         private static bool EmailAlreadyUsed(IError err)
         {
@@ -36,12 +62,18 @@ namespace RedNimbus.API.Controllers
         }
 
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto) =>
-            _mapper.Map<User>(authenticateUserDto)
+        public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto)
+        {
+            Guid requestId = Guid.NewGuid();
+
+            return _mapper.Map<User>(authenticateUserDto)
+               .Map((u) => SendLogMessage(requestId, u, "UserController/Authenticate - Request Received"))
                .Map(_userService.Authenticate)
+               .Map((u) => SendLogMessage(requestId, u, "UserController/Authenticate - Successful"))
                .Map(x => AllOk(new KeyDto() { Key = x.Key }))
                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
                .Reduce(InternalServisErrorHandler);
+        }
 
         [HttpGet]
         public IActionResult Get()
