@@ -26,7 +26,7 @@ namespace UserService.Database
         {
             UserDB userDB = ConvertUserToUserDB(newUser);
 
-            userDB.ActiveAccount = false;
+            userDB.ActiveAccount = true;
 
             using (context = new DatabaseContext())
             {

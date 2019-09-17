@@ -28,7 +28,7 @@ class RegistrationForm extends React.Component{
         this.handleToSCheckboxChange        = this.handleToSCheckboxChange.bind(this);
         this.handleSubmit                   = this.handleSubmit.bind(this);
         this.redirectToHome                 = this.redirectToHome.bind(this);
-        this.handleError = this.handleError.bind(this);
+        this.handleError                    = this.handleError.bind(this);
     }
 
     handlePasswordChange(event){
@@ -190,8 +190,6 @@ class RegistrationForm extends React.Component{
         
         let self = this;
         
-
-
         axios.post("http://localhost:65001/api/user", { firstName: firstName, lastName: lastName, email: email, password: password, repeatedPassword: repeatedPassword, phoneNumber: phoneNumber }).then(
             (response) => {
                 self.props.history.push("/login");

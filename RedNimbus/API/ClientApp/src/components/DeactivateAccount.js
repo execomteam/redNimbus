@@ -10,35 +10,41 @@ class DeactivateAccount extends React.Component{
         this.setState =({
             deactivateErrorMessage : ''
         })
+
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleSubmit(event){
+        event.preventDefault();
         let token = localStorage.getItem("token");
 
         let headers = {
-            "Content-Type":'application/json; charset=utf-8',
-            "token" : token
-
+            token:token
         }
 
-        axios.post("http://localhost:65001/api/user/deactivateUserAccount", {} , {"headers": {token:token}}).then(
+        let self = this;
+
+        axios.post("http://localhost:65001/api/user/deactivateUserAccount", {} , {"headers": headers}).then(
         (resoponse) => {
-            this.props.history.push("/");
+            localStorage.setItem('token','');
+            self.props.signOut();
+            self.props.history.push("/");
         },
         (response) => {
-            this.setState({deactivateErrorMessage : response.data.message});
+            self.setState({deactivateErrorMessage : response.data.message});
         }
         );
     }
+
 
     render(){
         return(
             <div className = "global-container">
                 <center>
                     <h5>Warning</h5>
-                    <h6>By deactivating your account you won't be able to access your files!</h6>
+                    <h6><label style={{ color: 'red' }}>By deactivating your account you won't be able to access your files!</label></h6>
                     <form onSubmit={this.handleSubmit}>
-                        <input type="submit" value="Deactivate Account"/>
+                        <input type="submit" value="I uderstand. Deactivate Account"/>
                     </form>
                 </center>
             </div>
@@ -49,4 +55,4 @@ class DeactivateAccount extends React.Component{
 
 }
 
-export default DeactivateAccount;
+export default withRouter(DeactivateAccount);

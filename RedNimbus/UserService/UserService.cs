@@ -212,7 +212,7 @@ namespace RedNimbus.UserService
 
             _userRepository.DeactivateUserAccount(id);
 
-            Message<TokenMessage> userMessage = new Message<TokenMessage>("Response");
+            tokenMessage.Topic = "Response";
             NetMQMessage msg = tokenMessage.ToNetMQMessage();
             SendMessage(msg);
         }
