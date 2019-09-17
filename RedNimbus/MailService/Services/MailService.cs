@@ -1,6 +1,5 @@
 ﻿using NetMQ;
 using RedNimbus.Communication;
-using RedNimbus.MailService.Helper;
 using RedNimbus.Messages;
 using System;
 using System.Collections.Generic;

@@ -53,11 +53,21 @@ namespace RedNimbus.API.Controllers
                 .Reduce(InternalServisErrorHandler);
         }
 
-        [HttpGet("/emailConfirmation/{token}")]
+        [HttpPost("deactivateAccount")]
+        public IActionResult deactivateAccount()
+        {
+            var token = Request.Headers["token"];
+            return _userService.deactivateUserAccount(Request.Headers["token"])
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+        }
+
+        [HttpGet("emailConfirmation/{token}")]
         public IActionResult EmailConfirmation(string token)
         {
             return _userService.EmailConfirmation(token)
-                .Map(x => AllOk(x))
+                .Map(() => (IActionResult)Redirect("http://localhost:65001/login/"))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         }
