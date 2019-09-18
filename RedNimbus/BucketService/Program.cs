@@ -16,7 +16,7 @@ namespace RedNimbus.BucketService
             catch(Exception e)
             {
                 Console.WriteLine(e.Message);
-                Console.WriteLine("press any button");
+                Console.WriteLine("press any button to exit");
                 Console.ReadLine();
                 return;
             }          

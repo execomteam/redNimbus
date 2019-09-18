@@ -21,11 +21,11 @@ namespace RedNimbus.API.Controllers
         private readonly IEitherMapper _mapper;
         private ILogSender _logSender;
 
-        public UserController(IUserService userService, IEitherMapper mapper)
+        public UserController(IUserService userService, IEitherMapper mapper, ILogSender logSender)
         {
             _userService = userService;
             _mapper = mapper;
-            _logSender = new LogSender("tcp://127.0.0.1:8887");
+            _logSender = logSender;
         }
 
         [HttpPost]
@@ -33,7 +33,7 @@ namespace RedNimbus.API.Controllers
         {
             Guid requestId = Guid.NewGuid();
 
-            return _mapper.Map<User>(createUserDto, (u) => LogRequest(requestId, u))
+            return _mapper.Map<User>(createUserDto, (u) => LogRequest(requestId, "UserController/Post", u))
                 .Map(_userService.RegisterUser)
                 .Map(() => AllOk(), (u) => LogSuccessfulPost(requestId, u))
                 .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed, (e) => LogError(requestId, e, "UserController/Post"))
@@ -45,7 +45,7 @@ namespace RedNimbus.API.Controllers
         {
             Guid requestId = Guid.NewGuid();
 
-            return _mapper.Map<User>(authenticateUserDto, (u) => LogRequest(requestId, u))
+            return _mapper.Map<User>(authenticateUserDto, (u) => LogRequest(requestId, "UserController/Post", u))
                .Map(_userService.Authenticate)
                .Map(x => AllOk(new KeyDto() { Key = x.Key }), (x) => LogSuccessfulAuthentication(requestId, x))
                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError, (e) => LogError(requestId, e, "UserController/Authernticate"))
@@ -56,7 +56,7 @@ namespace RedNimbus.API.Controllers
         public IActionResult Get()
         {
             Guid requestId = Guid.NewGuid();
-            LogRequest(requestId);
+            LogRequest(requestId, "UserController/Get");
 
             return _userService.GetUserByToken(Request.Headers["token"])
                 .Map(_mapper.Map<UserDto>)
@@ -113,7 +113,7 @@ namespace RedNimbus.API.Controllers
             });
         }
 
-        private void LogRequest(Guid id, User u = null)
+        private void LogRequest(Guid id, string origin, User u = null)
         {
             _logSender.Send(id, new LogMessage()
             {
@@ -121,7 +121,7 @@ namespace RedNimbus.API.Controllers
                 Time = DateTime.Now.TimeOfDay.ToString(),
                 Type = LogMessage.Types.LogType.Info,
                 Payload = u != null ? u.ToString() : "function does not take any parameters",
-                Sender = "UserController/Post"
+                Sender = origin
             });
         }
 
