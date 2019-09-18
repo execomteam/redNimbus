@@ -46,7 +46,7 @@ namespace RedNimbus.API
 
             services.Configure<FormOptions>(options =>
             {
-                options.MultipartBodyLengthLimit = 360000000;
+                options.MultipartBodyLengthLimit = 350001000;
             });
 
             // Auto Mapper Configuration
