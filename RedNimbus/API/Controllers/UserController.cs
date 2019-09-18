@@ -16,11 +16,13 @@ namespace RedNimbus.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IEitherMapper _mapper;
+        private string _loginPage;
 
         public UserController(IUserService userService, IEitherMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;
+            _loginPage = "http://localhost:65001/login/";
         }
 
         [HttpPost]
@@ -67,7 +69,7 @@ namespace RedNimbus.API.Controllers
         public IActionResult EmailConfirmation(string token)
         {
             return _userService.EmailConfirmation(token)
-                .Map(() => (IActionResult)Redirect("http://localhost:65001/login/"))
+                .Map(() => (IActionResult)Redirect(_loginPage))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         }
