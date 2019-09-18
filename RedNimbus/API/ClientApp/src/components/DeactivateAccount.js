@@ -12,6 +12,7 @@ class DeactivateAccount extends React.Component{
         })
 
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
 
     handleSubmit(event){
@@ -36,15 +37,21 @@ class DeactivateAccount extends React.Component{
         );
     }
 
+    handleCancel(event){
+        event.preventDefault();
+        this.props.history.push("/");
+    }
+
 
     render(){
         return(
             <div className = "global-container">
                 <center>
-                    <h5>Warning</h5>
-                    <h6><label style={{ color: 'red' }}>By deactivating your account you won't be able to access your files!</label></h6>
+                    <h3>Warning</h3>
+                    <h6><label style={{ color: 'red' }}>By deactivating your account you won't be able to access your files! <br/> You will be logged out if you continue deactivation</label></h6>
                     <form onSubmit={this.handleSubmit}>
-                        <input type="submit" value="I uderstand. Deactivate Account"/>
+                        <input type="submit" value="I uderstand. Deactivate my Account."/><br/><br/>
+                        <input type="button" value="I changed my mind. Take me back to safety." onClick={this.handleCancel}/>
                     </form>
                 </center>
             </div>

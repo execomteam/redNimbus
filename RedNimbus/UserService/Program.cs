@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
 using GalaSoft.MvvmLight.Ioc;
-using Org.BouncyCastle.Asn1.Ocsp;
-using RedNimbus.Domain;
 using RedNimbus.TokenManager;
 using UserService.Database;
-using UserService.Database.Model;
 using UserService.Mapping;
 
 namespace RedNimbus.UserService
@@ -18,9 +15,13 @@ namespace RedNimbus.UserService
             SimpleIoc.Default.Register<ITokenManager, TokenManager.TokenManager>();
             SimpleIoc.Default.Register<UserService>();
 
-            var userService = SimpleIoc.Default.GetInstance<UserService>();
+            SimpleIoc.Default.Register<UserService2.UserService2<UserCommunicationService>>();
+            SimpleIoc.Default.Register<UserCommunicationService>();
 
-            userService.Start();
+            var userService = SimpleIoc.Default.GetInstance<UserService>();
+            var userService2 = SimpleIoc.Default.GetInstance<UserService2.UserService2<UserCommunicationService>>();
+
+            userService2.Start();
         }
     }
 }

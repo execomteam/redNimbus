@@ -9,7 +9,7 @@ using System;
 using UserService.Database;
 using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
-namespace UserService
+namespace RedNimbus.UserService2
 {
     class UserService2<T> where T:BaseService, IUserCommunicationService
     {
@@ -22,6 +22,7 @@ namespace UserService
             this._userRepository            = userRepository;
             this._userCommunicationService  = userCommunicationService;
             this._tokenManager              = tokenManager;
+            this.SubscribeToTopics();
         }
 
         private void SubscribeToTopics()
@@ -127,6 +128,11 @@ namespace UserService
             _userRepository.DeactivateUserAccount(id);
 
             _userCommunicationService.HandleDeactivateUserAccountResponse(tokenMessage);
+        }
+
+        public void Start()
+        {
+            _userCommunicationService.Start();
         }
     }
 }
