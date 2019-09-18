@@ -142,7 +142,6 @@ namespace RedNimbus.UserService
                     return;
                 }
             }
-
             SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
         }
 
