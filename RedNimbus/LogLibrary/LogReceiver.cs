@@ -22,7 +22,7 @@ namespace RedNimbus.LogLibrary
             Start();
         }
 
-        public bool IsRunning { get; }
+        public bool IsRunning { get; private set; }
 
         private void RecieiveReadyHandler(object sender, NetMQSocketEventArgs e)
         {
@@ -40,6 +40,7 @@ namespace RedNimbus.LogLibrary
                 _receiver.ReceiveReady += RecieiveReadyHandler;
                 _receiver.Bind(_listenAddress);
                 _poller.Run();
+                IsRunning = true;
             }
         }
 
@@ -49,6 +50,7 @@ namespace RedNimbus.LogLibrary
             {
                 _receiver.Unbind(_listenAddress);
                 _receiver.Close();
+                IsRunning = false;
             }
         }
 

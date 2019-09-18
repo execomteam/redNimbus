@@ -73,7 +73,7 @@ namespace RedNimbus.API.Controllers
                 Time = DateTime.Now.TimeOfDay.ToString(),
                 Type = LogMessage.Types.LogType.Info,
                 Payload = u.ToString(),
-                Sender = "UserController/Post"
+                Origin = "UserController/Post"
             });
         }
 
@@ -85,7 +85,7 @@ namespace RedNimbus.API.Controllers
                 Time = DateTime.Now.TimeOfDay.ToString(),
                 Type = LogMessage.Types.LogType.Info,
                 Payload = userDto.ToString(),
-                Sender = "UserController/Get"
+                Origin = "UserController/Get"
             });
         }
 
@@ -97,7 +97,7 @@ namespace RedNimbus.API.Controllers
                 Time = DateTime.Now.TimeOfDay.ToString(),
                 Type = LogMessage.Types.LogType.Info,
                 Payload = token.Key,
-                Sender = "UserController/Authenticate"
+                Origin = "UserController/Authenticate"
             });
         }
 
@@ -109,7 +109,7 @@ namespace RedNimbus.API.Controllers
                 Time = DateTime.Now.TimeOfDay.ToString(),
                 Type = LogMessage.Types.LogType.Error,
                 Payload = e.Code.ToString(),
-                Sender = origin
+                Origin = origin
             });
         }
 
@@ -121,7 +121,7 @@ namespace RedNimbus.API.Controllers
                 Time = DateTime.Now.TimeOfDay.ToString(),
                 Type = LogMessage.Types.LogType.Info,
                 Payload = u != null ? u.ToString() : "function does not take any parameters",
-                Sender = origin
+                Origin = origin
             });
         }
 

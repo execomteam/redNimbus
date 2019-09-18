@@ -25,7 +25,7 @@ namespace RedNimbus.Messages {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChBMb2dNZXNzYWdlLnByb3RvEhJSZWROaW1idXMuTWVzc2FnZXMiuwEKCkxv",
-            "Z01lc3NhZ2USDgoGU2VuZGVyGAEgASgJEgwKBERhdGUYAiABKAkSDAoEVGlt",
+            "Z01lc3NhZ2USDgoGT3JpZ2luGAEgASgJEgwKBERhdGUYAiABKAkSDAoEVGlt",
             "ZRgDIAEoCRIPCgdQYXlsb2FkGAQgASgJEjQKBFR5cGUYBSABKA4yJi5SZWRO",
             "aW1idXMuTWVzc2FnZXMuTG9nTWVzc2FnZS5Mb2dUeXBlIjoKB0xvZ1R5cGUS",
             "CAoESW5mbxAAEg0KCUV4Y2VwdGlvbhABEgsKB1dhcm5pbmcQAhIJCgVFcnJv",
@@ -33,7 +33,7 @@ namespace RedNimbus.Messages {
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.LogMessage), global::RedNimbus.Messages.LogMessage.Parser, new[]{ "Sender", "Date", "Time", "Payload", "Type" }, null, new[]{ typeof(global::RedNimbus.Messages.LogMessage.Types.LogType) }, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.LogMessage), global::RedNimbus.Messages.LogMessage.Parser, new[]{ "Origin", "Date", "Time", "Payload", "Type" }, null, new[]{ typeof(global::RedNimbus.Messages.LogMessage.Types.LogType) }, null, null)
           }));
     }
     #endregion
@@ -65,7 +65,7 @@ namespace RedNimbus.Messages {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public LogMessage(LogMessage other) : this() {
-      sender_ = other.sender_;
+      origin_ = other.origin_;
       date_ = other.date_;
       time_ = other.time_;
       payload_ = other.payload_;
@@ -78,14 +78,14 @@ namespace RedNimbus.Messages {
       return new LogMessage(this);
     }
 
-    /// <summary>Field number for the "Sender" field.</summary>
-    public const int SenderFieldNumber = 1;
-    private string sender_ = "";
+    /// <summary>Field number for the "Origin" field.</summary>
+    public const int OriginFieldNumber = 1;
+    private string origin_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Sender {
-      get { return sender_; }
+    public string Origin {
+      get { return origin_; }
       set {
-        sender_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        origin_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -146,7 +146,7 @@ namespace RedNimbus.Messages {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Sender != other.Sender) return false;
+      if (Origin != other.Origin) return false;
       if (Date != other.Date) return false;
       if (Time != other.Time) return false;
       if (Payload != other.Payload) return false;
@@ -157,7 +157,7 @@ namespace RedNimbus.Messages {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (Sender.Length != 0) hash ^= Sender.GetHashCode();
+      if (Origin.Length != 0) hash ^= Origin.GetHashCode();
       if (Date.Length != 0) hash ^= Date.GetHashCode();
       if (Time.Length != 0) hash ^= Time.GetHashCode();
       if (Payload.Length != 0) hash ^= Payload.GetHashCode();
@@ -175,9 +175,9 @@ namespace RedNimbus.Messages {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Sender.Length != 0) {
+      if (Origin.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteString(Sender);
+        output.WriteString(Origin);
       }
       if (Date.Length != 0) {
         output.WriteRawTag(18);
@@ -203,8 +203,8 @@ namespace RedNimbus.Messages {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (Sender.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Sender);
+      if (Origin.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Origin);
       }
       if (Date.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Date);
@@ -229,8 +229,8 @@ namespace RedNimbus.Messages {
       if (other == null) {
         return;
       }
-      if (other.Sender.Length != 0) {
-        Sender = other.Sender;
+      if (other.Origin.Length != 0) {
+        Origin = other.Origin;
       }
       if (other.Date.Length != 0) {
         Date = other.Date;
@@ -256,7 +256,7 @@ namespace RedNimbus.Messages {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            Sender = input.ReadString();
+            Origin = input.ReadString();
             break;
           }
           case 18: {

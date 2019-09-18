@@ -53,7 +53,7 @@ namespace RedNimbus.LoggerService
 
             //compose message format
             // date | time | id | type | origin | payload 
-            return String.Format("{0} | {1} | reqId: {2} | type: {3} | origin: {4} | payload: {5}", data.Date, data.Time, requestId.ToString(), data.Type, data.Sender, data.Payload);
+            return String.Format("{0} | {1} | reqId: {2} | type: {3} | origin: {4} | payload: {5}", data.Date, data.Time, requestId.ToString(), data.Type, data.Origin, data.Payload);
         }
     }
 }
