@@ -30,7 +30,7 @@ class Folder extends React.Component {
     }
 
     onErrorHandler(resp) {
-        alert(resp.response.data);
+        alert(resp.response.data.message);
     }
 
     onSuccessHandler(resp) {

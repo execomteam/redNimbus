@@ -19,6 +19,7 @@ class Routes extends React.Component {
                 <Route path="/lambda" render={(props) => <LambdaPage path={this.props.path} />} />
                 <Route path="/bucket" render={(props) => <Bucket  name={this.props.user.firstName} />} />
                 <Route path="/signout" render={(props) => <SignOut signOut={this.props.signOut} />} />
+                <Route path="/emailConfirmation/:guid" render={(props) => <LoginForm changeState={this.props.changeState} />} />
                 <Route path="/login" render={(props) => <LoginForm changeState={this.props.changeState} />} />
                 <Route path="/register" render={(props) => <RegistrationForm />} />
             </Switch>

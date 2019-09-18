@@ -26,11 +26,12 @@ namespace RedNimbus.UserService
             Subscribe("RegisterUser", HandleRegisterUser);
             Subscribe("AuthenticateUser", HandleAuthenticateUser);
             Subscribe("GetUser", HandleGetUser);
-            
+            Subscribe("DeactivateUserAccount", HandleDeactivateUserAccount);
+            Subscribe("ConfirmEmail", ConfirmEmail);
+
             _tokenManager = tokenManager;
             _userRepository = repository;
         }
-
 
 
         private bool Validate(Message<UserMessage> userMessage)
@@ -67,6 +68,35 @@ namespace RedNimbus.UserService
             return true;
         }
 
+        private void ConfirmEmail(NetMQMessage message)
+        {
+            Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
+
+            if (tokenMessage.Data.Token == null)
+            {
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
+            }
+            Guid id;
+            try { 
+                id = new Guid(tokenMessage.Data.Token);
+                if (id.Equals(Guid.Empty))
+                {
+                    SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                    return;
+                }
+            }
+            catch(Exception)
+            {
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
+            }
+           
+            _userRepository.ActivateUserAccount(id);
+            tokenMessage.Topic = "Response";
+            SendMessage(tokenMessage.ToNetMQMessage());
+        }
+
         private void HandleRegisterUser(NetMQMessage message)
         {
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
@@ -76,6 +106,7 @@ namespace RedNimbus.UserService
                 return;
             }
 
+            
             User user = new User
             {
                 Id = Guid.NewGuid(),
@@ -83,7 +114,7 @@ namespace RedNimbus.UserService
                 LastName = userMessage.Data.LastName,
                 Email = userMessage.Data.Email,
                 Password = HashHelper.ComputeHash(userMessage.Data.Password),
-                PhoneNumber = userMessage.Data.PhoneNumber,
+                PhoneNumber = userMessage.Data.PhoneNumber
             };
 
             try
@@ -92,6 +123,12 @@ namespace RedNimbus.UserService
 
                 userMessage.Topic = "Response";
 
+                Message<MailServiceMessage> mailMessage = new Message<MailServiceMessage>("SendMail");
+                mailMessage.Data.MailTo = userMessage.Data.Email;
+                mailMessage.Data.Subject = "Email confirmation for redNimbus";
+                mailMessage.Data.Body = "Your confirmation link is: http://localhost:65001/api/user/emailConfirmation/" + user.Id.ToString();
+                SendMessage(mailMessage.ToNetMQMessage());
+                
                 NetMQMessage msg = userMessage.ToNetMQMessage();
                 SendMessage(msg);
             }
@@ -123,6 +160,8 @@ namespace RedNimbus.UserService
             if (_userRepository.CheckIfExists(email))
                 {
                 var registeredUser = _userRepository.GetUserByEmail(userMessage.Data.Email);
+
+                
                 if (registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
                 {
                     Message<TokenMessage> tokenMessage = new Message<TokenMessage>("Response");
@@ -186,19 +225,33 @@ namespace RedNimbus.UserService
             SendMessage(msg);
         }
 
-        private void SendErrorMessage(string messageText, ErrorCode errorCode, NetMQFrame idFrame)
+        private void HandleDeactivateUserAccount(NetMQMessage message)
         {
-            Message<ErrorMessage> errorMessage = new Message<ErrorMessage>("Error")
-            {
-                Data = new ErrorMessage
-                {
-                    MessageText = messageText,
-                    ErrorCode = (int)errorCode
-                },
-                Id = idFrame
-            };
+            Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
 
-            NetMQMessage msg = errorMessage.ToNetMQMessage();
+            if (tokenMessage.Data.Token == null)
+            {
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
+            }
+
+            Guid id = _tokenManager.ValidateToken(tokenMessage.Data.Token);
+            if (id.Equals(Guid.Empty))
+            {
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
+            }
+
+            if (_userRepository.GetUserById(id) == null)
+            {
+                SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                return;
+            }
+
+            _userRepository.DeactivateUserAccount(id);
+
+            Message<TokenMessage> userMessage = new Message<TokenMessage>("Response");
+            NetMQMessage msg = tokenMessage.ToNetMQMessage();
             SendMessage(msg);
         }
     }
