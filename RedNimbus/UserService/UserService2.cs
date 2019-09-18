@@ -2,13 +2,10 @@
 using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.Domain;
-using RedNimbus.Either.Enums;
 using RedNimbus.Messages;
 using RedNimbus.TokenManager;
 using RedNimbus.UserService.Helper;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UserService.Database;
 using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
@@ -39,13 +36,18 @@ namespace UserService
         {
             Message<UserMessage> userMessage = _userCommunicationService.HandleRegisterUserRequest(message);
 
+            if(userMessage == null)
+            {
+                return;
+            }
+
             User newUser = new User
             {
-                Id = Guid.NewGuid(),
-                FirstName = userMessage.Data.FirstName,
-                LastName = userMessage.Data.LastName,
-                Email = userMessage.Data.Email,
-                Password = HashHelper.ComputeHash(userMessage.Data.Password),
+                Id          = Guid.NewGuid(),
+                FirstName   = userMessage.Data.FirstName,
+                LastName    = userMessage.Data.LastName,
+                Email       = userMessage.Data.Email,
+                Password    = HashHelper.ComputeHash(userMessage.Data.Password),
                 PhoneNumber = userMessage.Data.PhoneNumber,
             };
 
@@ -64,19 +66,67 @@ namespace UserService
             }
         }
 
-        private void HandleAuthenticateUser(NetMQMessage obj)
+        private void HandleAuthenticateUser(NetMQMessage message)
         {
-            throw new NotImplementedException();
+            Message<UserMessage> userMessage = _userCommunicationService.HandleAuthenticateUserRequest(message);
+
+            var email = userMessage.Data.Email;
+
+            if (_userRepository.CheckIfExists(email))
+            {
+                var registeredUser = _userRepository.GetUserByEmail(userMessage.Data.Email);
+                if(registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
+                {
+                    var token = _tokenManager.GenerateToken(registeredUser.Id);
+                    _userCommunicationService.HandleAuthenticateUserResponse(userMessage, token);
+                }
+            }
+            _userCommunicationService.SendUserErrorMessage("Email or password are not valid", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
         }
 
-        private void HandleGetUser(NetMQMessage obj)
+        private void HandleGetUser(NetMQMessage message)
         {
-            throw new NotImplementedException();
+            Message<TokenMessage> tokenMessage = _userCommunicationService.HandleGetUserRequest(message);
+
+            Guid id = _tokenManager.ValidateToken(tokenMessage.Data.Token);
+
+            if (id.Equals(Guid.Empty))
+            {
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
+            }
+
+            User registeredUser = _userRepository.GetUserById(id);
+            if (registeredUser == null)
+            {
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                return;
+            }
+
+            _userCommunicationService.HandleGetUserResponse(tokenMessage, registeredUser);
         }
 
-        private void HandleDeactivateUserAccount(NetMQMessage obj)
+        private void HandleDeactivateUserAccount(NetMQMessage message)
         {
-            throw new NotImplementedException();
+           Message<TokenMessage> tokenMessage = _userCommunicationService.HandleDeactivateUserAccountRequest(message);
+
+            Guid id = _tokenManager.ValidateToken(tokenMessage.Data.Token);
+
+            if (id.Equals(Guid.Empty))
+            {
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                return;
+            }
+
+            if (_userRepository.GetUserById(id) == null)
+            {
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                return;
+            }
+
+            _userRepository.DeactivateUserAccount(id);
+
+            _userCommunicationService.HandleDeactivateUserAccountResponse(tokenMessage);
         }
     }
 }
