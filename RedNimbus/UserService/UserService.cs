@@ -101,12 +101,12 @@ namespace RedNimbus.UserService
         {
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
 
-            if(!Validate(userMessage))
+            if (!Validate(userMessage))
             {
                 return;
             }
 
-            
+
             User user = new User
             {
                 Id = Guid.NewGuid(),
@@ -123,12 +123,18 @@ namespace RedNimbus.UserService
 
                 userMessage.Topic = "Response";
 
-                Message<MailServiceMessage> mailMessage = new Message<MailServiceMessage>("SendMail");
-                mailMessage.Data.MailTo = userMessage.Data.Email;
-                mailMessage.Data.Subject = "Email confirmation for redNimbus";
-                mailMessage.Data.Body = "Your confirmation link is: http://localhost:65001/api/user/emailConfirmation/" + user.Id.ToString();
-                SendMessage(mailMessage.ToNetMQMessage());
-                
+                Message<MailServiceMessage> mailMessage = new Message<MailServiceMessage>("SendMail")
+                {
+                    Data = new MailServiceMessage
+                    {
+                        MailTo = userMessage.Data.Email,
+                        Subject = "Email confirmation for redNimbus",
+                        Body = "Your confirmation link is: http://localhost:65001/api/user/emailConfirmation/" + user.Id.ToString()
+                    }
+
+                };
+                SendMessage(mailMessage.ToNetMQMessage()); 
+
                 NetMQMessage msg = userMessage.ToNetMQMessage();
                 SendMessage(msg);
             }
