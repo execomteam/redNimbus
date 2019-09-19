@@ -24,17 +24,20 @@ namespace RedNimbus.Messages {
     static LambdaMessageReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChNMYW1iZGFNZXNzYWdlLnByb3RvEhJSZWROaW1idXMuTWVzc2FnZXMilgIK",
-            "DUxhbWJkYU1lc3NhZ2USDAoETmFtZRgBIAEoCRI+CgdUcmlnZ2VyGAIgASgO",
-            "Mi0uUmVkTmltYnVzLk1lc3NhZ2VzLkxhbWJkYU1lc3NhZ2UuVHJpZ2dlclR5",
-            "cGUSPgoHUnVudGltZRgDIAEoDjItLlJlZE5pbWJ1cy5NZXNzYWdlcy5MYW1i",
-            "ZGFNZXNzYWdlLlJ1bnRpbWVUeXBlEg8KB093bmVySWQYBCABKAkSDwoHSW1h",
-            "Z2VJZBgFIAEoCRIMCgRHdWlkGAYgASgJIiAKC1RyaWdnZXJUeXBlEgcKA0dF",
-            "VBAAEggKBFBPU1QQASIlCgtSdW50aW1lVHlwZRIKCgZDU0hBUlAQABIKCgZQ",
-            "WVRIT04QAWIGcHJvdG8z"));
+            "ChNMYW1iZGFNZXNzYWdlLnByb3RvEhJSZWROaW1idXMuTWVzc2FnZXMiVwoS",
+            "TGlzdExhbWJkYXNNZXNzYWdlEg0KBVRva2VuGAEgASgJEjIKB2xhbWJkYXMY",
+            "AiADKAsyIS5SZWROaW1idXMuTWVzc2FnZXMuTGFtYmRhTWVzc2FnZSKWAgoN",
+            "TGFtYmRhTWVzc2FnZRIMCgROYW1lGAEgASgJEj4KB1RyaWdnZXIYAiABKA4y",
+            "LS5SZWROaW1idXMuTWVzc2FnZXMuTGFtYmRhTWVzc2FnZS5UcmlnZ2VyVHlw",
+            "ZRI+CgdSdW50aW1lGAMgASgOMi0uUmVkTmltYnVzLk1lc3NhZ2VzLkxhbWJk",
+            "YU1lc3NhZ2UuUnVudGltZVR5cGUSDwoHT3duZXJJZBgEIAEoCRIPCgdJbWFn",
+            "ZUlkGAUgASgJEgwKBEd1aWQYBiABKAkiIAoLVHJpZ2dlclR5cGUSBwoDR0VU",
+            "EAASCAoEUE9TVBABIiUKC1J1bnRpbWVUeXBlEgoKBkNTSEFSUBAAEgoKBlBZ",
+            "VEhPThABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.ListLambdasMessage), global::RedNimbus.Messages.ListLambdasMessage.Parser, new[]{ "Token", "Lambdas" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::RedNimbus.Messages.LambdaMessage), global::RedNimbus.Messages.LambdaMessage.Parser, new[]{ "Name", "Trigger", "Runtime", "OwnerId", "ImageId", "Guid" }, null, new[]{ typeof(global::RedNimbus.Messages.LambdaMessage.Types.TriggerType), typeof(global::RedNimbus.Messages.LambdaMessage.Types.RuntimeType) }, null, null)
           }));
     }
@@ -42,6 +45,155 @@ namespace RedNimbus.Messages {
 
   }
   #region Messages
+  public sealed partial class ListLambdasMessage : pb::IMessage<ListLambdasMessage> {
+    private static readonly pb::MessageParser<ListLambdasMessage> _parser = new pb::MessageParser<ListLambdasMessage>(() => new ListLambdasMessage());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<ListLambdasMessage> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RedNimbus.Messages.LambdaMessageReflection.Descriptor.MessageTypes[0]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ListLambdasMessage() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ListLambdasMessage(ListLambdasMessage other) : this() {
+      token_ = other.token_;
+      lambdas_ = other.lambdas_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ListLambdasMessage Clone() {
+      return new ListLambdasMessage(this);
+    }
+
+    /// <summary>Field number for the "Token" field.</summary>
+    public const int TokenFieldNumber = 1;
+    private string token_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Token {
+      get { return token_; }
+      set {
+        token_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "lambdas" field.</summary>
+    public const int LambdasFieldNumber = 2;
+    private static readonly pb::FieldCodec<global::RedNimbus.Messages.LambdaMessage> _repeated_lambdas_codec
+        = pb::FieldCodec.ForMessage(18, global::RedNimbus.Messages.LambdaMessage.Parser);
+    private readonly pbc::RepeatedField<global::RedNimbus.Messages.LambdaMessage> lambdas_ = new pbc::RepeatedField<global::RedNimbus.Messages.LambdaMessage>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<global::RedNimbus.Messages.LambdaMessage> Lambdas {
+      get { return lambdas_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as ListLambdasMessage);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(ListLambdasMessage other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Token != other.Token) return false;
+      if(!lambdas_.Equals(other.lambdas_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Token.Length != 0) hash ^= Token.GetHashCode();
+      hash ^= lambdas_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Token.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Token);
+      }
+      lambdas_.WriteTo(output, _repeated_lambdas_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Token.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
+      }
+      size += lambdas_.CalculateSize(_repeated_lambdas_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(ListLambdasMessage other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Token.Length != 0) {
+        Token = other.Token;
+      }
+      lambdas_.Add(other.lambdas_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Token = input.ReadString();
+            break;
+          }
+          case 18: {
+            lambdas_.AddEntriesFrom(input, _repeated_lambdas_codec);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   public sealed partial class LambdaMessage : pb::IMessage<LambdaMessage> {
     private static readonly pb::MessageParser<LambdaMessage> _parser = new pb::MessageParser<LambdaMessage>(() => new LambdaMessage());
     private pb::UnknownFieldSet _unknownFields;
@@ -50,7 +202,7 @@ namespace RedNimbus.Messages {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::RedNimbus.Messages.LambdaMessageReflection.Descriptor.MessageTypes[0]; }
+      get { return global::RedNimbus.Messages.LambdaMessageReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

@@ -10,5 +10,6 @@ namespace RedNimbus.LambdaService.Database
         Lambda GetLambdaById(string guid);
         void AddLambda(Lambda l);
         void DeleteLambda(Lambda l);
+        List<Lambda> GetLambdasByUserGuid(Guid userGuid);
     }
 }

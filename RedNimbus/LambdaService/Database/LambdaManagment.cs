@@ -32,6 +32,29 @@ namespace RedNimbus.LambdaService.Database
             return _mapper.Map<Lambda>(lambda);
         }
 
+        public List<Lambda> GetLambdasByUserGuid(Guid userGuid)
+        {
+            List<LambdaDB> lambdaDbResult = null;
+            using (var context = new LambdaContext())
+            {
+                var query = from l in context.Lambdas
+                            where l.OwnerGuid == userGuid
+                            select  l ;
+                lambdaDbResult = query.ToList();
+            }
+            if (lambdaDbResult == null)
+            {
+                return null;
+            }
+
+            List<Lambda> result = new List<Lambda>();
+            foreach(var l in lambdaDbResult)
+            {
+                result.Add(_mapper.Map<Lambda>(l));
+            }
+            return result;
+        }
+
         public void AddLambda(Lambda l)
         {
             LambdaDB lambda = _mapper.Map<LambdaDB>(l);

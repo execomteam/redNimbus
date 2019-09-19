@@ -27,10 +27,19 @@ namespace API.Controllers
         [HttpPost("create")]
         public IActionResult Create([FromForm]CreateLambdaDto dto)
         {
-            return _lambdaService.CreateLambda(dto)
+            return _lambdaService.CreateLambda(dto, Request.Headers["token"])
                 .Map((id) => AllOk(id)) //return lambda id
                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
+        }
+
+        [HttpGet("getLambdas")]
+        public IActionResult Get()
+        {
+            return _lambdaService.GetLambdas(Request.Headers["token"])
+                 .Map((r) => AllOk(r)) //if ok return result
+                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
+                 .Reduce(InternalServisErrorHandler);
         }
 
         /// <summary>

@@ -16,6 +16,8 @@ namespace RedNimbus.LambdaService.Database
 
         public LambdaMessage.Types.RuntimeType Runtime { get; set; }
 
+        public Guid OwnerGuid { get; set; }
+
         [Key]
         public string Guid { get; set; }
 
