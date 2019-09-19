@@ -34,7 +34,7 @@ namespace API.Controllers
         }
 
         [HttpGet("getLambdas")]
-        public IActionResult Get()
+        public IActionResult GetLambdas()
         {
             return _lambdaService.GetLambdas(Request.Headers["token"])
                  .Map((r) => AllOk(r)) //if ok return result

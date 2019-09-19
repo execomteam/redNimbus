@@ -1,6 +1,6 @@
 ﻿import React from 'react'
 import axios from 'axios'
-import LambdaGroup from './LambdaGroup'
+import LambdaGroup from './LambdaTable'
 import LambdaNav from './LambdaNav'
 
 class LambdaPage extends React.Component {
@@ -16,16 +16,16 @@ class LambdaPage extends React.Component {
         this.setCreateModalShow = this.setCreateModalShow.bind(this);
         this.addLambda = this.addLambda.bind(this);
 
-        //let path = "http://localhost:65001/api/lambda";
+        let path = "http://localhost:65001/api/lambda/getLambdas";
 
-        //const options = {
-        //    headers: { 'token': localStorage.getItem("token") }
-        //};
+        const options = {
+            headers: { 'token': localStorage.getItem("token") }
+        };
 
-        //axios.get(path, options).then(
-        //    (resp) => this.onSuccessHandler(resp),
-        //    (resp) => this.onErrorHandler(resp)
-        //);
+        axios.get(path, options).then(
+            (resp) => this.onSuccessHandler(resp),
+            (resp) => this.onErrorHandler(resp)
+        );
     }
 
     onErrorHandler(response) {
@@ -70,7 +70,7 @@ class LambdaPage extends React.Component {
                     </div>
                     <div className="col-md-10">
                         <br />
-                        <LambdaGroup content={this.state.lambdas} path={this.props.path} />
+                        <LambdaTable content={this.state.lambdas} />
                     </div>
                 </div>
             </div>
