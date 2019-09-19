@@ -17,5 +17,6 @@ namespace RedNimbus.Domain
         public string PhoneNumber { get; set; }
 
         public string Key { get; set; }
+        public bool ActiveAccount { get; set; }
     }
 }

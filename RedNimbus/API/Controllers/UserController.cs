@@ -16,11 +16,13 @@ namespace RedNimbus.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IEitherMapper _mapper;
+        private string _loginPage;
 
         public UserController(IUserService userService, IEitherMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;
+            _loginPage = "http://localhost:65001/login/";
         }
 
         [HttpPost]
@@ -49,6 +51,25 @@ namespace RedNimbus.API.Controllers
             return _userService.GetUserByToken(Request.Headers["token"])
                 .Map(_mapper.Map<UserDto>)
                 .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+        }
+
+        [HttpPost("deactivateAccount")]
+        public IActionResult deactivateAccount()
+        {
+            var token = Request.Headers["token"];
+            return _userService.deactivateUserAccount(Request.Headers["token"])
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+        }
+
+        [HttpGet("emailConfirmation/{token}")]
+        public IActionResult EmailConfirmation(string token)
+        {
+            return _userService.EmailConfirmation(token)
+                .Map(() => (IActionResult)Redirect(_loginPage))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         }
