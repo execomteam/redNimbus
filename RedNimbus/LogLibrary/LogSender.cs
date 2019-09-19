@@ -38,6 +38,11 @@ namespace RedNimbus.LogLibrary
             }
         }
 
+        public void SetIdentity(Guid id)
+        {
+            _sender.Options.Identity = id.ToByteArray();
+        }
+
         public void Send(Guid requestId, LogMessage log)
         {
             NetMQMessage message = new NetMQMessage();
@@ -59,5 +64,6 @@ namespace RedNimbus.LogLibrary
         {
             Stop();
         }
+        
     }
 }

@@ -30,13 +30,13 @@ namespace RedNimbus.LoggerService
 
         public ConfigContainer LoadConfig()
         {
-            ConfigContainer tuple;
+            ConfigContainer config;
             try
             {
                 using (StreamReader r = new StreamReader("LoggerConfig.json"))
                 {
                     string json = r.ReadToEnd();
-                    tuple = JsonConvert.DeserializeObject<ConfigContainer>(json);
+                    config = JsonConvert.DeserializeObject<ConfigContainer>(json);
                 }
             }
             catch
@@ -44,7 +44,7 @@ namespace RedNimbus.LoggerService
                 throw new FileNotFoundException("Can't find log configuration file!");
             }
 
-            return tuple;
+            return config;
         }
     }
 

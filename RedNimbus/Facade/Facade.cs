@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Google.Protobuf;
 using NetMQ;
 using NetMQ.Sockets;
 using RedNimbus.Communication;
+using RedNimbus.LogLibrary;
+using RedNimbus.Messages;
 
 namespace RedNimbus.Facade
 {
@@ -13,6 +16,8 @@ namespace RedNimbus.Facade
         private const string _facadeAddress = "tcp://*:8000";
 
         private RouterSocket _routerSocket;
+
+        private ILogSender _logger;
 
         /// <summary>
         /// Facade constructor calling the base class constructor, and initializing the Router socket.
@@ -23,6 +28,7 @@ namespace RedNimbus.Facade
 
             Subscribe("Response", SendResponse);
             Subscribe("Error", SendResponse);
+            _logger = new LogSender("tcp://127.0.0.1:8887");
 
             Poller.Add(_routerSocket);
         }
@@ -120,16 +126,34 @@ namespace RedNimbus.Facade
         {
             NetMQMessage receivedMessage = null;
 
+
             while (e.Socket.TryReceiveMultipartMessage(ref receivedMessage))
             {
+                LogMessage(receivedMessage, "Facade/ReceiveRequestEventHandler - Message received from router");
                 SendMessage(ToDealerMessage(receivedMessage));
+                LogMessage(receivedMessage, "Facade/ReceiveRequestEventHandler - Message sent to event bus");
             }
         }
-
 
         public void SendResponse(NetMQMessage message)
         {
             _routerSocket.SendMultipartMessage(ToRouterMessage(message));
         }
+
+        private void LogMessage(NetMQMessage message, string origin)
+        {
+
+            LogMessage logMessage = new LogMessage()
+            {
+                Origin = origin,
+                Payload = "",
+                Date = DateTime.Now.ToShortDateString().ToString(),
+                Time = DateTime.Now.TimeOfDay.ToString(),
+                Type = Messages.LogMessage.Types.LogType.Info
+            };
+
+            _logger.Send(new Guid(message[0].ToByteArray()), logMessage);
+        }
+
     }
 }

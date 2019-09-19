@@ -10,5 +10,7 @@ namespace RedNimbus.LogLibrary
         void Start();
         void Stop();
         void Send(Guid requestId, LogMessage log);
+
+        void SetIdentity(Guid id);
     }
 }

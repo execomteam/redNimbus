@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using Google.Protobuf;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.Domain;
+using RedNimbus.LogLibrary;
 using RedNimbus.Messages;
 using RedNimbus.TokenManager;
 using RedNimbus.UserService.Helper;
@@ -20,8 +22,9 @@ namespace RedNimbus.UserService
         private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
         private IUserRepository _userRepository;
         private ITokenManager _tokenManager;
+        private ILogSender _logSender;
 
-        public UserService(IUserRepository repository, ITokenManager tokenManager) : base()
+        public UserService(IUserRepository repository, ITokenManager tokenManager, ILogSender logSender) : base()
         {
             Subscribe("RegisterUser", HandleRegisterUser);
             Subscribe("AuthenticateUser", HandleAuthenticateUser);
@@ -29,6 +32,7 @@ namespace RedNimbus.UserService
             
             _tokenManager = tokenManager;
             _userRepository = repository;
+            _logSender = logSender;
         }
 
 
@@ -67,8 +71,27 @@ namespace RedNimbus.UserService
             return true;
         }
 
+        private void LogRequest<T>(NetMQMessage message, string origin) where T: IMessage, new()
+        {
+            T payload = new T();
+            payload.MergeFrom(message[2].ToByteArray());
+
+            LogMessage logMessage = new LogMessage()
+            {
+                Origin = origin,
+                Payload = "**** " + payload.ToString(),
+                Date = DateTime.Now.ToShortDateString(),
+                Time = DateTime.Now.TimeOfDay.ToString(),
+                Type = LogMessage.Types.LogType.Info
+            };
+
+            _logSender.Send(new Guid(message[1].ToByteArray()), logMessage);
+        }
+
         private void HandleRegisterUser(NetMQMessage message)
         {
+            LogRequest<UserMessage>(message, "UserService/HandleRegisterUser - Message received from Event bus");
+
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
 
             if(!Validate(userMessage))
@@ -107,6 +130,8 @@ namespace RedNimbus.UserService
 
         private void HandleAuthenticateUser(NetMQMessage message)
         {
+            LogRequest<UserMessage>(message, "UserService/HandleAuthenticateUser - Message received from Event bus");
+
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
 
             if (!Validation.IsEmailValid(userMessage.Data.Email))
@@ -149,6 +174,8 @@ namespace RedNimbus.UserService
 
         private void HandleGetUser(NetMQMessage message)
         {
+            LogRequest<TokenMessage>(message, "UserService/HandleGetUser - Message received from Event bus");
+
             Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
 
             if (tokenMessage.Data.Token == null)

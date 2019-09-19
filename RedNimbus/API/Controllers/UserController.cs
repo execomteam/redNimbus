@@ -32,9 +32,10 @@ namespace RedNimbus.API.Controllers
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
             Guid requestId = Guid.NewGuid();
+            _logSender.SetIdentity(requestId);
 
             return _mapper.Map<User>(createUserDto, (u) => LogRequest(requestId, "UserController/Post", u))
-                .Map(_userService.RegisterUser)
+                .Map((x) => _userService.RegisterUser(x, requestId))
                 .Map(() => AllOk(), (u) => LogSuccessfulPost(requestId, u))
                 .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed, (e) => LogError(requestId, e, "UserController/Post"))
                 .Reduce(this.InternalServisErrorHandler, (e) => LogError(requestId, e, "UserController/Post"));
@@ -44,9 +45,10 @@ namespace RedNimbus.API.Controllers
         public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto)
         {
             Guid requestId = Guid.NewGuid();
+            _logSender.SetIdentity(requestId);
 
-            return _mapper.Map<User>(authenticateUserDto, (u) => LogRequest(requestId, "UserController/Post", u))
-               .Map(_userService.Authenticate)
+            return _mapper.Map<User>(authenticateUserDto, (u) => LogRequest(requestId, "UserController/Authernticate", u))
+               .Map((u) => _userService.Authenticate(u, requestId))
                .Map(x => AllOk(new KeyDto() { Key = x.Key }), (x) => LogSuccessfulAuthentication(requestId, x))
                .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError, (e) => LogError(requestId, e, "UserController/Authernticate"))
                .Reduce(InternalServisErrorHandler, (e) => LogError(requestId, e, "UserController/Authernticate"));
@@ -56,9 +58,11 @@ namespace RedNimbus.API.Controllers
         public IActionResult Get()
         {
             Guid requestId = Guid.NewGuid();
+            _logSender.SetIdentity(requestId);
+
             LogRequest(requestId, "UserController/Get");
 
-            return _userService.GetUserByToken(Request.Headers["token"])
+            return _userService.GetUserByToken(Request.Headers["token"], requestId)
                 .Map(_mapper.Map<UserDto>)
                 .Map(x => AllOk(x), (u) => LogSuccessfulGet(requestId, u))
                 .Reduce(NotFoundErrorHandler, err => err is NotFoundError, (e) => LogError(requestId, e, "UserController/Get"))
