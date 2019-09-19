@@ -3,6 +3,7 @@ using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.Domain;
 using RedNimbus.Messages;
+using System;
 using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
 namespace UserService.Database

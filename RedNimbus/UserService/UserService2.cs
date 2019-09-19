@@ -11,13 +11,13 @@ using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
 namespace RedNimbus.UserService2
 {
-    class UserService2<T> where T:BaseService, IUserCommunicationService
+    class UserService2
     {
         private IUserRepository             _userRepository;
         private ITokenManager               _tokenManager;
-        private T                           _userCommunicationService;
+        private IUserCommunicationService                           _userCommunicationService;
 
-        public UserService2(IUserRepository userRepository, ITokenManager tokenManager, T userCommunicationService)
+        public UserService2(IUserRepository userRepository, ITokenManager tokenManager, IUserCommunicationService userCommunicationService)
         {
             this._userRepository            = userRepository;
             this._userCommunicationService  = userCommunicationService;
@@ -27,10 +27,10 @@ namespace RedNimbus.UserService2
 
         private void SubscribeToTopics()
         {
-            _userCommunicationService.Subscribe("RegisterUser",             HandleRegisterUser);
-            _userCommunicationService.Subscribe("AuthenticateUser",         HandleAuthenticateUser);
-            _userCommunicationService.Subscribe("GetUser",                  HandleGetUser);
-            _userCommunicationService.Subscribe("DeactivateUserAccount",    HandleDeactivateUserAccount);
+            ((BaseService) _userCommunicationService).Subscribe("RegisterUser",             HandleRegisterUser);
+            ((BaseService) _userCommunicationService).Subscribe("AuthenticateUser",         HandleAuthenticateUser);
+            ((BaseService) _userCommunicationService).Subscribe("GetUser",                  HandleGetUser);
+            ((BaseService) _userCommunicationService).Subscribe("DeactivateUserAccount",    HandleDeactivateUserAccount);
         }
 
         private void HandleRegisterUser(NetMQMessage message)
@@ -132,7 +132,7 @@ namespace RedNimbus.UserService2
 
         public void Start()
         {
-            _userCommunicationService.Start();
+           ((BaseService)_userCommunicationService).Start();
         }
     }
 }

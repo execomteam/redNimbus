@@ -14,12 +14,12 @@ namespace RedNimbus.UserService
             SimpleIoc.Default.Register<IUserRepository, UserRepository>();
             SimpleIoc.Default.Register<ITokenManager, TokenManager.TokenManager>();
             SimpleIoc.Default.Register<UserService>();
-
-            SimpleIoc.Default.Register<UserService2.UserService2<UserCommunicationService>>();
-            SimpleIoc.Default.Register<UserCommunicationService>();
+            
+            SimpleIoc.Default.Register<UserService2.UserService2>();
+            SimpleIoc.Default.Register<IUserCommunicationService,UserCommunicationService>();
 
             var userService = SimpleIoc.Default.GetInstance<UserService>();
-            var userService2 = SimpleIoc.Default.GetInstance<UserService2.UserService2<UserCommunicationService>>();
+            var userService2 = SimpleIoc.Default.GetInstance<UserService2.UserService2>();
 
             userService2.Start();
         }
