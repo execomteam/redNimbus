@@ -11,8 +11,8 @@ namespace RedNimbus.LogLibrary
     {
         private DealerSocket _receiver;
         private string _listenAddress;
-        Action<NetMQMessage> _messageHandler;
-
+        private Action<NetMQMessage> _messageHandler;
+        private bool _isRunning;
         private NetMQPoller _poller;
 
         public LogReceiver(string listenAddress, Action<NetMQMessage> messageHandler)
@@ -22,7 +22,6 @@ namespace RedNimbus.LogLibrary
             Start();
         }
 
-        public bool IsRunning { get; private set; }
 
         private void RecieiveReadyHandler(object sender, NetMQSocketEventArgs e)
         {
@@ -32,7 +31,7 @@ namespace RedNimbus.LogLibrary
 
         public void Start()
         {
-            if (!IsRunning)
+            if (!_isRunning)
             {
                 Console.WriteLine("Start Listening...");
                 _receiver = new DealerSocket();
@@ -40,17 +39,17 @@ namespace RedNimbus.LogLibrary
                 _receiver.ReceiveReady += RecieiveReadyHandler;
                 _receiver.Bind(_listenAddress);
                 _poller.Run();
-                IsRunning = true;
+                _isRunning = true;
             }
         }
 
         public void Stop()
         {
-            if (IsRunning)
+            if (_isRunning)
             {
                 _receiver.Unbind(_listenAddress);
                 _receiver.Close();
-                IsRunning = false;
+                _isRunning = false;
             }
         }
 

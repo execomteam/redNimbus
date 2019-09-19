@@ -11,6 +11,7 @@ namespace RedNimbus.LogLibrary
     {
         private DealerSocket _sender;
         string _loggerEndpoint;
+        private bool _isRunning;
 
         public LogSender(string loggerEndpoint)
         {
@@ -18,23 +19,23 @@ namespace RedNimbus.LogLibrary
             Start();
         }
 
-        public bool IsRunning { get; }
-
         public void Start()
         {
-            if (!IsRunning)
+            if (!_isRunning)
             {
                 _sender = new DealerSocket();
                 _sender.Connect(_loggerEndpoint);
+                _isRunning = true;
             }
         }
 
         public void Stop()
         {
-            if (IsRunning)
+            if (_isRunning)
             {
                 _sender.Disconnect(_loggerEndpoint);
                 _sender.Close();
+                _isRunning = false;
             }
         }
 

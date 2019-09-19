@@ -46,12 +46,10 @@ namespace RedNimbus.LoggerService
 
             return config;
         }
+        public class ConfigContainer
+        {
+            public string Endpoint { get; set; }
+            public string LogFilePath { get; set; }
+        }
     }
-
-    class ConfigContainer
-    {
-        public string Endpoint { get; set; }
-        public string LogFilePath { get; set; }
-    }
-    
 }

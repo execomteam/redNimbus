@@ -71,7 +71,7 @@ namespace RedNimbus.UserService
             return true;
         }
 
-        private void LogRequest<T>(NetMQMessage message, string origin) where T: IMessage, new()
+        private void Log<T>(NetMQMessage message, string origin, LogMessage.Types.LogType type) where T: IMessage, new()
         {
             T payload = new T();
             payload.MergeFrom(message[2].ToByteArray());
@@ -82,7 +82,7 @@ namespace RedNimbus.UserService
                 Payload = "**** " + payload.ToString(),
                 Date = DateTime.Now.ToShortDateString(),
                 Time = DateTime.Now.TimeOfDay.ToString(),
-                Type = LogMessage.Types.LogType.Info
+                Type = type
             };
 
             _logSender.Send(new Guid(message[1].ToByteArray()), logMessage);
@@ -90,7 +90,7 @@ namespace RedNimbus.UserService
 
         private void HandleRegisterUser(NetMQMessage message)
         {
-            LogRequest<UserMessage>(message, "UserService/HandleRegisterUser - Message received from Event bus");
+            Log<UserMessage>(message, "UserService/HandleRegisterUser - Message received from Event bus", LogMessage.Types.LogType.Info);
 
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
 
@@ -117,31 +117,36 @@ namespace RedNimbus.UserService
 
                 NetMQMessage msg = userMessage.ToNetMQMessage();
                 SendMessage(msg);
+                Log<UserMessage>(message, "UserService/HandleRegisterUser - User registrated", LogMessage.Types.LogType.Info);
             }
             catch (DbUpdateException)
             {
                 SendErrorMessage("Email already exists.", ErrorCode.EmailAlreadyUsed, userMessage.Id);
+                Log<UserMessage>(message, "UserService/HandleRegisterUser - Email exist", LogMessage.Types.LogType.Info);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 SendErrorMessage("Internal server error.", ErrorCode.InternalServerError, userMessage.Id);
+                Log<UserMessage>(message, "UserService/HandleRegisterUser - Internal error", LogMessage.Types.LogType.Info);
             }
         }
 
         private void HandleAuthenticateUser(NetMQMessage message)
         {
-            LogRequest<UserMessage>(message, "UserService/HandleAuthenticateUser - Message received from Event bus");
+            Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Message received from Event bus", LogMessage.Types.LogType.Info);
 
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
 
             if (!Validation.IsEmailValid(userMessage.Data.Email))
             {
                 SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
+                Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Email not vaild", LogMessage.Types.LogType.Info);
             }
 
             if (!Validation.IsPasswordValid(userMessage.Data.Password))
             {
                 SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
+                Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Password not valid", LogMessage.Types.LogType.Info);
             }
 
             var email = userMessage.Data.Email;
@@ -163,24 +168,27 @@ namespace RedNimbus.UserService
 
                     NetMQMessage msg = tokenMessage.ToNetMQMessage();
                     SendMessage(msg);
+                    Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Success", LogMessage.Types.LogType.Info);
                     return;
                 }
             }
 
             SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
+            Log<UserMessage>(message, "UserService/HandleAuthenticateUser - cant find user in db", LogMessage.Types.LogType.Info);
         }
 
 
 
         private void HandleGetUser(NetMQMessage message)
         {
-            LogRequest<TokenMessage>(message, "UserService/HandleGetUser - Message received from Event bus");
+            Log<TokenMessage>(message, "UserService/HandleGetUser - Message received from Event bus", LogMessage.Types.LogType.Info);
 
             Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
 
             if (tokenMessage.Data.Token == null)
             {
                 SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                Log<UserMessage>(message, "UserService/HandleGetUser - token is null", LogMessage.Types.LogType.Info);
                 return;
             }
 
@@ -188,6 +196,7 @@ namespace RedNimbus.UserService
             if (id.Equals(Guid.Empty))
             {
                 SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                Log<UserMessage>(message, "UserService/HandleGetUser - Invalid token", LogMessage.Types.LogType.Info);
                 return;
             }
 
@@ -195,6 +204,7 @@ namespace RedNimbus.UserService
             if (registeredUser == null)
             {
                 SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                Log<UserMessage>(message, "UserService/HandleGetUser - can't find user in db", LogMessage.Types.LogType.Info);
                 return;
             }
 
@@ -211,6 +221,7 @@ namespace RedNimbus.UserService
 
             NetMQMessage msg = userMessage.ToNetMQMessage();
             SendMessage(msg);
+            Log<UserMessage>(message, "UserService/HandleGetUser - Success", LogMessage.Types.LogType.Info);
         }
 
         private void SendErrorMessage(string messageText, ErrorCode errorCode, NetMQFrame idFrame)
