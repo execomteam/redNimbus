@@ -87,10 +87,14 @@ namespace UserService.Database
 
         public void HandleAuthenticateUserResponse(Message<UserMessage> userMessage, string Token)
         {
-            Message<TokenMessage> tokenMessage = new Message<TokenMessage>("Response");
-            tokenMessage.Id         = userMessage.Id;
-            tokenMessage.Data.Token = Token;
-
+            Message<TokenMessage> tokenMessage = new Message<TokenMessage>("Response")
+            {
+                Id = userMessage.Id,
+                Data = new TokenMessage
+                {
+                    Token = Token
+                }
+            };
             NetMQMessage response = tokenMessage.ToNetMQMessage();
             SendMessage(response);
         }
