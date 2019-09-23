@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Google.Protobuf;
 using NetMQ;
 using NetMQ.Sockets;
 using RedNimbus.Communication;
+using RedNimbus.LogLibrary;
+using RedNimbus.Messages;
 
 namespace RedNimbus.Facade
 {
@@ -14,16 +17,18 @@ namespace RedNimbus.Facade
 
         private RouterSocket _routerSocket;
 
+        private ILogSender _logger;
+
         /// <summary>
         /// Facade constructor calling the base class constructor, and initializing the Router socket.
         /// </summary>
-        public Facade() : base()
+        public Facade(string logEndpoint) : base()
         {
             _routerSocket = new RouterSocket();
 
             Subscribe("Response", SendResponse);
             Subscribe("Error", SendResponse);
-
+            _logger = new LogSender(logEndpoint);
             Poller.Add(_routerSocket);
         }
 
@@ -120,16 +125,36 @@ namespace RedNimbus.Facade
         {
             NetMQMessage receivedMessage = null;
 
+
             while (e.Socket.TryReceiveMultipartMessage(ref receivedMessage))
             {
+                LogMessage(new Guid(receivedMessage[0].ToByteArray()), "Facade/ReceiveRequestEventHandler - Message received from router");
                 SendMessage(ToDealerMessage(receivedMessage));
+                LogMessage(new Guid(receivedMessage[0].ToByteArray()), "Facade/ReceiveRequestEventHandler - Message sent to event bus");
             }
         }
 
-
         public void SendResponse(NetMQMessage message)
         {
+            LogMessage(new Guid(message[1].ToByteArray()), "Facade/SendResponse - Message received from event bus");
             _routerSocket.SendMultipartMessage(ToRouterMessage(message));
+            LogMessage(new Guid(message[1].ToByteArray()), "Facade/SendResponse - Message sent back to api gateway");
         }
+
+        private void LogMessage(Guid id, string origin)
+        {
+
+            LogMessage logMessage = new LogMessage()
+            {
+                Origin = origin,
+                Payload = "",
+                Date = DateTime.Now.ToShortDateString().ToString(),
+                Time = DateTime.Now.TimeOfDay.ToString(),
+                Type = Messages.LogMessage.Types.LogType.Info
+            };
+
+            _logger.Send(id, logMessage);
+        }
+
     }
 }

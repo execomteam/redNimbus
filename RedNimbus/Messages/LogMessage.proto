@@ -1,0 +1,17 @@
+﻿syntax = "proto3";
+package RedNimbus.Messages;
+
+message LogMessage {
+	string Origin = 1;
+	string Date = 2;
+	string Time = 3;
+	string Payload = 4;
+	LogType Type = 5;
+
+	enum LogType{
+		Info = 0;
+		Exception = 1;
+		Warning = 2;
+		Error = 3;
+	}
+}

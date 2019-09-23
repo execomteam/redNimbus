@@ -23,7 +23,7 @@ namespace RedNimbus.API.Services
     public class BucketService : BaseService
     {
         //Get user Buckets
-        public Either<IError, List<string>> Get(string token)
+        public Either<IError, List<string>> Get(string token, Guid requestId)
         {
             Message<BucketMessage> message = new Message<BucketMessage>("bucket/listBucketContent")
             {
@@ -34,7 +34,7 @@ namespace RedNimbus.API.Services
                 }
             };
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
              
@@ -50,7 +50,7 @@ namespace RedNimbus.API.Services
             return new Left<IError, List<string>>(GetError(response));
         }
 
-        public Either<IError, List<string>> ListBucketContent(string token, string id)
+        public Either<IError, List<string>> ListBucketContent(string token, string id, Guid requestId)
         {
             Message<BucketMessage> message = new Message<BucketMessage>("bucket/listBucketContent")
             {
@@ -61,7 +61,7 @@ namespace RedNimbus.API.Services
                 }
             };
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
 
@@ -77,7 +77,7 @@ namespace RedNimbus.API.Services
             return new Left<IError, List<string>>(GetError(response));
         }
 
-        public Either<IError, StringDto> CreateBucket(string token, StringDto bucketName)
+        public Either<IError, StringDto> CreateBucket(string token, StringDto bucketName, Guid requestId)
         {
             Message<BucketMessage> message;
             if (bucketName.Path.Equals("/"))
@@ -103,7 +103,7 @@ namespace RedNimbus.API.Services
                 };
             }
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
             
@@ -118,7 +118,7 @@ namespace RedNimbus.API.Services
             return new Left<IError, StringDto>(GetError(response));
         }
 
-        public Either<IError, StringDto> DeleteBucket(string token, StringDto bucketName)
+        public Either<IError, StringDto> DeleteBucket(string token, StringDto bucketName, Guid requestId)
         {
             Message<BucketMessage> message = new Message<BucketMessage>("bucket/deleteBucket")
             {
@@ -129,7 +129,7 @@ namespace RedNimbus.API.Services
                 }
             };
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
 
@@ -141,7 +141,7 @@ namespace RedNimbus.API.Services
             return new Left<IError, StringDto>(GetError(response));
         }
         
-        public Either<IError, UploadFileDto> UploadFile(string token, UploadFileDto uploadFile)
+        public Either<IError, UploadFileDto> UploadFile(string token, UploadFileDto uploadFile, Guid requestId)
         {
             if(uploadFile.Path.Equals("/"))
                 return new Left<IError, UploadFileDto>(new FormatError("You must be in bucket to upload file.", Either.Enums.ErrorCode.PutFileError));
@@ -160,7 +160,7 @@ namespace RedNimbus.API.Services
                     Bytes = new NetMQFrame(stream.ToByteArray())
                 };
             }
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
             
             string responseTopic = response.First.ConvertToString();
 
@@ -174,7 +174,7 @@ namespace RedNimbus.API.Services
 
         }
 
-        public Either<IError, StringDto> DeleteFile(string token, StringDto fileName)
+        public Either<IError, StringDto> DeleteFile(string token, StringDto fileName, Guid requestId)
         {
             Message<BucketMessage> message = new Message<BucketMessage>("bucket/deleteFile")
             {
@@ -186,7 +186,7 @@ namespace RedNimbus.API.Services
             };
 
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
 
@@ -200,7 +200,7 @@ namespace RedNimbus.API.Services
 
         }
 
-        public Either<IError, DownloadFileDto> DownloadFile(string token, StringDto fileName)
+        public Either<IError, DownloadFileDto> DownloadFile(string token, StringDto fileName, Guid requestId)
         {
             Message<BucketMessage> message = new Message<BucketMessage>("bucket/getFile")
             {
@@ -212,7 +212,7 @@ namespace RedNimbus.API.Services
             };
 
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
 

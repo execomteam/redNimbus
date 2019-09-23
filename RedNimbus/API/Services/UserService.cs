@@ -7,12 +7,13 @@ using RedNimbus.DTO;
 using RedNimbus.Domain;
 using NetMQ;
 using RedNimbus.API.Helper;
+using System;
 
 namespace RedNimbus.API.Services
 {
     public class UserService : BaseService, IUserService
     {
-        public Either<IError, User> RegisterUser(User user)
+        public Either<IError, User> RegisterUser(User user, Guid id)
         {
             Message<UserMessage> message = new Message<UserMessage>("RegisterUser")
             {
@@ -25,7 +26,7 @@ namespace RedNimbus.API.Services
                 }
             };
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), id);
 
             string responseTopic = response.First.ConvertToString();
 
@@ -38,7 +39,7 @@ namespace RedNimbus.API.Services
 
             return new Left<IError, User>(GetError(response));
         }
-
+        
         public Either<IError, Empty> deactivateUserAccount(string token)
         {
             Message<TokenMessage> message = new Message<TokenMessage>("DeactivateUserAccount")
@@ -61,7 +62,7 @@ namespace RedNimbus.API.Services
             return new Left<IError, Empty>(GetError(response));
         }
 
-        public Either<IError, KeyDto> Authenticate(User user)
+        public Either<IError, KeyDto> Authenticate(User user, Guid requestId)
         {
             Message<UserMessage> message = new Message<UserMessage>("AuthenticateUser")
             {
@@ -72,7 +73,7 @@ namespace RedNimbus.API.Services
                 }
             };
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
 
@@ -89,7 +90,7 @@ namespace RedNimbus.API.Services
             return new Left<IError, KeyDto>(GetError(response));
         }
 
-        public Either<IError, User> GetUserByToken(string token)
+        public Either<IError, User> GetUserByToken(string token, Guid id)
         {
             Message<TokenMessage> message = new Message<TokenMessage>("GetUser")
             {
@@ -99,7 +100,7 @@ namespace RedNimbus.API.Services
                 }
             };
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), id);
 
             string responseTopic = response.First.ConvertToString();
 
