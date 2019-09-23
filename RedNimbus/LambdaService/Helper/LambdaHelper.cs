@@ -12,14 +12,16 @@ namespace RedNimbus.LambdaService.Helper
 {
     public class LambdaHelper : ILambdaHelper
     {
-        public Guid CreateLambda(Message<LambdaMessage> message)
+        public Guid CreateLambda(Message<LambdaMessage> lambdaMessage)
         {
             Guid lambdaId = Guid.NewGuid();
+            var sourceFile = lambdaMessage.Bytes.ToByteArray();
+            var runtime = lambdaMessage.Data.Runtime;
 
             try
             {
-                ExtractSourceFile(message.Bytes.ToByteArray(), lambdaId);
-                GenerateDockerfile(message.Data.Runtime, lambdaId);
+                ExtractSourceFile(sourceFile, lambdaId);
+                GenerateDockerfile(runtime, lambdaId);
                 BuildImage(lambdaId);
                 RemoveSourceFile(lambdaId);
             }
@@ -31,6 +33,8 @@ namespace RedNimbus.LambdaService.Helper
 
             return lambdaId;
         }
+
+        #region Create lambda logic
 
         private void ExtractSourceFile(byte[] file, Guid guid)
         {
@@ -73,6 +77,12 @@ namespace RedNimbus.LambdaService.Helper
                 case RuntimeType.Python:
                     extension = "main.py";
                     break;
+                case RuntimeType.Node:
+                    extension = "app.js";
+                    break;
+                case RuntimeType.Go:
+                    extension = "main.go";
+                    break;
                 default:
                     return extension;
             }
@@ -90,6 +100,10 @@ namespace RedNimbus.LambdaService.Helper
                     return "CSHARP";
                 case RuntimeType.Python:
                     return "PYTHON";
+                case RuntimeType.Node:
+                    return "NODE";
+                case RuntimeType.Go:
+                    return "GO";
                 default:
                     return "";
             }
@@ -144,12 +158,14 @@ namespace RedNimbus.LambdaService.Helper
                 Directory.Delete(sourcePath, true);
         }
 
-        public string ExecuteLambda(string guid)
+        #endregion
+
+        public string ExecuteGetLambda(string lambdaId)
         {
             ProcessStartInfo processInfo = new ProcessStartInfo()
             {
                 FileName = "docker",
-                Arguments = $"run --rm {guid}",
+                Arguments = $"run --rm {lambdaId}",
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -175,6 +191,54 @@ namespace RedNimbus.LambdaService.Helper
             }
 
             return result;
+        }
+
+        public byte[] ExecutePostLambda(Message<LambdaMessage> lambdaMessage)
+        {
+            string absolutePath = AppDomain.CurrentDomain.BaseDirectory + "data";
+
+            // TODO: Add request id from message
+            //var requestId = System.Text.Encoding.UTF8.GetString(message.Id.ToByteArray(), 0, message.Id.ToByteArray().Length);
+
+            var requestId = Guid.NewGuid();
+            var lambdaId = lambdaMessage.Data.Guid;
+
+            var targetPath = absolutePath + Path.DirectorySeparatorChar + requestId + Path.DirectorySeparatorChar;
+            if (!Directory.Exists(targetPath))
+                Directory.CreateDirectory(targetPath);
+
+            File.WriteAllBytes(targetPath + "in", lambdaMessage.Bytes.ToByteArray());
+
+            ProcessStartInfo processInfo = new ProcessStartInfo()
+            {
+                FileName = "docker",
+                Arguments = $"run --rm -v {absolutePath}:/app/data {lambdaId} {requestId}",
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            string result = string.Empty;
+
+            using (var process = new Process())
+            {
+                process.StartInfo = processInfo;
+
+                process.Start();
+
+                result = process.StandardOutput.ReadToEnd().Trim();
+
+                process.WaitForExit();
+
+                if (!process.HasExited)
+                    process.Kill();
+
+                process.Close();
+            }
+
+            return File.ReadAllBytes(targetPath + "out");
+            // TODO: Directory.Delete(targetPath, true);
         }
     }
 }

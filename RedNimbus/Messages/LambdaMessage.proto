@@ -17,5 +17,7 @@ message LambdaMessage {
 	enum RuntimeType {
 		CSHARP = 0;
 		PYTHON = 1;
+		NODE = 2;
+		GO = 3;
 	}
 }

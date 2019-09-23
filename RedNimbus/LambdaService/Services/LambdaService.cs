@@ -22,6 +22,7 @@ namespace RedNimbus.LambdaService.Services
             
             Subscribe("CreateLambda", HandleCreateLambda);
             Subscribe("GetLambda", HandleGetLambda);
+            Subscribe("PostLambda", HandlePostLambda);
         }
 
         private void HandleCreateLambda(NetMQMessage obj)
@@ -51,27 +52,20 @@ namespace RedNimbus.LambdaService.Services
 
         private void HandleGetLambda(NetMQMessage obj)
         {
-            Message<GetLambdaMessage> requestMessage = new Message<GetLambdaMessage>(obj);
-            Message<GetLambdaMessage> responseMessage = new Message<GetLambdaMessage>("Response")
+            Message<LambdaMessage> requestMessage = new Message<LambdaMessage>(obj);
+
+            Message<LambdaResultMessage> responseMessage = new Message<LambdaResultMessage>("Response")
             {
-                Id = requestMessage.Id
+                Id = requestMessage.Id,
+                Data = new LambdaResultMessage()
+                {
+                    LambdaId = requestMessage.Data.Guid
+                }
             };
-
-            Guid userId = _tokenManager.ValidateToken(requestMessage.Data.Token);
-            if (userId.Equals(Guid.Empty))
-            {
-                responseMessage.Data.Token = "";
-                responseMessage.Data.LambdaId = requestMessage.Data.LambdaId;
-                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.NotAuthorized, null));
-                SendMessage(responseMessage.ToNetMQMessage());
-            }
-
-            responseMessage.Data.Token = requestMessage.Data.Token;
-            responseMessage.Data.LambdaId = requestMessage.Data.LambdaId;
 
             try
             {
-                string result = _lambdaHelper.ExecuteLambda(requestMessage.Data.LambdaId);
+                string result = _lambdaHelper.ExecuteGetLambda(requestMessage.Data.Guid);
                 responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.Ok, result));
             }
             catch (ArgumentException)
@@ -84,6 +78,32 @@ namespace RedNimbus.LambdaService.Services
             }
 
             SendMessage(responseMessage.ToNetMQMessage());
+        }
+
+        private void HandlePostLambda(NetMQMessage obj)
+        {
+            Message<LambdaMessage> requestMessage = new Message<LambdaMessage>(obj);
+
+            byte[] result = _lambdaHelper.ExecutePostLambda(requestMessage);
+
+            if (!result.Equals(string.Empty))
+            {
+                Message<LambdaResultMessage> responseMessage = new Message<LambdaResultMessage>("Response")
+                {
+                    Data = new LambdaResultMessage()
+                    {
+                        Result = "Lambda successfully executed."
+                    },
+                    Id = requestMessage.Id,
+                    Bytes = new NetMQFrame(result)
+                };
+
+                SendMessage(responseMessage.ToNetMQMessage());
+            }
+            else
+            {
+                SendErrorMessage("An error occured while trying to execute lambda.", ErrorCode.InternalServerError, requestMessage.Id);
+            }
         }
 
         new private void SendErrorMessage(string messageText, ErrorCode errorCode, NetMQFrame idFrame)

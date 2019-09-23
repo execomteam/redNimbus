@@ -45,7 +45,7 @@ class CreateLambda extends React.Component {
         formData.append('Runtime', runtime);
         formData.append('Trigger', trigger);
 
-        axios.post("http://localhost:65001/api/lambda/create", formData , options).then(
+        axios.post("http://localhost:65001/api/lambda/", formData , options).then(
             (resp) => this.onSuccessHandler(resp),
             (resp) => this.onErrorHandler(resp)
         );
@@ -118,11 +118,14 @@ class CreateLambda extends React.Component {
                                 <select id="runtime" name="runtime" className="form-control form-control-sm" required>
                                     <option value="CSHARP">.NET Core 2.1</option>
                                     <option value="PYTHON">Python 3</option>
+                                    <option value="NODEJS">node.js 11</option>
+                                    <option value="GOLANG">Go</option>
                                 </select>
                                 <br />
                                 <label htmlFor="trigger">Trigger</label>
                                 <select id="trigger" name="trigger" className="form-control form-control-sm" required>
                                     <option value="GET">GET</option>
+                                    <option value="POST">POST</option>
                                 </select>
                                 <br />
                                 <div>

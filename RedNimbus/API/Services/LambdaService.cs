@@ -1,4 +1,5 @@
 ﻿using DTO;
+using Microsoft.AspNetCore.Http;
 using NetMQ;
 using RedNimbus.API.Helper;
 using RedNimbus.API.Services.Interfaces;
@@ -12,19 +13,18 @@ namespace RedNimbus.API.Services
 {
     public class LambdaService : BaseService, ILambdaService
     {
-        public Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createlambda)
+        public Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createLambdaDto)
         {
             var memoryStream = new MemoryStream();
-            createlambda.File.OpenReadStream().CopyTo(memoryStream);
-
+            createLambdaDto.File.OpenReadStream().CopyTo(memoryStream);
 
             Message<LambdaMessage> message = new Message<LambdaMessage>("CreateLambda")
             {
                 Data = new LambdaMessage()
                 {
-                    Name = createlambda.Name,
-                    Trigger = createlambda.Trigger,
-                    Runtime = createlambda.Runtime,
+                    Name = createLambdaDto.Name,
+                    Trigger = createLambdaDto.Trigger,
+                    Runtime = createLambdaDto.Runtime,
                     OwnerId = "",
                     ImageId = "",
                     Guid = ""
@@ -36,7 +36,7 @@ namespace RedNimbus.API.Services
 
             string responseTopic = response.First.ConvertToString();
 
-            if (responseTopic == "Response")
+            if (responseTopic.Equals("Response"))
             {
                 Message<LambdaMessage> successMessage = new Message<LambdaMessage>(response);
                 return new Right<IError, CreateLambdaDto>(LambdaConverter.LambdaMessageToDto(successMessage.Data));
@@ -45,14 +45,13 @@ namespace RedNimbus.API.Services
             return new Left<IError, CreateLambdaDto>(GetError(response));
         }
 
-        public Either<IError, string> GetLambda(string lambdaId, string token)
+        public Either<IError, string> GetLambda(string lambdaId)
         {
-            Message<GetLambdaMessage> message = new Message<GetLambdaMessage>("GetLambda")
+            Message<LambdaMessage> message = new Message<LambdaMessage>("GetLambda")
             {
-                Data = new GetLambdaMessage()
+                Data = new LambdaMessage()
                 {
-                    Token = token,
-                    LambdaId = lambdaId
+                    Guid = lambdaId
                 }
             };
 
@@ -60,13 +59,50 @@ namespace RedNimbus.API.Services
 
             string responseTopic = response.First.ConvertToString();
 
-            if (responseTopic == "Response")
+            if (responseTopic.Equals("Response"))
             {
-                Message<GetLambdaMessage> successMessage = new Message<GetLambdaMessage>(response);
+                Message<LambdaResultMessage> successMessage = new Message<LambdaResultMessage>(response);
+
+                // TODO: Re-check
                 return successMessage.Data.Result;
             }
             
             return new Left<IError, string>(GetError(response));
+        }
+
+        public Either<IError, PostLambdaDto> PostLambda(string lambdaId, IFormFile data)
+        {
+            var memoryStream = new MemoryStream();
+            data.OpenReadStream().CopyTo(memoryStream);
+
+            Message<LambdaMessage> message = new Message<LambdaMessage>("PostLambda")
+            {
+                Data = new LambdaMessage()
+                {
+                    Guid = lambdaId
+                },
+                Bytes = new NetMQFrame(memoryStream.ToArray())
+            };
+
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+
+            string responseTopic = response.First.ConvertToString();
+
+            if (responseTopic.Equals("Response"))
+            {
+                Message<LambdaResultMessage> successMessage = new Message<LambdaResultMessage>(response);
+
+                PostLambdaDto result = new PostLambdaDto()
+                {
+                    File = successMessage.Bytes.ToByteArray()
+                };
+
+                // TODO: Move DTO logic to controller
+
+                return result;
+            }
+
+            return new Left<IError, PostLambdaDto>(GetError(response));
         }
     }
 }

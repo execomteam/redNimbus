@@ -1,5 +1,12 @@
 ﻿FROM mcr.microsoft.com/dotnet/core/runtime:2.1-stretch-slim AS base
 WORKDIR /app
+
+RUN apt-get update
+RUN apt-get install -y apt-utils
+RUN apt-get install -y libgdiplus
+RUN apt-get install -y libc6-dev 
+RUN ln -s /usr/lib/libgdiplus.so/usr/lib/gdiplus.dll
+
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
 COPY ["{0}.csproj", ""]

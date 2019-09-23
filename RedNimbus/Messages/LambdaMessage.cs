@@ -24,14 +24,14 @@ namespace RedNimbus.Messages {
     static LambdaMessageReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChNMYW1iZGFNZXNzYWdlLnByb3RvEhJSZWROaW1idXMuTWVzc2FnZXMilgIK",
+            "ChNMYW1iZGFNZXNzYWdlLnByb3RvEhJSZWROaW1idXMuTWVzc2FnZXMiqAIK",
             "DUxhbWJkYU1lc3NhZ2USDAoETmFtZRgBIAEoCRI+CgdUcmlnZ2VyGAIgASgO",
             "Mi0uUmVkTmltYnVzLk1lc3NhZ2VzLkxhbWJkYU1lc3NhZ2UuVHJpZ2dlclR5",
             "cGUSPgoHUnVudGltZRgDIAEoDjItLlJlZE5pbWJ1cy5NZXNzYWdlcy5MYW1i",
             "ZGFNZXNzYWdlLlJ1bnRpbWVUeXBlEg8KB093bmVySWQYBCABKAkSDwoHSW1h",
             "Z2VJZBgFIAEoCRIMCgRHdWlkGAYgASgJIiAKC1RyaWdnZXJUeXBlEgcKA0dF",
-            "VBAAEggKBFBPU1QQASIlCgtSdW50aW1lVHlwZRIKCgZDU0hBUlAQABIKCgZQ",
-            "WVRIT04QAWIGcHJvdG8z"));
+            "VBAAEggKBFBPU1QQASI3CgtSdW50aW1lVHlwZRIKCgZDU0hBUlAQABIKCgZQ",
+            "WVRIT04QARIICgROT0RFEAISBgoCR08QA2IGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -321,6 +321,8 @@ namespace RedNimbus.Messages {
       public enum RuntimeType {
         [pbr::OriginalName("CSHARP")] Csharp = 0,
         [pbr::OriginalName("PYTHON")] Python = 1,
+        [pbr::OriginalName("NODE")] Node = 2,
+        [pbr::OriginalName("GO")] Go = 3,
       }
 
     }

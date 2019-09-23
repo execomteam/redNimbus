@@ -15,34 +15,54 @@ namespace API.Controllers
 {
     [Route("api/lambda")]
     [ApiController]
-    [System.Runtime.InteropServices.Guid("13CFBDF0-499A-40A8-966F-F74B38407A24")]
     public class LambdaController : BaseController
     {
         public ILambdaService _lambdaService;
+
         public LambdaController(ILambdaService lambdaService)
         {
             _lambdaService = lambdaService;
         }
-
-        [HttpPost("create")]
+        /// <summary>
+        /// Endpoint for creating lambda functions.
+        /// </summary>
+        /// <param name="dto">DTO that contains all values required for lambda function creation.</param>
+        /// <returns></returns>
+        [HttpPost]
         public IActionResult Create([FromForm]CreateLambdaDto dto)
         {
             return _lambdaService.CreateLambda(dto)
-                .Map((id) => AllOk(id)) //return lambda id
+                .Map((id) => AllOk(id))
                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         }
 
         /// <summary>
-        /// return value of lambda MUST BE some object that can be coverted in JSON obj
+        /// Endpoint for executing a lambda function using GET request.
+        /// Return value of the lambda function MUST BE some object that can be converted in JSON format.
         /// </summary>
-        /// <param name="lambdaId"></param>
+        /// <param name="lambdaId">Unique identifier of the lambda function.</param>
         /// <returns></returns>
         [HttpGet("{lambdaId}")]
         public IActionResult Get([FromRoute] string lambdaId)
         {
-            return _lambdaService.GetLambda(lambdaId, Request.Headers["token"])
-                 .Map((r) => AllOk(r)) //if ok return result
+            return _lambdaService.GetLambda(lambdaId)
+                 .Map((r) => AllOk(r))
+                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
+                 .Reduce(InternalServisErrorHandler);
+        }
+
+        /// <summary>
+        /// Endpoint for executing a lambda function using POST request.
+        /// </summary>
+        /// <param name="lambdaId">Unique identifier of the lambda function.</param>
+        /// <param name="data">POST request data.</param>
+        /// <returns></returns>
+        [HttpPost("{lambdaId}")]
+        public IActionResult Post([FromRoute] string lambdaId,[FromForm] IFormFile data)
+        {
+            return _lambdaService.PostLambda(lambdaId, data)
+                 .Map((r) => AllOk(r))
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
         }
