@@ -39,7 +39,7 @@ class UploadFile extends React.Component {
     onChange(e) {
         e.preventDefault();
         let file_size = e.target.files[0].size;
-        if (file_size > 350000000) {
+        if (file_size > 350*1024*1024) {
             alert("File size limit is 350MB. Choose another file please.");
             this.setState({ file: null });
         } else {
@@ -51,7 +51,7 @@ class UploadFile extends React.Component {
 
 
     onErrorHandler(resp) {
-        alert(resp.response.data);
+        alert(resp.response.data.message);
     }
 
     onSuccessHandler(resp) {

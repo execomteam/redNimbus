@@ -20,12 +20,14 @@ namespace RedNimbus.API.Controllers
         private readonly IUserService _userService;
         private readonly IEitherMapper _mapper;
         private ILogSender _logSender;
+        private string _loginPage;
 
         public UserController(IUserService userService, IEitherMapper mapper, ILogSender logSender)
         {
             _userService = userService;
             _mapper = mapper;
             _logSender = logSender;
+            _loginPage = "http://localhost:65001/login/";
         }
 
         [HttpPost]
@@ -132,6 +134,25 @@ namespace RedNimbus.API.Controllers
         private static bool EmailAlreadyUsed(IError err)
         {
             return err is FormatError formatError && formatError.Code == RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed;
+        }
+
+        [HttpPost("deactivateAccount")]
+        public IActionResult deactivateAccount()
+        {
+            var token = Request.Headers["token"];
+            return _userService.deactivateUserAccount(Request.Headers["token"])
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
+        }
+
+        [HttpGet("emailConfirmation/{token}")]
+        public IActionResult EmailConfirmation(string token)
+        {
+            return _userService.EmailConfirmation(token)
+                .Map(() => (IActionResult)Redirect(_loginPage))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
         }
     }
 }

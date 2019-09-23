@@ -20,12 +20,15 @@ namespace RedNimbus.Domain
 
         public override string ToString()
         {
-            return String.Format("first name = {0}; last name = {1}; email = {2}; password = {3}; phone number = {4}",
+            return String.Format("first name = {0}; last name = {1}; email = {2}; password = {3}; phone number = {4}; active account: {5}",
                     this.FirstName,
                     this.LastName,
                     this.Email,
                     this.Password,
-                    this.PhoneNumber);
+                    this.PhoneNumber,
+                    this.ActiveAccount);
         }
+      
+        public bool ActiveAccount { get; set; }
     }
 }
