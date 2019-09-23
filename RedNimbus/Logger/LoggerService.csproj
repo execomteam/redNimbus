@@ -6,6 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="LoggerConfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="LoggerConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NetMQ" Version="4.0.0.207" />
   </ItemGroup>
 

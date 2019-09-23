@@ -1,6 +1,6 @@
 ﻿import React from 'react'
 import axios from 'axios'
-import LambdaGroup from './LambdaTable'
+import LambdaTable from './LambdaTable'
 import LambdaNav from './LambdaNav'
 
 class LambdaPage extends React.Component {

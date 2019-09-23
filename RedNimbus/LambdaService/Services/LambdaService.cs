@@ -26,6 +26,7 @@ namespace RedNimbus.LambdaService.Services
             
             Subscribe("CreateLambda", HandleCreateLambda);
             Subscribe("GetLambda", HandleGetLambda);
+            Subscribe("ListUserLambdas", ListUserLambdas);
         }
 
         private void HandleCreateLambda(NetMQMessage obj)

@@ -12,9 +12,9 @@ namespace RedNimbus.API.Services.Interfaces
 {
     public interface ILambdaService
     {
-        Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createlambda, string token);
-        Either<IError, string> GetLambda(string lambdaId, string token);
+        Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createlambda, string token, Guid requestId);
+        Either<IError, string> GetLambda(string lambdaId, string token, Guid requestId);
 
-        Either<IError, List<Lambda>> GetLambdas(string token);
+        Either<IError, List<Lambda>> GetLambdas(string token, Guid requestId);
     }
 }
