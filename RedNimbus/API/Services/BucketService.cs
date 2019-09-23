@@ -106,7 +106,7 @@ namespace RedNimbus.API.Services
             NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
-
+            
 
             if (responseTopic.Equals("Response"))
             {

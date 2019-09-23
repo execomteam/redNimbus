@@ -90,7 +90,7 @@ namespace RedNimbus.API.Controllers
 
 
         [HttpPost("uploadFile")]
-        [RequestSizeLimit(350001000)]
+        [RequestSizeLimit(367002600)]
         public IActionResult UploadFile([FromForm]UploadFileDto uploadFile)
         {
             Guid requestId = Guid.NewGuid();

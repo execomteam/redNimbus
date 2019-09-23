@@ -26,7 +26,7 @@ namespace UserService.Database
         {
             UserDB userDB = ConvertUserToUserDB(newUser);
 
-            userDB.ActiveAccount = true;
+            userDB.ActiveAccount = false;
 
             using (context = new DatabaseContext())
             {
@@ -91,6 +91,35 @@ namespace UserService.Database
         private UserDB ConvertUserToUserDB(User user)
         {
             return _mapper.Map<UserDB>(user);
+        }
+
+        public void DeactivateUserAccount(Guid guid)
+        {
+            using (context = new DatabaseContext())
+            {
+                UserDB userDb = context.Users.First(u => u.Id.Equals(guid));
+                if (userDb == null)
+                    return;
+
+                userDb.ActiveAccount = false;
+                context.Users.Update(userDb);
+                context.SaveChanges();
+            }
+        }
+
+        public void ActivateUserAccount(Guid guid)
+        {
+            using (context = new DatabaseContext())
+            {
+                UserDB userDb = context.Users.First(u => u.Id.Equals(guid));
+                if (userDb == null)
+                    return;
+
+                userDb.ActiveAccount = true;
+                context.Users.Update(userDb);
+                context.SaveChanges();
+               
+            }
         }
     }
 }

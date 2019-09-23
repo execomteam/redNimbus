@@ -39,6 +39,28 @@ namespace RedNimbus.API.Services
 
             return new Left<IError, User>(GetError(response));
         }
+        
+        public Either<IError, Empty> deactivateUserAccount(string token)
+        {
+            Message<TokenMessage> message = new Message<TokenMessage>("DeactivateUserAccount")
+            {
+                Data = new TokenMessage()
+                {
+                    Token = token
+                }
+            };
+
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            string responseTopic = response.First.ConvertToString();
+
+            if (responseTopic.Equals("Response"))
+            {
+                Message<UserMessage> successMessage = new Message<UserMessage>(response);
+                return new Right<IError, Empty>(new Empty());
+            }
+
+            return new Left<IError, Empty>(GetError(response));
+        }
 
         public Either<IError, KeyDto> Authenticate(User user, Guid requestId)
         {
@@ -97,6 +119,28 @@ namespace RedNimbus.API.Services
             }
 
             return new Left<IError, User>(GetError(response));
+        }
+
+        public Either<IError, bool> EmailConfirmation(string token)
+        {
+            Message<TokenMessage> message = new Message<TokenMessage>("ConfirmEmail")
+            {
+                Data = new TokenMessage()
+                {
+                    Token = token
+                }
+            };
+
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+
+            string responseTopic = response.First.ConvertToString();
+
+            if (responseTopic.Equals("Response"))
+            {
+                return new Right<IError, bool>(true);
+            }
+
+            return new Left<IError, bool>(GetError(response));
         }
     }
 }
