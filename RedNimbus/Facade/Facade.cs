@@ -143,7 +143,6 @@ namespace RedNimbus.Facade
 
         private void LogMessage(Guid id, string origin)
         {
-
             LogMessage logMessage = new LogMessage()
             {
                 Origin = origin,

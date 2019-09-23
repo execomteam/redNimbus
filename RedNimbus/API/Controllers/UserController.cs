@@ -83,6 +83,18 @@ namespace RedNimbus.API.Controllers
             });
         }
 
+        private void LogSuccessfulDeactivation(Guid id, string token)
+        {
+            _logSender.Send(id, new LogMessage()
+            {
+                Date = DateTime.Now.ToShortDateString().ToString(),
+                Time = DateTime.Now.TimeOfDay.ToString(),
+                Type = LogMessage.Types.LogType.Info,
+                Payload = token.ToString(),
+                Origin = "UserController/DeactivateAccount"
+            });
+        }
+
         private void LogSuccessfulGet(Guid id, UserDto userDto)
         {
             _logSender.Send(id, new LogMessage()
@@ -92,6 +104,18 @@ namespace RedNimbus.API.Controllers
                 Type = LogMessage.Types.LogType.Info,
                 Payload = userDto.ToString(),
                 Origin = "UserController/Get"
+            });
+        }
+
+        private void LogSuccessfulGet(Guid id, bool active)
+        {
+            _logSender.Send(id, new LogMessage()
+            {
+                Date = DateTime.Now.ToShortDateString().ToString(),
+                Time = DateTime.Now.TimeOfDay.ToString(),
+                Type = LogMessage.Types.LogType.Info,
+                Payload = active ? "account activated" : "cant activate account",
+                Origin = "UserController/EmailComfirmation"
             });
         }
 
@@ -139,20 +163,26 @@ namespace RedNimbus.API.Controllers
         [HttpPost("deactivateAccount")]
         public IActionResult deactivateAccount()
         {
+            Guid requestId = Guid.NewGuid();
+            LogRequest(requestId, "UserController/DeactivateAccount");
             var token = Request.Headers["token"];
-            return _userService.deactivateUserAccount(Request.Headers["token"])
-                .Map(x => AllOk(x))
-                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
-                .Reduce(InternalServisErrorHandler);
+
+            return _userService.deactivateUserAccount(Request.Headers["token"], requestId)
+                .Map(x => AllOk(x), (u) => LogSuccessfulDeactivation(requestId, Request.Headers["token"]))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError, (e) => LogError(requestId, e, "UserController/DeactivateAccount", LogMessage.Types.LogType.Info))
+                .Reduce(InternalServisErrorHandler, (e) => LogError(requestId, e, "UserController/DeactivateAccount", LogMessage.Types.LogType.Info));
         }
 
         [HttpGet("emailConfirmation/{token}")]
         public IActionResult EmailConfirmation(string token)
         {
-            return _userService.EmailConfirmation(token)
-                .Map(() => (IActionResult)Redirect(_loginPage))
-                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
-                .Reduce(InternalServisErrorHandler);
+            Guid requestId = Guid.NewGuid();
+            LogRequest(requestId, "UserController/EmailConfirmation");
+
+            return _userService.EmailConfirmation(token, requestId)
+                .Map(() => (IActionResult)Redirect(_loginPage), (u) => LogSuccessfulGet(requestId, u))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError, (e) => LogError(requestId, e, "UserController/EmailConfirmation", LogMessage.Types.LogType.Info))
+                .Reduce(InternalServisErrorHandler, (e) => LogError(requestId, e, "UserController/EmailConfirmation", LogMessage.Types.LogType.Info));
         }
     }
 }
