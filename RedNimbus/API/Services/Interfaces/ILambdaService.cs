@@ -14,6 +14,6 @@ namespace RedNimbus.API.Services.Interfaces
     {
         Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createLambdaDto);
         Either<IError, string> GetLambda(string lambdaId);
-        Either<IError, PostLambdaDto> PostLambda(string lambdaId, IFormFile data);
+        Either<IError, byte[]> PostLambda(string lambdaId, IFormFile data);
     }
 }

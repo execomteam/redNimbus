@@ -10,6 +10,7 @@ using RedNimbus.API.Services;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
+using RedNimbus.Either.Mappings;
 
 namespace API.Controllers
 {
@@ -17,7 +18,7 @@ namespace API.Controllers
     [ApiController]
     public class LambdaController : BaseController
     {
-        public ILambdaService _lambdaService;
+        private readonly ILambdaService _lambdaService;
 
         public LambdaController(ILambdaService lambdaService)
         {
@@ -62,7 +63,7 @@ namespace API.Controllers
         public IActionResult Post([FromRoute] string lambdaId,[FromForm] IFormFile data)
         {
             return _lambdaService.PostLambda(lambdaId, data)
-                 .Map((r) => AllOk(r))
+                 .Map((x) => (IActionResult)File(x, "application/octet-stream"))
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
         }

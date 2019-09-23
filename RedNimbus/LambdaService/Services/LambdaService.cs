@@ -84,26 +84,31 @@ namespace RedNimbus.LambdaService.Services
         {
             Message<LambdaMessage> requestMessage = new Message<LambdaMessage>(obj);
 
-            byte[] result = _lambdaHelper.ExecutePostLambda(requestMessage);
-
-            if (!result.Equals(string.Empty))
+            Message<LambdaResultMessage> responseMessage = new Message<LambdaResultMessage>("Response")
             {
-                Message<LambdaResultMessage> responseMessage = new Message<LambdaResultMessage>("Response")
+                Id = requestMessage.Id,
+                Data = new LambdaResultMessage()
                 {
-                    Data = new LambdaResultMessage()
-                    {
-                        Result = "Lambda successfully executed."
-                    },
-                    Id = requestMessage.Id,
-                    Bytes = new NetMQFrame(result)
-                };
+                    LambdaId = requestMessage.Data.Guid
+                }
+            };
 
-                SendMessage(responseMessage.ToNetMQMessage());
-            }
-            else
+            try
             {
-                SendErrorMessage("An error occured while trying to execute lambda.", ErrorCode.InternalServerError, requestMessage.Id);
+                byte[] result = _lambdaHelper.ExecutePostLambda(requestMessage);
+                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.Ok, null));
+                responseMessage.Bytes = new NetMQFrame(result);
             }
+            catch (ArgumentException)
+            {
+                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.LambdaUnacceptableReturnValue, null));
+            }
+            catch (Exception)
+            {
+                responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.InternalError, null));
+            }
+
+            SendMessage(responseMessage.ToNetMQMessage());
         }
 
         new private void SendErrorMessage(string messageText, ErrorCode errorCode, NetMQFrame idFrame)

@@ -63,14 +63,13 @@ namespace RedNimbus.API.Services
             {
                 Message<LambdaResultMessage> successMessage = new Message<LambdaResultMessage>(response);
 
-                // TODO: Re-check
                 return successMessage.Data.Result;
             }
             
             return new Left<IError, string>(GetError(response));
         }
 
-        public Either<IError, PostLambdaDto> PostLambda(string lambdaId, IFormFile data)
+        public Either<IError, byte[]> PostLambda(string lambdaId, IFormFile data)
         {
             var memoryStream = new MemoryStream();
             data.OpenReadStream().CopyTo(memoryStream);
@@ -92,17 +91,10 @@ namespace RedNimbus.API.Services
             {
                 Message<LambdaResultMessage> successMessage = new Message<LambdaResultMessage>(response);
 
-                PostLambdaDto result = new PostLambdaDto()
-                {
-                    File = successMessage.Bytes.ToByteArray()
-                };
-
-                // TODO: Move DTO logic to controller
-
-                return result;
+                return successMessage.Bytes.ToByteArray();
             }
 
-            return new Left<IError, PostLambdaDto>(GetError(response));
+            return new Left<IError, byte[]>(GetError(response));
         }
     }
 }

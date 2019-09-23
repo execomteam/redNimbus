@@ -197,7 +197,7 @@ namespace RedNimbus.LambdaService.Helper
         {
             string absolutePath = AppDomain.CurrentDomain.BaseDirectory + "data";
 
-            // TODO: Add request id from message
+            // TODO: Add request id from message after merging with development
             //var requestId = System.Text.Encoding.UTF8.GetString(message.Id.ToByteArray(), 0, message.Id.ToByteArray().Length);
 
             var requestId = Guid.NewGuid();
@@ -237,8 +237,10 @@ namespace RedNimbus.LambdaService.Helper
                 process.Close();
             }
 
-            return File.ReadAllBytes(targetPath + "out");
-            // TODO: Directory.Delete(targetPath, true);
+            byte[] payload = File.ReadAllBytes(targetPath + "out");
+            Directory.Delete(targetPath, true);
+
+            return payload;
         }
     }
 }
