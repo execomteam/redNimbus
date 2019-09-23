@@ -7,7 +7,6 @@ namespace RedNimbus.Either
 {
     public static class EitherAdapters
     {
-        
         public static Either<TLeft, TRightResult> Map<TLeft, TRight, TRightResult>(this Either<TLeft, TRight> either, Func<TRight, TRightResult> func)
         {
             if (either is Right<TLeft, TRight> right)
@@ -36,6 +35,27 @@ namespace RedNimbus.Either
             return (TLeft)(Left<TLeft, TRight>)either;
         }
 
+        public static Either<TLeft, TRightResult> Map<TLeft, TRight, TRightResult>(this Either<TLeft, TRight> either, Func<TRightResult> func, Action<TRight> logAction)
+        {
+            if (either is Right<TLeft, TRight> right)
+            {
+                logAction(right);
+                return func();
+            }
+
+            return (TLeft)(Left<TLeft, TRight>)either;
+        }
+
+        public static Either<TLeft, TRightResult> Map<TLeft, TRight, TRightResult>(this Either<TLeft, TRight> either, Func<TRight, TRightResult> func, Action<TRight> action)
+        {
+            if (either is Right<TLeft, TRight> right)
+            {
+                action(right);
+                return func(right);
+            }
+            return (TLeft)(Left<TLeft, TRight>)either;
+        }
+
         public static TRight Reduce<TLeft, TRight>(this Either<TLeft, TRight> either, Func<TLeft, TRight> func)
         {
             if (either is Left<TLeft, TRight> left)
@@ -61,6 +81,33 @@ namespace RedNimbus.Either
             if (either is Left<TLeft, TRight>)
             {
                 return func();
+            }
+
+            return (Right<TLeft, TRight>)either;
+        }
+
+        public static Either<TLeft, TRight> Reduce<TLeft, TRight>(this Either<TLeft, TRight> either, Func<TLeft, TRight> func, Func<TLeft, bool> when, Action<TLeft> logAction)
+        {
+            if (either is Left<TLeft, TRight> left)
+            {
+                if (when(left))
+                {
+                    logAction(left);
+                    return func(left); 
+                }
+
+                return either;
+            }
+
+            return either;
+        }
+
+        public static TRight Reduce<TLeft, TRight>(this Either<TLeft, TRight> either, Func<TLeft, TRight> func, Action<TLeft> logAction)
+        {
+            if (either is Left<TLeft, TRight> left)
+            {
+                logAction(left);
+                return func(left);
             }
 
             return (Right<TLeft, TRight>)either;

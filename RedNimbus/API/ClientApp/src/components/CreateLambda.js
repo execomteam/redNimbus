@@ -13,12 +13,14 @@ class CreateLambda extends React.Component {
 
         this.createLambda = this.createLambda.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.onClose = this.onClose.bind(this);
 
         this.state = {
             file: null,
             lambdaName: '',
             runtime: '',
-            trigger: ''
+            trigger: '',
+            isFileSelected: false
         }
     }
 
@@ -72,9 +74,14 @@ class CreateLambda extends React.Component {
 
     onChange(e) {
         e.preventDefault();
-        this.setState({ file: e.target.files[0] })
+        this.setState({ file: e.target.files[0], isFileSelected: true })
     }
 
+    onClose(e) {
+        e.preventDefault();
+        this.setState({ file: null, isFileSelected: false })
+        this.props.onHide(false)
+    }
 
     render() {
         return (
@@ -96,6 +103,7 @@ class CreateLambda extends React.Component {
                     <Modal.Body>
                         <form onSubmit={this.createLambda} id="lambdaForm">
                             <div className="form-group">
+                                <label htmlFor="lambdaName">Lambda Name</label>
                                 <input type="text"
                                     className="form-control form-control-sm"
                                     id="lambdaName"
@@ -104,23 +112,25 @@ class CreateLambda extends React.Component {
                                     required
                                 />
                                 <br/>
+                                <label htmlFor="runtime">Runtime</label>
                                 <select id="runtime" name="runtime" className="form-control form-control-sm" required>
                                     <option value="CSHARP">.NET Core 2.1</option>
                                     <option value="PYTHON">Python 3</option>
                                 </select>
                                 <br />
+                                <label htmlFor="trigger">Trigger</label>
                                 <select id="trigger" name="trigger" className="form-control form-control-sm" required>
                                     <option value="GET">GET</option>
                                 </select>
                                 <br />
                                 <div>
                                     <label>Select File</label>
-                                    <input type="file" name="file" id="file" onChange={this.onChange} />
+                                    <input type="file" name="file" id="file" accept=".zip" onChange={this.onChange} />
                                 </div>
                             </div>
                             <hr/>
-                            <Button type="submit">Create</Button>
-                            <Button onClick={() => this.props.onHide(false)}>Close</Button>
+                            <Button type="submit" disabled={!this.state.isFileSelected}>Create</Button>
+                            <Button onClick={this.onClose}>Close</Button>
                         </form>
                     </Modal.Body>
                 </Modal>

@@ -10,6 +10,7 @@ using RedNimbus.API.Services;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.Either;
 using RedNimbus.Either.Mappings;
+using RedNimbus.LogLibrary;
 
 namespace RedNimbus.API
 {
@@ -45,7 +46,7 @@ namespace RedNimbus.API
 
             services.Configure<FormOptions>(options =>
             {
-                options.MultipartBodyLengthLimit = 350001000;
+                options.MultipartBodyLengthLimit = 350*1024*1024 + 1000;
             });
 
             // Auto Mapper Configuration
@@ -64,6 +65,7 @@ namespace RedNimbus.API
             services.AddSingleton(typeof(IUserService), new UserService());
             services.AddSingleton(typeof(BucketService), new BucketService());
             services.AddSingleton(typeof(ILambdaService), new LambdaService());
+            services.AddTransient<ILogSender>(s => new LogSender(Configuration["LoggerEndpoint"]));
             services.AddEitherServiceMapper();
 
         }
