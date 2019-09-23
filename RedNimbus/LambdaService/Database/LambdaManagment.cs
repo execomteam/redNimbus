@@ -17,7 +17,7 @@ namespace RedNimbus.LambdaService.Database
         }
         public Lambda GetLambdaById(string guid)
         {
-            LambdaDB lambda = new LambdaDB();
+            LambdaDB lambda;
 
             using (var context = new LambdaContext())
             {
@@ -63,16 +63,6 @@ namespace RedNimbus.LambdaService.Database
             {
                 context.Database.EnsureCreated();
                 context.Add(lambda);
-                context.SaveChanges();
-            }
-        }
-
-        public void DeleteLambda(Lambda l)
-        {
-            using(var context = new LambdaContext())
-            {
-                LambdaDB lambda = context.Lambdas.First();
-                context.Lambdas.Remove(lambda);
                 context.SaveChanges();
             }
         }

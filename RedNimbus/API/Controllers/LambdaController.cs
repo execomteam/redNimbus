@@ -41,7 +41,7 @@ namespace API.Controllers
             Guid requestId = Guid.NewGuid();
 
             return _lambdaService.GetLambdas(Request.Headers["token"], requestId)
-                 .Map((r) => AllOk(r)) //if ok return result
+                 .Map((r) => AllOk(r))
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
         }
