@@ -36,6 +36,7 @@ namespace RedNimbus.UserService
             ((BaseService) _userCommunicationService).Subscribe("AuthenticateUser",         HandleAuthenticateUser);
             ((BaseService) _userCommunicationService).Subscribe("GetUser",                  HandleGetUser);
             ((BaseService) _userCommunicationService).Subscribe("DeactivateUserAccount",    HandleDeactivateUserAccount);
+            ((BaseService) _userCommunicationService).Subscribe("ConfirmEmail",             ConfirmEmail);
         }
 
         private void Log<T>(NetMQMessage message, string origin, LogMessage.Types.LogType type) where T: IMessage, new()
@@ -115,6 +116,7 @@ namespace RedNimbus.UserService
             try
             {
                 _userRepository.SaveUser(newUser);
+                _userRepository.DeactivateUserAccount(newUser.Id);
                 _userCommunicationService.HandleRegisterUserResponse(userMessage, newUser);
               Message<MailServiceMessage> mailMessage = new Message<MailServiceMessage>("SendMail")
                 {
