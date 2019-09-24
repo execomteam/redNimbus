@@ -192,6 +192,7 @@ class RegistrationForm extends React.Component{
         
         axios.post("http://localhost:65001/api/user", { firstName: firstName, lastName: lastName, email: email, password: password, repeatedPassword: repeatedPassword, phoneNumber: phoneNumber }).then(
             (response) => {
+                alert("You must confirm your mail. The confirmation link is in inbox.");
                 self.props.history.push("/login");
             },
             (response) => {

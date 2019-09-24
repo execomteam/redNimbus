@@ -25,5 +25,21 @@ namespace RedNimbus.Either.Mappings
                 return new Left<IError, TDestination>(new MappingError(e.Message, ErrorCode.MappingError));
             }
         }
+
+        public Either<IError, TDestination> Map<TDestination>(object source, Action<TDestination> logAction)
+        {
+            Right<IError, TDestination> either;
+            try
+            {
+                either = new Right<IError, TDestination>(_mapper.Map<TDestination>(source));
+            }
+            catch (Exception e)
+            {
+                return new Left<IError, TDestination>(new MappingError(e.Message, ErrorCode.MappingError));
+            }
+
+            logAction(either);
+            return either;
+        }
     }
 }

@@ -49,23 +49,23 @@ namespace RedNimbus.Communication
         {
             if(message.FrameCount == 4)
             {
-                Topic = message.Pop().ConvertToString();
+                Topic = message[0].ConvertToString();
 
-                Id = message.Pop();
+                Id = message[1];
 
-                NetMQFrame data = message.Pop();
+                NetMQFrame data = message[2];
                 Data.MergeFrom(data.ToByteArray());
 
-                Bytes = message.Pop();
+                Bytes = message[3];
             }
-            else
+               else
             {
-                Topic = message.Pop().ConvertToString();
+                Topic = message[0].ConvertToString();
 
-                NetMQFrame data = message.Pop();
+                NetMQFrame data = message[1];
                 Data.MergeFrom(data.ToByteArray());
 
-                Bytes = message.Pop();
+                Bytes = message[2];
             }
         }
 

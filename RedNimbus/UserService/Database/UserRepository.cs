@@ -98,6 +98,9 @@ namespace UserService.Database
             using (context = new DatabaseContext())
             {
                 UserDB userDb = context.Users.First(u => u.Id.Equals(guid));
+                if (userDb == null)
+                    return;
+
                 userDb.ActiveAccount = false;
                 context.Users.Update(userDb);
                 context.SaveChanges();
@@ -109,9 +112,13 @@ namespace UserService.Database
             using (context = new DatabaseContext())
             {
                 UserDB userDb = context.Users.First(u => u.Id.Equals(guid));
-                userDb.ActiveAccount = false;
+                if (userDb == null)
+                    return;
+
+                userDb.ActiveAccount = true;
                 context.Users.Update(userDb);
                 context.SaveChanges();
+               
             }
         }
     }

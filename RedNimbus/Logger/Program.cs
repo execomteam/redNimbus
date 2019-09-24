@@ -1,36 +1,34 @@
-﻿using Newtonsoft.Json;
+﻿
+
+using Newtonsoft.Json;
 using System;
 using System.IO;
 
-namespace RedNimbus.Facade
+namespace RedNimbus.LoggerService
 {
     class Program
     {
+
         static void Main(string[] args)
         {
-            new Program().Run();
+            Program program = new Program();
+            program.Run();
         }
 
-        private void Run()
+        public void Run()
         {
-            string logEndpoint = null;
-
             try
             {
-                logEndpoint = LoadConfig().Endpoint;
+                ConfigContainer config = LoadConfig();
+                Logger logger = new Logger(config.Endpoint, config.LogFilePath);
             }
-            catch(Exception e)
+            catch(FileNotFoundException e)
             {
                 Console.WriteLine(e.Message);
-                Console.WriteLine("File can not be found");
-                return;
             }
-
-            Facade facade = new Facade(logEndpoint);
-            facade.Start();
         }
 
-        private ConfigContainer LoadConfig()
+        public ConfigContainer LoadConfig()
         {
             ConfigContainer config;
             try
@@ -43,15 +41,15 @@ namespace RedNimbus.Facade
             }
             catch
             {
-                throw new FileNotFoundException("Can't find configuration file!");
+                throw new FileNotFoundException("Can't find log configuration file!");
             }
 
             return config;
         }
-
         public class ConfigContainer
         {
             public string Endpoint { get; set; }
+            public string LogFilePath { get; set; }
         }
     }
 }
