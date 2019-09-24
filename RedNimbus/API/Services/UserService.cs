@@ -42,6 +42,7 @@ namespace RedNimbus.API.Services
         
         public Either<IError, Empty> deactivateUserAccount(string token)
         {
+
             Message<TokenMessage> message = new Message<TokenMessage>("DeactivateUserAccount")
             {
                 Data = new TokenMessage()

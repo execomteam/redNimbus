@@ -1,4 +1,6 @@
-﻿using System;
+
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -12,64 +14,34 @@ using RedNimbus.LogLibrary;
 using RedNimbus.Messages;
 using RedNimbus.TokenManager;
 using RedNimbus.UserService.Helper;
+using System;
 using UserService.Database;
 using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
 namespace RedNimbus.UserService
 {
-    public class UserService : BaseService
+    class UserService
     {
-        private static readonly Dictionary<string, string> tokenEmailPairs = new Dictionary<string, string>();
-        private IUserRepository _userRepository;
-        private ITokenManager _tokenManager;
-        private ILogSender _logSender;
+        private IUserRepository             _userRepository;
+        private ITokenManager               _tokenManager;
+        private IUserCommunicationService   _userCommunicationService;
+        private ILogSender                  _logSender;
 
-        public UserService(IUserRepository repository, ITokenManager tokenManager, ILogSender logSender) : base()
+        public UserService(IUserRepository userRepository, ITokenManager tokenManager, IUserCommunicationService userCommunicationService, ILogSender logSender)
         {
-            Subscribe("RegisterUser", HandleRegisterUser);
-            Subscribe("AuthenticateUser", HandleAuthenticateUser);
-            Subscribe("GetUser", HandleGetUser);
-            Subscribe("DeactivateUserAccount", HandleDeactivateUserAccount);
-            Subscribe("ConfirmEmail", ConfirmEmail);
-
-            _tokenManager = tokenManager;
-            _userRepository = repository;
-            _logSender = logSender;
+            this._userRepository            = userRepository;
+            this._userCommunicationService  = userCommunicationService;
+            this._tokenManager              = tokenManager;
+            this._logSender                 = logSender;
+            this.SubscribeToTopics();
         }
 
-
-        private bool Validate(Message<UserMessage> userMessage)
+        private void SubscribeToTopics()
         {
-            if (!Validation.IsFirstNameValid(userMessage.Data.FirstName))
-            {
-                SendErrorMessage("Invalid First Name format.", ErrorCode.FirstNameNullEmptyOrWhiteSpace, userMessage.Id);
-                return false;
-            }
-
-            if (!Validation.IsLastNameValid(userMessage.Data.LastName))
-            {
-                SendErrorMessage("Invalid Last Name format.", ErrorCode.LastNameNullEmptyOrWhiteSpace, userMessage.Id);
-                return false;
-            }
-
-            if (!Validation.IsEmailValid(userMessage.Data.Email))
-            {
-                SendErrorMessage("Invalid email format.", ErrorCode.EmailWrongFormat, userMessage.Id);
-                return false;
-            }
-
-            if (!Validation.IsPasswordValid(userMessage.Data.Password))
-            {
-                SendErrorMessage("Password does not satisfy requirements.", ErrorCode.PasswordWrongFormat, userMessage.Id);
-                return false;
-            }
-            if (!String.IsNullOrWhiteSpace(userMessage.Data.PhoneNumber) && !Validation.IsPhoneValid(userMessage.Data.PhoneNumber))
-            {
-                SendErrorMessage("Invalid phone number format.", ErrorCode.PhoneNumberWrongFormat, userMessage.Id);
-                return false;
-            }
-
-            return true;
+            ((BaseService) _userCommunicationService).Subscribe("RegisterUser",             HandleRegisterUser);
+            ((BaseService) _userCommunicationService).Subscribe("AuthenticateUser",         HandleAuthenticateUser);
+            ((BaseService) _userCommunicationService).Subscribe("GetUser",                  HandleGetUser);
+            ((BaseService) _userCommunicationService).Subscribe("DeactivateUserAccount",    HandleDeactivateUserAccount);
         }
 
         private void Log<T>(NetMQMessage message, string origin, LogMessage.Types.LogType type) where T: IMessage, new()
@@ -121,33 +93,37 @@ namespace RedNimbus.UserService
 
         private void HandleRegisterUser(NetMQMessage message)
         {
+            Message<UserMessage> userMessage = _userCommunicationService.HandleRegisterUserRequest(message);
+
+            if(userMessage == null)
+              {
+                return;
+            }
+
             Log<UserMessage>(message, "UserService/HandleRegisterUser - Message received from Event bus", LogMessage.Types.LogType.Info);
 
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
 
             if (!Validate(userMessage))
-            {
+  {
                 return;
             }
 
-
-            User user = new User
+            User newUser = new User
             {
-                Id = Guid.NewGuid(),
-                FirstName = userMessage.Data.FirstName,
-                LastName = userMessage.Data.LastName,
-                Email = userMessage.Data.Email,
-                Password = HashHelper.ComputeHash(userMessage.Data.Password),
-                PhoneNumber = userMessage.Data.PhoneNumber
+                Id          = Guid.NewGuid(),
+                FirstName   = userMessage.Data.FirstName,
+                LastName    = userMessage.Data.LastName,
+                Email       = userMessage.Data.Email,
+                Password    = HashHelper.ComputeHash(userMessage.Data.Password),
+                PhoneNumber = userMessage.Data.PhoneNumber,
             };
 
             try
             {
-                this._userRepository.SaveUser(user);
-
-                userMessage.Topic = "Response";
-
-                Message<MailServiceMessage> mailMessage = new Message<MailServiceMessage>("SendMail")
+                _userRepository.SaveUser(newUser);
+                _userCommunicationService.HandleRegisterUserResponse(userMessage, newUser);
+              Message<MailServiceMessage> mailMessage = new Message<MailServiceMessage>("SendMail")
                 {
                     Data = new MailServiceMessage
                     {
@@ -158,26 +134,25 @@ namespace RedNimbus.UserService
 
                 };
                 SendMessage(mailMessage.ToNetMQMessage()); 
-
-                NetMQMessage msg = userMessage.ToNetMQMessage();
-                SendMessage(msg);
                 Log<UserMessage>(message, "UserService/HandleRegisterUser - User registrated", LogMessage.Types.LogType.Info);
             }
             catch (DbUpdateException)
             {
-                SendErrorMessage("Email already exists.", ErrorCode.EmailAlreadyUsed, userMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Email already exists", ErrorCode.EmailAlreadyUsed, userMessage.Id);
                 Log<UserMessage>(message, "UserService/HandleRegisterUser - Email exist", LogMessage.Types.LogType.Info);
             }
             catch (Exception e)
             {
-                SendErrorMessage("Internal server error.", ErrorCode.InternalServerError, userMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Internal  server error", ErrorCode.InternalServerError, userMessage.Id);
                 Log<UserMessage>(message, "UserService/HandleRegisterUser - Internal error", LogMessage.Types.LogType.Info);
             }
         }
 
         private void HandleAuthenticateUser(NetMQMessage message)
         {
+            Message<UserMessage> userMessage = _userCommunicationService.HandleAuthenticateUserRequest(message);
             Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Message received from Event bus", LogMessage.Types.LogType.Info);
+            
 
             Message<UserMessage> userMessage = new Message<UserMessage>(message);
 
@@ -194,42 +169,28 @@ namespace RedNimbus.UserService
             }
 
             var email = userMessage.Data.Email;
+
             if (_userRepository.CheckIfExists(email))
-                {
+            {
                 var registeredUser = _userRepository.GetUserByEmail(userMessage.Data.Email);
-
-                
-                if (registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
+              
+                if(registeredUser.Password == HashHelper.ComputeHash(userMessage.Data.Password))
                 {
-                    Message<TokenMessage> tokenMessage = new Message<TokenMessage>("Response");
-
-                    tokenMessage.Id = userMessage.Id;
-                    tokenMessage.Data.Token = _tokenManager.GenerateToken(registeredUser.Id);
-
-
-                    if (!tokenEmailPairs.ContainsKey(tokenMessage.Data.Token))
-                    {
-                        tokenEmailPairs.Add(tokenMessage.Data.Token, userMessage.Data.Email);
-                    }
-
-                    NetMQMessage msg = tokenMessage.ToNetMQMessage();
-                    SendMessage(msg);
-                    Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Success", LogMessage.Types.LogType.Info);
-                    return;
+                    var token = _tokenManager.GenerateToken(registeredUser.Id);
+                    _userCommunicationService.HandleAuthenticateUserResponse(userMessage, token);
+                   Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Success", LogMessage.Types.LogType.Info);
+                  return;
                 }
             }
-
-            SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
+            _userCommunicationService.SendUserErrorMessage("Email or password are not valid", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
             Log<UserMessage>(message, "UserService/HandleAuthenticateUser - cant find user in db", LogMessage.Types.LogType.Info);
         }
 
-
-
         private void HandleGetUser(NetMQMessage message)
         {
-            Log<TokenMessage>(message, "UserService/HandleGetUser - Message received from Event bus", LogMessage.Types.LogType.Info);
 
-            Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
+            Message<TokenMessage> tokenMessage = _userCommunicationService.HandleGetUserRequest(message);
+            Log<TokenMessage>(message, "UserService/HandleGetUser - Message received from Event bus", LogMessage.Types.LogType.Info);
 
             if (tokenMessage.Data.Token == null)
             {
@@ -239,9 +200,10 @@ namespace RedNimbus.UserService
             }
 
             Guid id = _tokenManager.ValidateToken(tokenMessage.Data.Token);
+
             if (id.Equals(Guid.Empty))
             {
-                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
                 Log<UserMessage>(message, "UserService/HandleGetUser - Invalid token", LogMessage.Types.LogType.Info);
                 return;
             }
@@ -249,55 +211,41 @@ namespace RedNimbus.UserService
             User registeredUser = _userRepository.GetUserById(id);
             if (registeredUser == null)
             {
-                SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
                 Log<UserMessage>(message, "UserService/HandleGetUser - can't find user in db", LogMessage.Types.LogType.Info);
                 return;
             }
 
-            Message<UserMessage> userMessage = new Message<UserMessage>("Response")
-            {
-                Id = tokenMessage.Id,
-                Data = new UserMessage
-                {
-                    FirstName = registeredUser.FirstName,
-                    LastName = registeredUser.LastName,
-                    Token = tokenMessage.Data.Token
-                }
-            };
-
-            NetMQMessage msg = userMessage.ToNetMQMessage();
-            SendMessage(msg);
+            _userCommunicationService.HandleGetUserResponse(tokenMessage, registeredUser);
             Log<UserMessage>(message, "UserService/HandleGetUser - Success", LogMessage.Types.LogType.Info);
         }
 
         private void HandleDeactivateUserAccount(NetMQMessage message)
         {
-            Message<TokenMessage> tokenMessage = new Message<TokenMessage>(message);
-
-            if (tokenMessage.Data.Token == null)
-            {
-                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
-                return;
-            }
+           Message<TokenMessage> tokenMessage = _userCommunicationService.HandleDeactivateUserAccountRequest(message);
 
             Guid id = _tokenManager.ValidateToken(tokenMessage.Data.Token);
+
             if (id.Equals(Guid.Empty))
             {
-                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
                 return;
             }
 
             if (_userRepository.GetUserById(id) == null)
             {
-                SendErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotRegistrated, tokenMessage.Id);
                 return;
             }
 
             _userRepository.DeactivateUserAccount(id);
 
-            Message<TokenMessage> userMessage = new Message<TokenMessage>("Response");
-            NetMQMessage msg = tokenMessage.ToNetMQMessage();
-            SendMessage(msg);
+            _userCommunicationService.HandleDeactivateUserAccountResponse(tokenMessage);
+        }
+
+        public void Start()
+        {
+           ((BaseService)_userCommunicationService).Start();
         }
     }
 }

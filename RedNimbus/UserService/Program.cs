@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using GalaSoft.MvvmLight.Ioc;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Ocsp;
@@ -8,7 +8,6 @@ using RedNimbus.TokenManager;
 using System;
 using System.IO;
 using UserService.Database;
-using UserService.Database.Model;
 using UserService.Mapping;
 
 namespace RedNimbus.UserService
@@ -39,6 +38,9 @@ namespace RedNimbus.UserService
             SimpleIoc.Default.Register<ITokenManager, TokenManager.TokenManager>();
             SimpleIoc.Default.Register<ILogSender>(()=> new LogSender(logEndndpoint));
             SimpleIoc.Default.Register<UserService>();
+            
+            SimpleIoc.Default.Register<UserService>();
+            SimpleIoc.Default.Register<IUserCommunicationService,UserCommunicationService>();
 
             var userService = SimpleIoc.Default.GetInstance<UserService>();
 
