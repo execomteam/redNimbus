@@ -136,7 +136,7 @@ namespace RedNimbus.API.Controllers
             return err is FormatError formatError && formatError.Code == RedNimbus.Either.Enums.ErrorCode.EmailAlreadyUsed;
         }
 
-        [HttpPost("deactivateAccount")]
+        [HttpPost("deactivateUserAccount")]
         public IActionResult deactivateAccount()
         {
             var token = Request.Headers["token"];

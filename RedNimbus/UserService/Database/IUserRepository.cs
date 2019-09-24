@@ -12,9 +12,7 @@ namespace UserService.Database
         bool CheckIfExists(String email);
         User GetUserByEmail(String email);
         User GetUserById(Guid id);
-
         void DeactivateUserAccount(Guid id);
-
         void ActivateUserAccount(Guid id);
     }
 }
