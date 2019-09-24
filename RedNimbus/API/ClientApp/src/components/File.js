@@ -53,6 +53,11 @@ class File extends React.Component {
     }
 
     render() {
+        let name = this.props.name;
+        if (name.length > 8) {
+            name = name.slice(0, 8);
+            name += "...";
+        }
         return (
             <div style={{ backgroundColor: 'red' }} className="card " style={{
                 width: '100', height: '120px', display: 'inline-block', justifyContent: 'center',
@@ -66,7 +71,7 @@ class File extends React.Component {
                     onDoubleClick={this.downloadFile}
                 />
                 <div className="card-body">
-                    <p style={{ textAlign: 'center' }} className="card-text">{this.props.name}</p>
+                    <p style={{ textAlign: 'center' }} className="card-text">{name}</p>
                     <div>
                         <center>
                             <Button onClick={this.deleteFile}>

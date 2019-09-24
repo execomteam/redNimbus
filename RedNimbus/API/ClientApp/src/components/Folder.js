@@ -38,6 +38,11 @@ class Folder extends React.Component {
     }
 
     render() {
+        let name = this.props.name;
+        if (name.length > 8) {
+            name = name.slice(0, 8);
+            name += "...";
+        }
         if (this.props.path == "/") {
             return (
                 <div id={this.props.id} style={{ backgroundColor: 'red' }} className="card " style={{
@@ -52,7 +57,7 @@ class Folder extends React.Component {
                         onDoubleClick={this.enterFolder}
                     />
                     <div className="card-body">
-                        <p style={{ textAlign: 'center' }} className="card-text">{this.props.name}</p>
+                        <p style={{ textAlign: 'center' }} className="card-text">{name}</p>
                         <div>
                             <center>
                                 <Button onClick={this.deleteBucket}>
@@ -79,7 +84,7 @@ class Folder extends React.Component {
                     onDoubleClick={this.enterFolder}
                 />
                 <div className="card-body">
-                    <p style={{ textAlign: 'center' }} className="card-text">{this.props.name}</p>
+                    <p style={{ textAlign: 'center' }} className="card-text">{name}</p>
                     <div>
                         <center>
                             <button onClick={this.deleteBucket}>Delete
