@@ -50,7 +50,7 @@ namespace RedNimbus.LambdaService.Services
                     Name = requestMessage.Data.Name,
                     Trigger = requestMessage.Data.Trigger,
                     Runtime = requestMessage.Data.Runtime,
-                    Guid = requestMessage.Data.Guid,
+                    Guid = lambdaId.ToString(),
                     OwnerGuid = ownerGuid
                 };
                 

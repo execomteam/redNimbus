@@ -14,6 +14,10 @@ namespace RedNimbus.LambdaService.Database
         public LambdaManagment(IMapper mapper)
         {
            this._mapper = mapper;
+            using(var context = new LambdaContext())
+            {
+                context.Database.EnsureCreated();
+            }
         }
         public Lambda GetLambdaById(string guid)
         {
