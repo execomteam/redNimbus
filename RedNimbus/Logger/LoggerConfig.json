@@ -1,0 +1,4 @@
+{
+    "Endpoint" : "tcp://*:8887",
+    "LogFilePath" : "C:/Users/praksa/Desktop/redNimbusLog.log"
+}

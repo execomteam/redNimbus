@@ -27,10 +27,23 @@ namespace API.Controllers
         [HttpPost("create")]
         public IActionResult Create([FromForm]CreateLambdaDto dto)
         {
-            return _lambdaService.CreateLambda(dto)
+            Guid requestId = Guid.NewGuid();
+
+            return _lambdaService.CreateLambda(dto, Request.Headers["token"], requestId)
                 .Map((id) => AllOk(id)) //return lambda id
                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
+        }
+
+        [HttpGet("getLambdas")]
+        public IActionResult GetLambdas()
+        {
+            Guid requestId = Guid.NewGuid();
+
+            return _lambdaService.GetLambdas(Request.Headers["token"], requestId)
+                 .Map((r) => AllOk(r))
+                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
+                 .Reduce(InternalServisErrorHandler);
         }
 
         /// <summary>
@@ -41,7 +54,9 @@ namespace API.Controllers
         [HttpGet("{lambdaId}")]
         public IActionResult Get([FromRoute] string lambdaId)
         {
-            return _lambdaService.GetLambda(lambdaId, Request.Headers["token"])
+            Guid requestId = Guid.NewGuid();
+
+            return _lambdaService.GetLambda(lambdaId, Request.Headers["token"], requestId)
                  .Map((r) => AllOk(r)) //if ok return result
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
