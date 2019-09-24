@@ -6,6 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="LoggerConfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="LoggerConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Communication\Communication.csproj" />
     <ProjectReference Include="..\LogLibrary\LogLibrary.csproj" />
   </ItemGroup>

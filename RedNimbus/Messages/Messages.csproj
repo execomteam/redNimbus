@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ListLambdasMessage.proto" />
     <None Remove="User.proto" />
   </ItemGroup>
 

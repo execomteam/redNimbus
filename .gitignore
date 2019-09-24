@@ -236,3 +236,6 @@ _Pvt_Extensions
 RedNimbus/BucketService/bucketConfig.json
 RedNimbus/BucketService/BucketService.csproj
 RedNimbus/BucketService/BucketService.csproj
+/RedNimbus/UserService/LoggerConfig.json
+/RedNimbus/LogLibrary/LoggerConfig.json
+/RedNimbus/Facade/LoggerConfig.json

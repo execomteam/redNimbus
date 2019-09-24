@@ -32,8 +32,6 @@ class CreateLambda extends React.Component {
             headers: { 'token': localStorage.getItem("token") }
         };
 
-
-
         var lambdaName = document.getElementById("lambdaName").value;
         var runtime = document.getElementById("runtime").value;
         var trigger = document.getElementById("trigger").value;

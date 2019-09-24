@@ -1,6 +1,11 @@
 ﻿syntax = "proto3";
 package RedNimbus.Messages;
 
+message ListLambdasMessage{
+	string Token = 1;
+	repeated LambdaMessage lambdas = 2;
+}
+
 message LambdaMessage {
 	string Name = 1;
 	TriggerType Trigger = 2;
