@@ -24,5 +24,24 @@ namespace RedNimbus.API.Helper
                 return responseMessage;
             }
         }
+
+        public static NetMQMessage SendRequest(NetMQMessage requestMessage, Guid id)
+        {
+            using (var requestSocket = new RequestSocket(_facadeAddress))
+            {
+                requestSocket.Options.Identity = id.ToByteArray();
+
+                requestSocket.SendMultipartMessage(requestMessage);
+
+                NetMQMessage responseMessage = null;
+                TimeSpan timeSpan = new TimeSpan(10, 0, 15);
+                requestSocket.TryReceiveMultipartMessage(timeSpan, ref responseMessage);
+
+                requestSocket.Disconnect(_facadeAddress);
+                requestSocket.Dispose();
+
+                return responseMessage;
+            }
+        }
     }
 }

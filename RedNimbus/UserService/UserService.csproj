@@ -7,10 +7,14 @@
 
   <ItemGroup>
     <None Remove="DBConfig.json" />
+    <None Remove="LoggerConfig.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="DBConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LoggerConfig.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -30,6 +34,7 @@
     <ProjectReference Include="..\Communication\Communication.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Either\Either.csproj" />
+    <ProjectReference Include="..\LogLibrary\LogLibrary.csproj" />
     <ProjectReference Include="..\Messages\Messages.csproj" />
     <ProjectReference Include="..\TokenManager\TokenManager.csproj" />
   </ItemGroup>

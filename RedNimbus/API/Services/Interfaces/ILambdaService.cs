@@ -1,19 +1,21 @@
 ﻿using DTO;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
+using RedNimbus.Domain;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RedNimbus.API.Services.Interfaces
 {
     public interface ILambdaService
     {
-        Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createLambdaDto);
-        Either<IError, string> GetLambda(string lambdaId);
-        Either<IError, byte[]> PostLambda(string lambdaId, IFormFile data);
+        Either<IError, CreateLambdaDto> Create(CreateLambdaDto createLambdaDto, string token, Guid requestId);
+
+        Either<IError, List<Lambda>> GetAll(string token, Guid requestId);
+
+        Either<IError, string> ExecuteGetLambda(string lambdaId, string token, Guid requestId);
+
+        Either<IError, byte[]> ExecutePostLambda(string lambdaId, IFormFile data, Guid requestId);
     }
 }

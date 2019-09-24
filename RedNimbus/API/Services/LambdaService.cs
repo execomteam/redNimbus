@@ -4,16 +4,19 @@ using NetMQ;
 using RedNimbus.API.Helper;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.Communication;
+using RedNimbus.Domain;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
 using RedNimbus.Messages;
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace RedNimbus.API.Services
-{
+{ 
     public class LambdaService : BaseService, ILambdaService
     {
-        public Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createLambdaDto)
+        public Either<IError, CreateLambdaDto> Create(CreateLambdaDto createLambdaDto, string token, Guid requestId)
         {
             var memoryStream = new MemoryStream();
             createLambdaDto.File.OpenReadStream().CopyTo(memoryStream);
@@ -25,14 +28,14 @@ namespace RedNimbus.API.Services
                     Name = createLambdaDto.Name,
                     Trigger = createLambdaDto.Trigger,
                     Runtime = createLambdaDto.Runtime,
-                    OwnerId = "",
+                    OwnerId = token,
                     ImageId = "",
                     Guid = ""
                 },
                 Bytes = new NetMQFrame(memoryStream.ToArray())
             };
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
 
@@ -45,9 +48,46 @@ namespace RedNimbus.API.Services
             return new Left<IError, CreateLambdaDto>(GetError(response));
         }
 
-        public Either<IError, string> GetLambda(string lambdaId)
+        public Either<IError, List<Lambda>> GetAll(string token, Guid requestId)
         {
-            Message<LambdaMessage> message = new Message<LambdaMessage>("GetLambda")
+            // TODO: Re-check this
+
+            Message<ListLambdasMessage> message = new Message<ListLambdasMessage>("GetUserLambdas")
+            {
+                Data = new ListLambdasMessage()
+                {
+                    Token = token
+                }
+            };
+
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
+
+            string responseTopic = response.First.ConvertToString();
+
+            if (responseTopic == "Response")
+            {
+                Message<ListLambdasMessage> successMessage = new Message<ListLambdasMessage>(response);
+                List<Lambda> lambdas = new List<Lambda>();
+                foreach (LambdaMessage l in successMessage.Data.Lambdas)
+                {
+                    Lambda lmd = new Lambda();
+                    lmd.Name = l.Name;
+                    lmd.Guid = l.Guid;
+                    lmd.Trigger = l.Trigger;
+                    lmd.Runtime = l.Runtime;
+                    lambdas.Add(lmd);
+                }
+
+                return new Right<IError, List<Lambda>>(lambdas);
+            }
+
+            return new Left<IError, List<Lambda>>(GetError(response));
+
+        }
+
+        public Either<IError, string> ExecuteGetLambda(string lambdaId, string token, Guid requestId)
+        {
+            Message<LambdaMessage> message = new Message<LambdaMessage>("ExecuteGetLambda")
             {
                 Data = new LambdaMessage()
                 {
@@ -55,7 +95,7 @@ namespace RedNimbus.API.Services
                 }
             };
 
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
 
             string responseTopic = response.First.ConvertToString();
 
@@ -69,12 +109,12 @@ namespace RedNimbus.API.Services
             return new Left<IError, string>(GetError(response));
         }
 
-        public Either<IError, byte[]> PostLambda(string lambdaId, IFormFile data)
+        public Either<IError, byte[]> ExecutePostLambda(string lambdaId, IFormFile data, Guid requestId)
         {
             var memoryStream = new MemoryStream();
             data.OpenReadStream().CopyTo(memoryStream);
 
-            Message<LambdaMessage> message = new Message<LambdaMessage>("PostLambda")
+            Message<LambdaMessage> message = new Message<LambdaMessage>("ExecutePostLambda")
             {
                 Data = new LambdaMessage()
                 {

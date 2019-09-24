@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace RedNimbus.DTO
 {
@@ -17,5 +18,15 @@ namespace RedNimbus.DTO
         public string Password { get; set; }
 
         public string PhoneNumber { get; set; }
+
+        public override string ToString()
+        {
+            return String.Format("first name = {0}; last name = {1}; email = {2}; password = {3}; phone number = {4}",
+                    this.FirstName,
+                    this.LastName,
+                    this.Email,
+                    this.Password,
+                    this.PhoneNumber);
+        }
     }
 }

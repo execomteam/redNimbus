@@ -32,10 +32,27 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult Create([FromForm]CreateLambdaDto dto)
         {
-            return _lambdaService.CreateLambda(dto)
+            Guid requestId = Guid.NewGuid();
+
+            return _lambdaService.Create(dto, Request.Headers["token"], requestId)
                 .Map((id) => AllOk(id))
                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
+        }
+
+        /// <summary>
+        /// Endpoint for retreiving the set of all lambdas the user has created.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            Guid requestId = Guid.NewGuid();
+
+            return _lambdaService.GetAll(Request.Headers["token"], requestId)
+                 .Map((r) => AllOk(r))
+                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
+                 .Reduce(InternalServisErrorHandler);
         }
 
         /// <summary>
@@ -45,9 +62,11 @@ namespace API.Controllers
         /// <param name="lambdaId">Unique identifier of the lambda function.</param>
         /// <returns></returns>
         [HttpGet("{lambdaId}")]
-        public IActionResult Get([FromRoute] string lambdaId)
+        public IActionResult ExecuteGetLambda([FromRoute] string lambdaId)
         {
-            return _lambdaService.GetLambda(lambdaId)
+            Guid requestId = Guid.NewGuid();
+
+            return _lambdaService.ExecuteGetLambda(lambdaId, Request.Headers["token"], requestId)
                  .Map((r) => AllOk(r))
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
@@ -60,9 +79,11 @@ namespace API.Controllers
         /// <param name="data">POST request data.</param>
         /// <returns></returns>
         [HttpPost("{lambdaId}")]
-        public IActionResult Post([FromRoute] string lambdaId,[FromForm] IFormFile data)
+        public IActionResult ExecutePostLambda([FromRoute] string lambdaId,[FromForm] IFormFile data)
         {
-            return _lambdaService.PostLambda(lambdaId, data)
+            Guid requestId = Guid.NewGuid();
+
+            return _lambdaService.ExecutePostLambda(lambdaId, data, requestId)
                  .Map((x) => (IActionResult)File(x, "application/octet-stream"))
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
