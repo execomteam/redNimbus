@@ -1,12 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using Google.Protobuf;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using NetMQ;
 using RedNimbus.Communication;
 using RedNimbus.Domain;
@@ -14,7 +9,6 @@ using RedNimbus.LogLibrary;
 using RedNimbus.Messages;
 using RedNimbus.TokenManager;
 using RedNimbus.UserService.Helper;
-using System;
 using UserService.Database;
 using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 
@@ -67,7 +61,7 @@ namespace RedNimbus.UserService
 
             if (tokenMessage.Data.Token == null)
             {
-                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
                 return;
             }
             Guid id;
@@ -75,19 +69,20 @@ namespace RedNimbus.UserService
                 id = new Guid(tokenMessage.Data.Token);
                 if (id.Equals(Guid.Empty))
                 {
-                    SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                    _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
                     return;
                 }
             }
             catch(Exception)
             {
-                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
                 return;
             }
            
             _userRepository.ActivateUserAccount(id);
             tokenMessage.Topic = "Response";
-            SendMessage(tokenMessage.ToNetMQMessage());
+            var service = (BaseService)_userCommunicationService;
+            service.SendMessage(tokenMessage.ToNetMQMessage());
 
         }
 
@@ -102,9 +97,7 @@ namespace RedNimbus.UserService
 
             Log<UserMessage>(message, "UserService/HandleRegisterUser - Message received from Event bus", LogMessage.Types.LogType.Info);
 
-            Message<UserMessage> userMessage = new Message<UserMessage>(message);
-
-            if (!Validate(userMessage))
+            if (!_userCommunicationService.Validate(userMessage))
   {
                 return;
             }
@@ -129,11 +122,12 @@ namespace RedNimbus.UserService
                     {
                         MailTo = userMessage.Data.Email,
                         Subject = "Email confirmation for redNimbus",
-                        Body = "Your confirmation link is: http://localhost:65001/api/user/emailConfirmation/" + user.Id.ToString()
+                        Body = "Your confirmation link is: http://localhost:65001/api/user/emailConfirmation/" + newUser.Id.ToString()
                     }
 
                 };
-                SendMessage(mailMessage.ToNetMQMessage()); 
+                var service = (BaseService)_userCommunicationService;
+                service.SendMessage(mailMessage.ToNetMQMessage());
                 Log<UserMessage>(message, "UserService/HandleRegisterUser - User registrated", LogMessage.Types.LogType.Info);
             }
             catch (DbUpdateException)
@@ -154,17 +148,15 @@ namespace RedNimbus.UserService
             Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Message received from Event bus", LogMessage.Types.LogType.Info);
             
 
-            Message<UserMessage> userMessage = new Message<UserMessage>(message);
-
             if (!Validation.IsEmailValid(userMessage.Data.Email))
             {
-                SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
                 Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Email not vaild", LogMessage.Types.LogType.Info);
             }
 
             if (!Validation.IsPasswordValid(userMessage.Data.Password))
             {
-                SendErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Email or password are not valid!", ErrorCode.IncorrectEmailOrPassword, userMessage.Id);
                 Log<UserMessage>(message, "UserService/HandleAuthenticateUser - Password not valid", LogMessage.Types.LogType.Info);
             }
 
@@ -194,7 +186,7 @@ namespace RedNimbus.UserService
 
             if (tokenMessage.Data.Token == null)
             {
-                SendErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
+                _userCommunicationService.SendUserErrorMessage("Requested user data not found", ErrorCode.UserNotFound, tokenMessage.Id);
                 Log<UserMessage>(message, "UserService/HandleGetUser - token is null", LogMessage.Types.LogType.Info);
                 return;
             }

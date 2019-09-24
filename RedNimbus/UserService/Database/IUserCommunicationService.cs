@@ -10,6 +10,7 @@ namespace UserService.Database
 {
     public interface IUserCommunicationService
     {
+        bool Validate(Message<UserMessage> message);
         Message<UserMessage> HandleRegisterUserRequest(NetMQMessage message);
         void HandleRegisterUserResponse(Message<UserMessage> userMessage, User user);
         void SendUserErrorMessage(string errorMessage, ErrorCode errCode, NetMQFrame id);

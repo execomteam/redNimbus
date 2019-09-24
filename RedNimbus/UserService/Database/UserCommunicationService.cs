@@ -11,7 +11,7 @@ namespace UserService.Database
 {
     class UserCommunicationService : BaseService, IUserCommunicationService
     {
-        private bool Validate(Message<UserMessage> userMessage)
+        public bool Validate(Message<UserMessage> userMessage)
         {
             if (!Validation.IsFirstNameValid(userMessage.Data.FirstName))
             {
