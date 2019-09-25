@@ -50,8 +50,6 @@ namespace RedNimbus.API.Services
 
         public Either<IError, List<Lambda>> GetAll(string token, Guid requestId)
         {
-            // TODO: Re-check this
-
             Message<ListLambdasMessage> message = new Message<ListLambdasMessage>("GetUserLambdas")
             {
                 Data = new ListLambdasMessage()

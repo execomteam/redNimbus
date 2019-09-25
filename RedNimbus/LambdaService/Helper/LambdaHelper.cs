@@ -198,7 +198,7 @@ namespace RedNimbus.LambdaService.Helper
             string absolutePath = AppDomain.CurrentDomain.BaseDirectory + "data";
 
             // TODO: Add request id from message after merging with development
-            //var requestId = System.Text.Encoding.UTF8.GetString(message.Id.ToByteArray(), 0, message.Id.ToByteArray().Length);
+            // var requestId = System.Text.Encoding.UTF8.GetString(message.Id.ToByteArray(), 0, message.Id.ToByteArray().Length);
 
             var requestId = Guid.NewGuid();
             var lambdaId = lambdaMessage.Data.Guid;

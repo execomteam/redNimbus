@@ -25,7 +25,7 @@ namespace RedNimbus.LambdaService.Database
 
             using (var context = new LambdaContext())
             {
-                lambda = context.Lambdas.First(l => l.Equals(guid));
+                lambda = context.Lambdas.First(l => l.Guid.Equals(guid));
             }
 
             if(lambda == null)

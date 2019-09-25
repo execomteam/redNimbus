@@ -9,6 +9,7 @@ using RedNimbus.LambdaService.Helper;
 using RedNimbus.LambdaService.Database;
 using ErrorCode = RedNimbus.Either.Enums.ErrorCode;
 using RedNimbus.Domain;
+using static RedNimbus.Messages.LambdaMessage.Types;
 
 namespace RedNimbus.LambdaService.Services
 {
@@ -119,6 +120,11 @@ namespace RedNimbus.LambdaService.Services
 
             try
             {
+                var lambda = _lambdaManagment.GetLambdaById(requestMessage.Data.Guid);
+
+                if (lambda.Trigger != TriggerType.Get)
+                    throw new ArgumentException();
+
                 string result = _lambdaHelper.ExecuteGetLambda(requestMessage.Data.Guid);
                 responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.Ok, result));
             }
@@ -143,13 +149,17 @@ namespace RedNimbus.LambdaService.Services
                 Id = requestMessage.Id,
                 Data = new LambdaResultMessage()
                 {
-                    // TODO: TOKEN?
                     LambdaId = requestMessage.Data.Guid
                 }
             };
 
             try
             {
+                var lambda = _lambdaManagment.GetLambdaById(requestMessage.Data.Guid);
+
+                if (lambda.Trigger != TriggerType.Post)
+                    throw new ArgumentException();
+
                 byte[] result = _lambdaHelper.ExecutePostLambda(requestMessage);
                 responseMessage.Data.Result = JsonConvert.SerializeObject(new LambdaReturnValue(LambdaStatusCode.Ok, null));
                 responseMessage.Bytes = new NetMQFrame(result);
