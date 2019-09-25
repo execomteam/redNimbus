@@ -29,19 +29,8 @@ namespace RedNimbus.LambdaService.Database
                 var password = values["password"];
 
                 string connStr = "server=" + server + ";database=" + database + ";user=" + user + ";password=" + password;
-                /*string s0 = "CREATE DATABASE IF NOT EXISTS `rednimbuslambdadb`;";
-
-                MySqlConnection conn = new MySqlConnection(connStr);
-                MySqlCommand cmd;
-
-                conn.Open();
-
-                cmd = new MySqlCommand(s0, conn);
-                cmd.ExecuteNonQuery();*/
 
                 optionsBuilder.UseMySQL(connStr);
-
-                //conn.Close();
             }
         }
 
