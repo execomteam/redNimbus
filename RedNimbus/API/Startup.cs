@@ -65,7 +65,6 @@ namespace RedNimbus.API
             services.AddSingleton(typeof(IUserService), new UserService());
             services.AddSingleton(typeof(BucketService), new BucketService());
             services.AddSingleton(typeof(ILambdaService), new LambdaService());
-            services.AddTransient<ILogSender>(s => new LogSender(Configuration["LoggerEndpoint"]));
             services.AddEitherServiceMapper();
 
         }

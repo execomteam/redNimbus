@@ -7,14 +7,10 @@
 
   <ItemGroup>
     <None Remove="DBConfig.json" />
-    <None Remove="LoggerConfig.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="DBConfig.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="LoggerConfig.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

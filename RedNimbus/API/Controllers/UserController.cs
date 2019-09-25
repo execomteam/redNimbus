@@ -19,14 +19,12 @@ namespace RedNimbus.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IEitherMapper _mapper;
-        private ILogSender _logSender;
         private string _loginPage;
 
-        public UserController(IUserService userService, IEitherMapper mapper, ILogSender logSender)
+        public UserController(IUserService userService, IEitherMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;
-            _logSender = logSender;
             _loginPage = "http://localhost:65001/login/";
         }
 
@@ -34,125 +32,36 @@ namespace RedNimbus.API.Controllers
         public IActionResult Post([FromBody]CreateUserDto createUserDto)
         {
             Guid requestId = Guid.NewGuid();
-            _logSender.SetIdentity(requestId);
-
-            return _mapper.Map<User>(createUserDto, (u) => LogRequest(requestId, "UserController/Post", u))
+            
+            return _mapper.Map<User>(createUserDto)
                 .Map((x) => _userService.RegisterUser(x, requestId))
-                .Map(() => AllOk(), (u) => LogSuccessfulPost(requestId, u))
-                .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed, (e) => LogError(requestId, e, "UserController/Post", LogMessage.Types.LogType.Info))
-                .Reduce(this.InternalServisErrorHandler, (e) => LogError(requestId, e, "UserController/Post", LogMessage.Types.LogType.Error));
+                .Map(() => AllOk())
+                .Reduce(this.BadRequestErrorHandler, EmailAlreadyUsed)
+                .Reduce(this.InternalServisErrorHandler);
         }
 
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthenticateUserDto authenticateUserDto)
         {
             Guid requestId = Guid.NewGuid();
-            _logSender.SetIdentity(requestId);
-
-            return _mapper.Map<User>(authenticateUserDto, (u) => LogRequest(requestId, "UserController/Authernticate", u))
+           
+            return _mapper.Map<User>(authenticateUserDto)
                .Map((u) => _userService.Authenticate(u, requestId))
-               .Map(x => AllOk(new KeyDto() { Key = x.Key }), (x) => LogSuccessfulAuthentication(requestId, x))
-               .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError, (e) => LogError(requestId, e, "UserController/Authernticate", LogMessage.Types.LogType.Info))
-               .Reduce(InternalServisErrorHandler, (e) => LogError(requestId, e, "UserController/Authernticate", LogMessage.Types.LogType.Error));
+               .Map(x => AllOk(new KeyDto() { Key = x.Key }))
+               .Reduce(AuthenticationErrorHandler, err => err is AuthenticationError)
+               .Reduce(InternalServisErrorHandler);
         }
 
         [HttpGet]
         public IActionResult Get()
         {
             Guid requestId = Guid.NewGuid();
-            _logSender.SetIdentity(requestId);
-
-            LogRequest(requestId, "UserController/Get");
-
+            
             return _userService.GetUserByToken(Request.Headers["token"], requestId)
                 .Map(_mapper.Map<UserDto>)
-                .Map(x => AllOk(x), (u) => LogSuccessfulGet(requestId, u))
-                .Reduce(NotFoundErrorHandler, err => err is NotFoundError, (e) => LogError(requestId, e, "UserController/Get", LogMessage.Types.LogType.Info))
-                .Reduce(InternalServisErrorHandler, (e) => LogError(requestId, e, "UserController/Get", LogMessage.Types.LogType.Error));
-        }
-
-        private void LogSuccessfulPost(Guid id, User u)
-        {
-            _logSender.Send(id, new LogMessage()
-            {
-                Date = DateTime.Now.ToShortDateString().ToString(),
-                Time = DateTime.Now.TimeOfDay.ToString(),
-                Type = LogMessage.Types.LogType.Info,
-                Payload = u.ToString(),
-                Origin = "UserController/Post"
-            });
-        }
-
-        private void LogSuccessfulDeactivation(Guid id, string token)
-        {
-            _logSender.Send(id, new LogMessage()
-            {
-                Date = DateTime.Now.ToShortDateString().ToString(),
-                Time = DateTime.Now.TimeOfDay.ToString(),
-                Type = LogMessage.Types.LogType.Info,
-                Payload = token.ToString(),
-                Origin = "UserController/DeactivateAccount"
-            });
-        }
-
-        private void LogSuccessfulGet(Guid id, UserDto userDto)
-        {
-            _logSender.Send(id, new LogMessage()
-            {
-                Date = DateTime.Now.ToShortDateString().ToString(),
-                Time = DateTime.Now.TimeOfDay.ToString(),
-                Type = LogMessage.Types.LogType.Info,
-                Payload = userDto.ToString(),
-                Origin = "UserController/Get"
-            });
-        }
-
-        private void LogSuccessfulGet(Guid id, bool active)
-        {
-            _logSender.Send(id, new LogMessage()
-            {
-                Date = DateTime.Now.ToShortDateString().ToString(),
-                Time = DateTime.Now.TimeOfDay.ToString(),
-                Type = LogMessage.Types.LogType.Info,
-                Payload = active ? "account activated" : "cant activate account",
-                Origin = "UserController/EmailComfirmation"
-            });
-        }
-
-        private void LogSuccessfulAuthentication(Guid id, KeyDto token)
-        {
-            _logSender.Send(id, new LogMessage()
-            {
-                Date = DateTime.Now.ToShortDateString().ToString(),
-                Time = DateTime.Now.TimeOfDay.ToString(),
-                Type = LogMessage.Types.LogType.Info,
-                Payload = token.Key,
-                Origin = "UserController/Authenticate"
-            });
-        }
-
-        private void LogError(Guid id, IError e, string origin, LogMessage.Types.LogType type)
-        {
-            _logSender.Send(id, new LogMessage()
-            {
-                Date = DateTime.Now.ToShortDateString().ToString(),
-                Time = DateTime.Now.TimeOfDay.ToString(),
-                Type = type,
-                Payload = e.Code.ToString(),
-                Origin = origin
-            });
-        }
-
-        private void LogRequest(Guid id, string origin, User u = null)
-        {
-            _logSender.Send(id, new LogMessage()
-            {
-                Date = DateTime.Now.ToShortDateString().ToString(),
-                Time = DateTime.Now.TimeOfDay.ToString(),
-                Type = LogMessage.Types.LogType.Info,
-                Payload = u != null ? u.ToString() : "function does not take any parameters",
-                Origin = origin
-            });
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
         }
 
         private static bool EmailAlreadyUsed(IError err)
@@ -164,25 +73,23 @@ namespace RedNimbus.API.Controllers
         public IActionResult deactivateAccount()
         {
             Guid requestId = Guid.NewGuid();
-            LogRequest(requestId, "UserController/DeactivateAccount");
             var token = Request.Headers["token"];
 
             return _userService.deactivateUserAccount(Request.Headers["token"], requestId)
-                .Map(x => AllOk(x), (u) => LogSuccessfulDeactivation(requestId, Request.Headers["token"]))
-                .Reduce(NotFoundErrorHandler, err => err is NotFoundError, (e) => LogError(requestId, e, "UserController/DeactivateAccount", LogMessage.Types.LogType.Info))
-                .Reduce(InternalServisErrorHandler, (e) => LogError(requestId, e, "UserController/DeactivateAccount", LogMessage.Types.LogType.Info));
+                .Map(x => AllOk(x))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
         }
 
         [HttpGet("emailConfirmation/{token}")]
         public IActionResult EmailConfirmation(string token)
         {
             Guid requestId = Guid.NewGuid();
-            LogRequest(requestId, "UserController/EmailConfirmation");
-
+           
             return _userService.EmailConfirmation(token, requestId)
-                .Map(() => (IActionResult)Redirect(_loginPage), (u) => LogSuccessfulGet(requestId, u))
-                .Reduce(NotFoundErrorHandler, err => err is NotFoundError, (e) => LogError(requestId, e, "UserController/EmailConfirmation", LogMessage.Types.LogType.Info))
-                .Reduce(InternalServisErrorHandler, (e) => LogError(requestId, e, "UserController/EmailConfirmation", LogMessage.Types.LogType.Info));
+                .Map(() => (IActionResult)Redirect(_loginPage))
+                .Reduce(NotFoundErrorHandler, err => err is NotFoundError)
+                .Reduce(InternalServisErrorHandler);
         }
     }
 }
