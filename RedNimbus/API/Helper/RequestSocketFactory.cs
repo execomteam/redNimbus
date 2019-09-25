@@ -27,10 +27,10 @@ namespace RedNimbus.API.Helper
 
         public static NetMQMessage SendRequest(NetMQMessage requestMessage, Guid id)
         {
-            using (var requestSocket = new RequestSocket(_facadeAddress))
+            using (var requestSocket = new RequestSocket())
             {
                 requestSocket.Options.Identity = id.ToByteArray();
-
+                requestSocket.Connect(_facadeAddress);
                 requestSocket.SendMultipartMessage(requestMessage);
 
                 NetMQMessage responseMessage = null;
