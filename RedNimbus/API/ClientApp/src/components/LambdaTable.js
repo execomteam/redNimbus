@@ -57,7 +57,7 @@ class LambdaTable extends React.Component {
             
             <div class="container">
                 <div class="row">
-                    <div class="col-xs-12">
+                    <div class="col-xs-9">
                         <div class="table-responsive-vertical shadow-z-1">
                             <h2>Your Lambdas</h2>
                             <table id='lambdas' class="table table-hover table-mc-light-blue">
