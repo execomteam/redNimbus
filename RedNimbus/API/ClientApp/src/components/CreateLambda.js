@@ -69,6 +69,7 @@ class CreateLambda extends React.Component {
           });
 
         this.setState({ redirect: this.state.redirect === false });
+        window.location.reload();
         this.props.onHide();
     }
 
