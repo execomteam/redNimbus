@@ -128,17 +128,17 @@ namespace RedNimbus.Facade
 
             while (e.Socket.TryReceiveMultipartMessage(ref receivedMessage))
             {
-                LogMessage(new Guid(receivedMessage[0].ToByteArray()), "Facade/ReceiveRequestEventHandler - Message received from router");
+                //LogMessage(new Guid(receivedMessage[0].ToByteArray()), "Facade/ReceiveRequestEventHandler - Message received from router");
                 SendMessage(ToDealerMessage(receivedMessage));
-                LogMessage(new Guid(receivedMessage[0].ToByteArray()), "Facade/ReceiveRequestEventHandler - Message sent to event bus");
+                //LogMessage(new Guid(receivedMessage[0].ToByteArray()), "Facade/ReceiveRequestEventHandler - Message sent to event bus");
             }
         }
 
         public void SendResponse(NetMQMessage message)
         {
-            LogMessage(new Guid(message[1].ToByteArray()), "Facade/SendResponse - Message received from event bus");
+            //LogMessage(new Guid(message[1].ToByteArray()), "Facade/SendResponse - Message received from event bus");
             _routerSocket.SendMultipartMessage(ToRouterMessage(message));
-            LogMessage(new Guid(message[1].ToByteArray()), "Facade/SendResponse - Message sent back to api gateway");
+            //LogMessage(new Guid(message[1].ToByteArray()), "Facade/SendResponse - Message sent back to api gateway");
         }
 
         private void LogMessage(Guid id, string origin)

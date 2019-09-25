@@ -7,12 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="LambdaConfig.json" />
     <None Remove="Resources\CSHARP" />
+    <None Remove="Resources\GO" />
+    <None Remove="Resources\NODE" />
     <None Remove="Resources\PYTHON" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="LambdaConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\CSHARP">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\GO">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\NODE">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\PYTHON">

@@ -116,8 +116,8 @@ class CreateLambda extends React.Component {
                                 <select id="runtime" name="runtime" className="form-control form-control-sm" required>
                                     <option value="CSHARP">.NET Core 2.1</option>
                                     <option value="PYTHON">Python 3</option>
-                                    <option value="NODEJS">node.js 11</option>
-                                    <option value="GOLANG">Go</option>
+                                    <option value="NODE">node.js 11</option>
+                                    <option value="GO">Go</option>
                                 </select>
                                 <br />
                                 <label htmlFor="trigger">Trigger</label>
