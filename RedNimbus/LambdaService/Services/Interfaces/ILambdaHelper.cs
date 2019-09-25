@@ -5,8 +5,10 @@ namespace RedNimbus.LambdaService.Services.Interfaces
 {
     public interface ILambdaHelper
     {
-        Guid CreateLambda(Message<LambdaMessage> message);
+        Guid CreateLambda(Message<LambdaMessage> lambdaMessage);
 
-        string ExecuteLambda(string id);
+        string ExecuteGetLambda(string lambdaId);
+
+        byte[] ExecutePostLambda(Message<LambdaMessage> lambdaMessage);
     }
 }

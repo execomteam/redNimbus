@@ -16,7 +16,7 @@ class LambdaPage extends React.Component {
         this.setCreateModalShow = this.setCreateModalShow.bind(this);
         this.addLambda = this.addLambda.bind(this);
 
-        let path = "http://localhost:65001/api/lambda/getLambdas";
+        let path = "http://localhost:65001/api/lambda/";
 
         const options = {
             headers: { 'token': localStorage.getItem("token") }

@@ -13,13 +13,24 @@ class LambdaTable extends React.Component {
         const { name, runtime, trigger, guid } = lambda
 
         let run;
+        switch (runtime) {
+            case 0:
+                run = 'CSHARP'
+                break;
+            case 1:
+                run = 'PYTHON'
+                break;
+            case 2:
+                run = 'NODE'
+                break;
+            case 3:
+                run = 'GO'
+                break;
+            default:
+                break;
+        }
 
-        if (runtime == 0) {
-            run = ' CSHARP ';
-        } else if (runtime == 1) {
-            run = ' PYTHON ';
-        } 
-
+        
         let t;
 
         if (trigger == 0) {
@@ -43,12 +54,14 @@ class LambdaTable extends React.Component {
 
     render() {
         return (
+            
             <div class="container">
                 <div class="row">
-                    <div class="col-xs-12">
+                    <div class="col-xs-9">
                         <div class="table-responsive-vertical shadow-z-1">
+                            <h2>Your Lambdas</h2>
                             <table id='lambdas' class="table table-hover table-mc-light-blue">
-                                <caption class="text-center">Your Lambdas:</caption>
+                                
                                 <thead>
                                     <tr>
                                         <th>Name</th>

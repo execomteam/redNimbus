@@ -13,7 +13,11 @@ namespace RedNimbus.LambdaService.Database
 
         public LambdaManagment(IMapper mapper)
         {
-           this._mapper = mapper;
+            this._mapper = mapper;
+            using(var context = new LambdaContext())
+            {
+                context.Database.EnsureCreated();
+            }
         }
         public Lambda GetLambdaById(string guid)
         {
@@ -21,7 +25,7 @@ namespace RedNimbus.LambdaService.Database
 
             using (var context = new LambdaContext())
             {
-                lambda = context.Lambdas.First(l => l.Equals(guid));
+                lambda = context.Lambdas.First(l => l.Guid.Equals(guid));
             }
 
             if(lambda == null)

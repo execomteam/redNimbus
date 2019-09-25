@@ -1,4 +1,5 @@
 ﻿using DTO;
+using Microsoft.AspNetCore.Http;
 using NetMQ;
 using RedNimbus.API.Helper;
 using RedNimbus.API.Services.Interfaces;
@@ -15,19 +16,18 @@ namespace RedNimbus.API.Services
 { 
     public class LambdaService : BaseService, ILambdaService
     {
-        public Either<IError, CreateLambdaDto> CreateLambda(CreateLambdaDto createlambda, string token, Guid requestId)
+        public Either<IError, CreateLambdaDto> Create(CreateLambdaDto createLambdaDto, string token, Guid requestId)
         {
             var memoryStream = new MemoryStream();
-            createlambda.File.OpenReadStream().CopyTo(memoryStream);
-
+            createLambdaDto.File.OpenReadStream().CopyTo(memoryStream);
 
             Message<LambdaMessage> message = new Message<LambdaMessage>("CreateLambda")
             {
                 Data = new LambdaMessage()
                 {
-                    Name = createlambda.Name,
-                    Trigger = createlambda.Trigger,
-                    Runtime = createlambda.Runtime,
+                    Name = createLambdaDto.Name,
+                    Trigger = createLambdaDto.Trigger,
+                    Runtime = createLambdaDto.Runtime,
                     OwnerId = token,
                     ImageId = "",
                     Guid = ""
@@ -39,7 +39,7 @@ namespace RedNimbus.API.Services
 
             string responseTopic = response.First.ConvertToString();
 
-            if (responseTopic == "Response")
+            if (responseTopic.Equals("Response"))
             {
                 Message<LambdaMessage> successMessage = new Message<LambdaMessage>(response);
                 return new Right<IError, CreateLambdaDto>(LambdaConverter.LambdaMessageToDto(successMessage.Data));
@@ -48,33 +48,9 @@ namespace RedNimbus.API.Services
             return new Left<IError, CreateLambdaDto>(GetError(response));
         }
 
-        public Either<IError, string> GetLambda(string lambdaId, string token, Guid requestId)
+        public Either<IError, List<Lambda>> GetAll(string token, Guid requestId)
         {
-            Message<GetLambdaMessage> message = new Message<GetLambdaMessage>("GetLambda")
-            {
-                Data = new GetLambdaMessage()
-                {
-                    Token = token,
-                    LambdaId = lambdaId
-                }
-            };
-
-            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
-
-            string responseTopic = response.First.ConvertToString();
-
-            if (responseTopic == "Response")
-            {
-                Message<GetLambdaMessage> successMessage = new Message<GetLambdaMessage>(response);
-                return successMessage.Data.Result;
-            }
-            
-            return new Left<IError, string>(GetError(response));
-        }
-
-        public Either<IError, List<Lambda>> GetLambdas(string token, Guid requestId)
-        {
-            Message<ListLambdasMessage> message = new Message<ListLambdasMessage>("ListUserLambdas")
+            Message<ListLambdasMessage> message = new Message<ListLambdasMessage>("GetUserLambdas")
             {
                 Data = new ListLambdasMessage()
                 {
@@ -90,7 +66,7 @@ namespace RedNimbus.API.Services
             {
                 Message<ListLambdasMessage> successMessage = new Message<ListLambdasMessage>(response);
                 List<Lambda> lambdas = new List<Lambda>();
-                foreach(LambdaMessage l in successMessage.Data.Lambdas)
+                foreach (LambdaMessage l in successMessage.Data.Lambdas)
                 {
                     Lambda lmd = new Lambda();
                     lmd.Name = l.Name;
@@ -105,6 +81,58 @@ namespace RedNimbus.API.Services
 
             return new Left<IError, List<Lambda>>(GetError(response));
 
+        }
+
+        public Either<IError, string> ExecuteGetLambda(string lambdaId, string token, Guid requestId)
+        {
+            Message<LambdaMessage> message = new Message<LambdaMessage>("ExecuteGetLambda")
+            {
+                Data = new LambdaMessage()
+                {
+                    Guid = lambdaId
+                }
+            };
+
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage(), requestId);
+
+            string responseTopic = response.First.ConvertToString();
+
+            if (responseTopic.Equals("Response"))
+            {
+                Message<LambdaResultMessage> successMessage = new Message<LambdaResultMessage>(response);
+
+                return successMessage.Data.Result;
+            }
+            
+            return new Left<IError, string>(GetError(response));
+        }
+
+        public Either<IError, byte[]> ExecutePostLambda(string lambdaId, IFormFile data, Guid requestId)
+        {
+            var memoryStream = new MemoryStream();
+            data.OpenReadStream().CopyTo(memoryStream);
+
+            Message<LambdaMessage> message = new Message<LambdaMessage>("ExecutePostLambda")
+            {
+                Data = new LambdaMessage()
+                {
+                    Guid = lambdaId
+                },
+                Bytes = new NetMQFrame(memoryStream.ToArray())
+            };
+
+            NetMQMessage response = RequestSocketFactory.SendRequest(message.ToNetMQMessage());
+
+            string responseTopic = response.First.ConvertToString();
+
+            if (responseTopic.Equals("Response"))
+            {
+                Message<LambdaResultMessage> successMessage = new Message<LambdaResultMessage>(response);
+
+                return successMessage.Bytes.ToByteArray();
+            }
+
+            return new Left<IError, byte[]>(GetError(response));
         }
     }
 }

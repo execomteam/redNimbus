@@ -10,54 +10,81 @@ using RedNimbus.API.Services;
 using RedNimbus.API.Services.Interfaces;
 using RedNimbus.Either;
 using RedNimbus.Either.Errors;
+using RedNimbus.Either.Mappings;
 
 namespace API.Controllers
 {
     [Route("api/lambda")]
     [ApiController]
-    [System.Runtime.InteropServices.Guid("13CFBDF0-499A-40A8-966F-F74B38407A24")]
     public class LambdaController : BaseController
     {
-        public ILambdaService _lambdaService;
+        private readonly ILambdaService _lambdaService;
+
         public LambdaController(ILambdaService lambdaService)
         {
             _lambdaService = lambdaService;
         }
-
-        [HttpPost("create")]
+        /// <summary>
+        /// Endpoint for creating lambda functions.
+        /// </summary>
+        /// <param name="dto">DTO that contains all values required for lambda function creation.</param>
+        /// <returns></returns>
+        [HttpPost]
         public IActionResult Create([FromForm]CreateLambdaDto dto)
         {
             Guid requestId = Guid.NewGuid();
 
-            return _lambdaService.CreateLambda(dto, Request.Headers["token"], requestId)
-                .Map((id) => AllOk(id)) //return lambda id
+            return _lambdaService.Create(dto, Request.Headers["token"], requestId)
+                .Map((id) => AllOk(id))
                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                 .Reduce(InternalServisErrorHandler);
         }
 
-        [HttpGet("getLambdas")]
-        public IActionResult GetLambdas()
+        /// <summary>
+        /// Endpoint for retreiving the set of all lambdas the user has created.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult GetAll()
         {
             Guid requestId = Guid.NewGuid();
 
-            return _lambdaService.GetLambdas(Request.Headers["token"], requestId)
+            return _lambdaService.GetAll(Request.Headers["token"], requestId)
                  .Map((r) => AllOk(r))
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
         }
 
         /// <summary>
-        /// return value of lambda MUST BE some object that can be coverted in JSON obj
+        /// Endpoint for executing a lambda function using GET request.
+        /// Return value of the lambda function MUST BE some object that can be converted in JSON format.
         /// </summary>
-        /// <param name="lambdaId"></param>
+        /// <param name="lambdaId">Unique identifier of the lambda function.</param>
         /// <returns></returns>
         [HttpGet("{lambdaId}")]
-        public IActionResult Get([FromRoute] string lambdaId)
+        public IActionResult ExecuteGetLambda([FromRoute] string lambdaId)
         {
             Guid requestId = Guid.NewGuid();
 
-            return _lambdaService.GetLambda(lambdaId, Request.Headers["token"], requestId)
-                 .Map((r) => AllOk(r)) //if ok return result
+            return _lambdaService.ExecuteGetLambda(lambdaId, Request.Headers["token"], requestId)
+                 .Map((r) => AllOk(r))
+                 .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
+                 .Reduce(InternalServisErrorHandler);
+        }
+
+        /// <summary>
+        /// Endpoint for executing a lambda function using POST request.
+        /// </summary>
+        /// <param name="lambdaId">Unique identifier of the lambda function.</param>
+        /// <param name="data">POST request data.</param>
+        /// <returns></returns>
+        [HttpPost("{lambdaId}")]
+        public IActionResult ExecutePostLambda([FromRoute] string lambdaId,[FromForm] IFormFile data)
+        {
+            Guid requestId = Guid.NewGuid();
+
+            return _lambdaService.ExecutePostLambda(lambdaId, data, requestId)
+                 .Map((x) => (IActionResult)File(x, "application/octet-stream"))
                  .Reduce(NotFoundErrorHandler, e => e is NotFoundError)
                  .Reduce(InternalServisErrorHandler);
         }

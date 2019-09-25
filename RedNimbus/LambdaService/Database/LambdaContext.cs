@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using RedNimbus.Domain;
 using RedNimbus.LambdaService.Database;
@@ -26,7 +27,10 @@ namespace RedNimbus.LambdaService.Database
                 var database = values["database"];
                 var user = values["user"];
                 var password = values["password"];
-                optionsBuilder.UseMySQL("server=" + server + ";database=" + database + ";user=" + user + ";password=" + password);
+
+                string connStr = "server=" + server + ";database=" + database + ";user=" + user + ";password=" + password;
+
+                optionsBuilder.UseMySQL(connStr);
             }
         }
 
